@@ -68,8 +68,8 @@ p { color: var(--muted); }
 .answer-list.solved .word-button:disabled { opacity: 1; border-color: #2f9c50; background: #e5f8e9; color: #1f5f31; cursor: default; }
 @media (prefers-color-scheme: dark) { .answer-list.solved .word-button:disabled { background: #1f3b28; color: #c9f2b8; border-color: #4cc26d; } }
 .drag-ghost { position: fixed; z-index: 10; pointer-events: none; transform: translate(-50%, -50%); box-shadow: 0 0.3rem 1rem #0004; opacity: 0.95; }
-.answer-list li.drop-before { border-top: 3px solid var(--accent); }
-.answer-list li.drop-after { border-bottom: 3px solid var(--accent); }
+.answer-list li.drop-before { border-top: 8px solid var(--accent); }
+.answer-list li.drop-after { border-bottom: 8px solid var(--accent); }
 button:disabled { opacity: 0.55; cursor: not-allowed; }
 button:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
 [tabindex="-1"]:focus { outline: none; }
@@ -78,7 +78,8 @@ button:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
 .game-instructions { margin-top: 0; }
 .progress { font-weight: 700; }
 .answer-list { display: grid; gap: 0.4rem; padding-left: 2rem; }
-.answer-list li { padding: 0.15rem; border-top: 3px solid transparent; border-bottom: 3px solid transparent; }
+.answer-list li { padding: 0.15rem; border-top: 8px solid transparent; border-bottom: 8px solid transparent; }
+.answer-list li::marker { font-size: 1.2rem; font-weight: 700; color: var(--accent); }
 .feedback { min-height: 1.6rem; font-weight: 700; font-size: 1.15rem; }
 .feedback.success { color: var(--accent); font-size: 1.4rem; animation: pop-in 0.45s ease-out; }
 .game-actions.centered { justify-content: center; }
