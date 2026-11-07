@@ -1,0 +1,33 @@
+{
+  "version": 1,
+  "messages": [
+    "Fantastic!",
+    "You did it!",
+    "ABC superstar!",
+    "Wonderful work!",
+    "Amazing sorting!",
+    "Hooray for you!",
+    "Way to go!",
+    "Super sorting!",
+    "Brilliant!",
+    "High five!",
+    "You're on a roll!",
+    "Letter-perfect!"
+  ],
+  "effects": [
+    {"id": "confetti", "label": "Confetti", "motion": "burst", "count": 90, "symbols": [], "colors": ["#ff5d8f", "#ffb627", "#3ccf91", "#3fa7f5", "#9b5de5", "#ff7a3d"]},
+    {"id": "sparkles", "label": "Sparkles", "motion": "shower", "count": 60, "symbols": ["✦", "✧", "★", "✨"], "colors": ["#ff5d8f", "#ffb627", "#3ccf91", "#3fa7f5", "#9b5de5", "#ff7a3d"]},
+    {"id": "flowers", "label": "Flowers", "motion": "shower", "count": 45, "symbols": ["🌸", "🌼", "🌷", "🌻", "🌺"], "colors": []},
+    {"id": "stars", "label": "Stars", "motion": "burst", "count": 50, "symbols": ["⭐", "🌟", "★"], "colors": ["#ffb627", "#ffd23f"]},
+    {"id": "balloons", "label": "Balloons", "motion": "rise", "count": 24, "symbols": ["🎈"], "colors": []},
+    {"id": "hearts", "label": "Hearts", "motion": "rise", "count": 36, "symbols": ["💖", "💛", "💚", "💙", "💜"], "colors": []},
+    {"id": "rainbows", "label": "Rainbows", "motion": "shower", "count": 24, "symbols": ["🌈"], "colors": []},
+    {"id": "dinosaurs", "label": "Dinosaurs", "motion": "burst", "count": 30, "symbols": ["🦕", "🦖"], "colors": []},
+    {"id": "bubbles", "label": "Bubbles", "motion": "rise", "count": 40, "symbols": ["🫧", "○"], "colors": ["#3fa7f5", "#7fd1ff"]},
+    {"id": "leaves", "label": "Leaves", "motion": "shower", "count": 40, "symbols": ["🍁", "🍂", "🍃"], "colors": []},
+    {"id": "snowflakes", "label": "Snowflakes", "motion": "shower", "count": 50, "symbols": ["❄", "❅", "❆"], "colors": ["#7fd1ff", "#b8e6ff", "#3fa7f5"]},
+    {"id": "butterflies", "label": "Butterflies", "motion": "rise", "count": 24, "symbols": ["🦋"], "colors": []},
+    {"id": "rockets", "label": "Rockets", "motion": "rise", "count": 16, "symbols": ["🚀", "✨"], "colors": []},
+    {"id": "fireworks", "label": "Fireworks", "motion": "burst", "count": 60, "symbols": ["🎆", "🎇", "✨"], "colors": []}
+  ]
+}

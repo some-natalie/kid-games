@@ -2,7 +2,7 @@ import { playableThemes, QUEST_LEVELS, readWordBank, selectLevelWords, selectThe
 import { DEFAULT_THEME, loadPreferences, savePreferences } from "./alphabet-preferences.js";
 import { clearProgress, loadProgress, saveProgress } from "./alphabet-progress.js";
 import { attachSorter, moveWord } from "./alphabet-sorter.js";
-import { celebrate, stopCelebration } from "./alphabet-celebration.js";
+import { celebrate, DEFAULT_CELEBRATIONS, readCelebrations, stopCelebration } from "./alphabet-celebration.js";
 
 (() => {
   const levels = QUEST_LEVELS;
@@ -29,6 +29,7 @@ import { celebrate, stopCelebration } from "./alphabet-celebration.js";
   let selectedTheme = DEFAULT_THEME;
   let bank;
   let entries;
+  let celebrations = DEFAULT_CELEBRATIONS;
   let roundWords = [];
   let levelIndex = 0;
   let words = [];
@@ -176,7 +177,7 @@ import { celebrate, stopCelebration } from "./alphabet-celebration.js";
     document.querySelector("#quest-theme").textContent = themed() ?
       `You sorted every ${themeLabel()} level!` : "You sorted every level, all the way to the dinosaurs!";
     document.querySelector("#quest-heading").focus();
-    celebrate();
+    celebrate(celebrations);
   }
 
   function checkAnswers() {
@@ -187,7 +188,7 @@ import { celebrate, stopCelebration } from "./alphabet-celebration.js";
     const correct = words.filter((word, index) => word === expected[index]).length;
     completed = correct === words.length;
     if (completed) {
-      const { message } = celebrate();
+      const { message } = celebrate(celebrations);
       const last = levelIndex === levels.length - 1;
       feedback.textContent = `${message} Every word is in the right place! 🎉`;
       feedback.classList.add("success");
@@ -210,9 +211,21 @@ import { celebrate, stopCelebration } from "./alphabet-celebration.js";
     }
   }
 
+  async function loadCelebrations() {
+    try {
+      const response = await fetch(new URL("./celebrations.json", import.meta.url));
+      if (!response.ok) throw new Error(`Celebrations request failed (${response.status}).`);
+      celebrations = readCelebrations(await response.json());
+    } catch (error) {
+      console.warn("Using built-in celebrations:", error);
+      celebrations = DEFAULT_CELEBRATIONS;
+    }
+  }
+
   async function loadBank() {
     startButton.disabled = true;
     loadStatus.textContent = "Getting your words ready...";
+    const celebrationsLoaded = loadCelebrations();
     try {
       const response = await fetch(new URL("./words.json", import.meta.url));
       if (!response.ok) throw new Error(`Word bank request failed (${response.status}).`);
@@ -220,6 +233,7 @@ import { celebrate, stopCelebration } from "./alphabet-celebration.js";
       entries = new Map(bank.map((entry) => [entry.word.toLowerCase(), entry]));
       levels.forEach((level) => selectLevelWords(bank, level));
       themes = playableThemes(bank);
+      await celebrationsLoaded;
       themeSelect.replaceChildren();
       const defaultOption = document.createElement("option");
       defaultOption.value = DEFAULT_THEME;

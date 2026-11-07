@@ -6,6 +6,10 @@ const bank = readWordBank(JSON.parse(readFileSync(new URL("../../../../static/wo
 const entries = new Map(bank.map((entry) => [entry.word, entry]));
 const preferenceKey = "kid-games.alphabetical-order.preferences";
 const progressKey = "kid-games.alphabetical-order.progress";
+const celebrationData = JSON.parse(readFileSync(new URL("../../../../static/celebrations.json", import.meta.url), "utf8"));
+const celebrationEffects = new Map(celebrationData.effects.map((effect) => [effect.id, effect]));
+const celebrationMessages = celebrationData.messages;
+const corners = ["top-left", "top-right", "bottom-left", "bottom-right"];
 const buttons = (page) => page.locator("#answer-list .word-button");
 const words = (page) => buttons(page).evaluateAll((items) => items.map((item) => item.lastChild.textContent));
 
@@ -123,11 +127,10 @@ test("the side alphabet stays in order and visible while scrolling at small and 
   }
 });
 
-test("each success shows a random celebration and stops before the next level", async ({ page }) => {
-  const effects = new Set();
-  const origins = new Set();
+test("each success shows a random celebration from the JSON list and stops before the next level", async ({ page }) => {
+  const seen = new Set();
   await startGame(page);
-  for (let attempt = 0; attempt < 12 && (effects.size < 2 || origins.size < 2); attempt += 1) {
+  for (let attempt = 0; attempt < 12 && seen.size < 3; attempt += 1) {
     if (attempt > 0) {
       await page.locator("#next-level").click();
       await page.evaluate((key) => localStorage.removeItem(key), progressKey);
@@ -137,26 +140,43 @@ test("each success shows a random celebration and stops before the next level", 
     await solve(page);
     const layer = page.locator(".celebration");
     await expect(layer).toHaveCount(1);
-    const { effect, origin, pieces } = await layer.evaluate((element) => ({
+    const { effect, motion, origin, pieces } = await layer.evaluate((element) => ({
       ...element.dataset, pieces: element.children.length,
     }));
-    expect(pieces).toBeGreaterThan(20);
-    expect(effect === "confetti" ? ["top-left", "top-right", "bottom-left", "bottom-right"] : ["top"]).toContain(origin);
-    effects.add(effect);
-    origins.add(origin);
+    const settings = celebrationEffects.get(effect);
+    expect(settings).toBeTruthy();
+    expect(motion).toBe(settings.motion);
+    expect(pieces).toBe(settings.count);
+    expect({ burst: corners, shower: ["top"], rise: ["bottom"] }[motion]).toContain(origin);
+    const feedbackText = await page.locator("#feedback").textContent();
+    expect(celebrationMessages.some((message) => feedbackText.startsWith(message))).toBe(true);
+    seen.add(effect);
     await expect(page.locator("#feedback")).toHaveClass(/success/);
     await expect(page.locator("#next-level")).toBeFocused();
   }
-  expect(effects).toEqual(new Set(["confetti", "sparkles"]));
+  expect(seen.size).toBeGreaterThanOrEqual(3);
   await page.locator("#next-level").click();
   await expect(page.locator(".celebration")).toHaveCount(0);
 });
 
-test("reduced motion shows still sparkles and a still dinosaur", async ({ page }) => {
+test("a missing or invalid celebrations file falls back to built-in celebrations", async ({ page }) => {
+  for (const body of [null, JSON.stringify({ version: 1, messages: [], effects: [] })]) {
+    await page.unroute("**/celebrations.json");
+    await page.route("**/celebrations.json", (route) => body === null ?
+      route.fulfill({ status: 404, body: "missing" }) :
+      route.fulfill({ status: 200, contentType: "application/json", body }));
+    await page.evaluate((key) => localStorage.removeItem(key), progressKey).catch(() => {});
+    await startGame(page);
+    await solve(page);
+    expect(["confetti", "sparkles"]).toContain(await page.locator(".celebration").getAttribute("data-effect"));
+  }
+});
+
+test("reduced motion shows still celebration pieces and a still dinosaur", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await startAtLevel(page, 9);
   await solve(page);
-  await expect(page.locator(".celebration .sparkle.still")).toHaveCount(5);
+  await expect(page.locator(".celebration .celebration-symbol.still")).toHaveCount(5);
   await expect(page.locator("#quest-complete")).toBeVisible();
   expect(await page.locator(".dino-body").evaluate((element) => getComputedStyle(element).animationName)).toBe("none");
 });

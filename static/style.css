@@ -87,8 +87,8 @@ button:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
 .level-map li.done { border-color: var(--accent); background: var(--accent); color: var(--surface); }
 .celebration { position: fixed; inset: 0; z-index: 20; overflow: hidden; pointer-events: none; }
 .confetti-piece { position: absolute; width: 0.7rem; height: 1rem; margin: -0.5rem; border-radius: 0.15rem; }
-.sparkle { position: absolute; top: 0; line-height: 1; text-shadow: 0 0 0.4rem #fff8; }
-.sparkle.still { font-size: 2rem; }
+.celebration-symbol { position: absolute; top: 0; line-height: 1; text-shadow: 0 0 0.4rem #fff8; }
+.celebration-symbol.still, .confetti-piece.still { font-size: 2rem; }
 .quest-complete { text-align: center; }
 .quest-complete h2 { font-size: clamp(2rem, 6vw, 3rem); margin: 0.25rem 0; color: var(--accent); }
 .quest-theme { font-weight: 700; color: var(--text); }

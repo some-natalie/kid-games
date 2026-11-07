@@ -52,11 +52,26 @@ so players can fix their order without starting over.
 Text and word tiles are sized for young readers. A vertical A–Z reference bar
 stays pinned to the right side while scrolling, with space reserved so it does
 not cover the game on phones or tablets. A correct answer shows a short
-cheer plus either confetti bursting from a random corner or a sparkle shower
-before **Next level** is offered. With reduced motion turned on, a few still
-sparkles appear instead. Finishing level 10 shows a dancing dinosaur and
+cheer and a random celebration before **Next level** is offered. With reduced
+motion turned on, a few still pieces appear instead. Finishing level 10 shows a dancing dinosaur and
 **Show your parent!**, then clears the saved quest so **Play again** starts at
 level 1.
+
+### Celebrations
+
+Cheers and effects are picked at random from `static/celebrations.json`
+(sparkles, flowers, stars, confetti, balloons, hearts, dinosaurs, and more).
+Add an effect with this structure:
+
+```json
+{"id": "flowers", "label": "Flowers", "motion": "shower", "count": 45, "symbols": ["🌸", "🌼"], "colors": []}
+```
+
+`motion` is `burst` (from a random corner), `shower` (falls from the top), or
+`rise` (floats up from the bottom). `count` is 1–150. An effect needs `symbols`,
+`colors`, or both; colors alone make confetti pieces, and colors tint text
+symbols such as `★`. If the file is missing or invalid, the game uses built-in
+confetti and sparkles.
 
 ## Themes and browser preferences
 
