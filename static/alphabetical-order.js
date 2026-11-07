@@ -3,6 +3,7 @@ import { DEFAULT_THEME, loadPreferences, savePreferences } from "./alphabet-pref
 import { clearProgress, loadProgress, saveProgress } from "./alphabet-progress.js";
 import { attachSorter, moveWord } from "./alphabet-sorter.js";
 import { celebrate, DEFAULT_CELEBRATIONS, readCelebrations, stopCelebration } from "./alphabet-celebration.js";
+import { pickVictory } from "./alphabet-victory.js";
 
 (() => {
   const levels = QUEST_LEVELS;
@@ -193,6 +194,11 @@ import { celebrate, DEFAULT_CELEBRATIONS, readCelebrations, stopCelebration } fr
     const warning = clearProgress(getStorage, selectedTheme);
     if (warning) showStatus(warning);
     playArea.hidden = true;
+    const victory = pickVictory();
+    questComplete.dataset.victory = victory;
+    for (const scene of questComplete.querySelectorAll("[data-victory-scene]")) {
+      scene.toggleAttribute("hidden", scene.dataset.victoryScene !== victory);
+    }
     questComplete.hidden = false;
     document.querySelector("#quest-theme").textContent = themed() ?
       `You sorted every ${themeLabel()} level!` : "You sorted every level, all the way to the dinosaurs!";

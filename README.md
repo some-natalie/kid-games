@@ -57,8 +57,12 @@ Storage warnings stay visible. A vertical A–Z reference bar
 stays pinned to the right side while scrolling, with space reserved so it does
 not cover the game on phones or tablets. A correct answer shows a short
 cheer and a random celebration before **Next level** is offered. With reduced
-motion turned on, a few still pieces appear instead. Finishing level 10 shows a dancing dinosaur and
-**Show your parent!**, then clears the saved quest so **Play again** starts at
+motion turned on, a few still pieces appear instead. Finishing level 10 randomly
+selects one of ten victory scenes: the original dancing dinosaur, a dancing robot,
+a rocket, butterflies, an ocean parade, a rainbow, balloons, blooming flowers,
+twinkling stars, or dancing penguins. Each scene has an accessible description
+and uses still artwork when reduced motion is enabled. The finale still says
+**Show your parent!** and clears the saved quest so **Play again** starts at
 level 1.
 
 The stylesheet URL includes Zola's content hash, so browsers fetch updated
