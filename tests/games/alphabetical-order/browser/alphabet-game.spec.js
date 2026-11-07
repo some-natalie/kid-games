@@ -65,11 +65,11 @@ test("game starts when the static host serves mjs files as binary downloads", as
   await expect(page.locator("#undo-word")).toBeEnabled();
 });
 
-test("only the alphabet game is listed; the tutorial leads into a 10-level quest with a finale", async ({ page }) => {
+test("the alphabet game is listed; the tutorial leads into a 10-level quest with a finale", async ({ page }) => {
   test.slow();
   await page.goto("/");
-  await expect(page.locator(".game-tile")).toHaveCount(1);
-  await expect(page.locator(".game-tile")).toContainText("Alphabetical Adventure");
+  await expect(page.locator(".game-tile")).toHaveCount(2);
+  await expect(page.locator(".game-tile").first()).toContainText("Alphabetical Adventure");
   await openGame(page);
   await expect(page.locator("#tutorial")).toBeVisible();
   await expect(page.locator("#play-area")).toBeHidden();
@@ -332,7 +332,7 @@ test("starting a level collapses the header, intro, and directions into a compac
   await expect(page.locator(".intro")).toBeHidden();
   await expect(buttons(page)).toHaveCount(4);
   await bar.getByRole("link", { name: "← All games" }).click();
-  await expect(page.locator(".game-tile")).toHaveCount(1);
+  await expect(page.locator(".game-tile")).toHaveCount(2);
   await expect(page.locator(".site-header")).toBeVisible();
 });
 

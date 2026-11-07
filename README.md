@@ -2,7 +2,8 @@
 
 A small Zola site for kid-games.dev, with responsive game tiles and automatic
 light/dark styling based on the device preference. Alphabetical Adventure is
-the site's alphabetical-order game.
+the site's alphabetical-order game, and Proofreading Detectives is its
+proofreading game.
 
 ## Local development
 
@@ -182,6 +183,34 @@ Run the word-bank checks (also run by CI) with:
 npm test
 npm run test:python
 ```
+
+## Proofreading Detectives
+
+A 10-level proofreading game for kids under 12 (`content/proofreading/`,
+`templates/proofreading.html`, `static/proofreading*.js`). Players tap every
+word, letter, or punctuation mark that looks wrong, then press **Check**.
+Level 1 is a single sentence with one mistake; level 10 is a five-sentence
+paragraph with seven mistakes where some sentences are already correct. Mistake
+kinds: capital letters, misplaced commas and periods, spacing between words,
+spacing after punctuation, commonly misspelled words, flipped (mirrored) letters
+and numbers, and sound-alike words (there/their/they're and similar).
+
+An incorrect check keeps the marks editable and shows which marks were right
+(✓), which marked spots were already correct (✗), how many mistakes remain, and
+which sentences still hide some. Any change clears those results. A correct
+check lists each fix with a short tip. Progress autosaves under
+`kid-games.proofreading.progress` as `{"version":1,"level":3}` and is cleared
+after level 10. Celebrations reuse `static/celebrations.json` effects with the
+game's own cheers.
+
+Levels live in `static/proofreading-levels.js`. Write the text normally and
+wrap each mistake as `{wrong>right#type}`, for example
+`{their>there#homonym}` or `{,>#comma}` (the fix is to remove it). Types are
+`capitalization`, `comma`, `period`, `spacing`, `space-after`, `spelling`,
+`flipped`, and `homonym`. Use two spaces as the wrong text for an extra space
+(`{  > #spacing}`), and a `^` to mirror the next character (`{^3>3#flipped}`).
+Keep topics friendly and kid-appropriate; `tests/games/proofreading/` checks the
+level shape and that every mistake type is used.
 
 ## Browser tests
 
