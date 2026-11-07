@@ -127,6 +127,23 @@ test("the side alphabet stays in order and visible while scrolling at small and 
   }
 });
 
+test("the stylesheet URL is versioned so older cached CSS cannot unpin the alphabet", async ({ page }) => {
+  await page.route("**/style.css", (route) => {
+    const url = new URL(route.request().url());
+    if (!url.search) {
+      return route.fulfill({ contentType: "text/css", body: "body { background: white; }" });
+    }
+    return route.continue();
+  });
+  await startGame(page);
+  const stylesheet = new URL(await page.locator('link[rel="stylesheet"]').getAttribute("href"), page.url());
+  expect(stylesheet.searchParams.get("h")).toMatch(/^[a-f0-9]{20}$/);
+  expect(await page.locator(".alphabet-rail").evaluate((element) => getComputedStyle(element).position))
+    .toBe("fixed");
+  expect(await page.locator(".alphabet-rail ol").evaluate((element) => getComputedStyle(element).listStyleType))
+    .toBe("none");
+});
+
 test("each success shows a random celebration from the JSON list and stops before the next level", async ({ page }) => {
   const seen = new Set();
   await startGame(page);
