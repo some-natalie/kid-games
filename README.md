@@ -29,31 +29,75 @@ title, description, weight (tile order), template, and icon. The root page lists
 these games automatically. The alphabetical
 game uses `templates/alphabetical-order.html` and `static/alphabetical-order.js`;
 it loads the tagged word bank from `static/words.json`. Each new round randomly
-selects 12 appropriate words; retries keep the same set in a new order.
+selects appropriate words for the current level; retries keep the same set in a
+new order.
 
-Arrange the full 12-word list by dragging words up or down with a mouse, pen,
+The game is a 10-level quest that ramps from 4 words to 12:
+
+| Level | Words | What changes |
+|---|---|---|
+| 1–3 | 4, 5, 6 | Every word starts with a different letter |
+| 4–7 | 7, 8, 9, 10 | One to four pairs share a first letter (look at the second letter) |
+| 8 | 11 | Adds a pair sharing two letters (look at the third letter) |
+| 9 | 12 | Two third-letter pairs and four second-letter pairs |
+| 10 | 12 | Dinosaur challenge, with at least one pair sharing two letters |
+
+Arrange the list by dragging words up or down with a mouse, pen,
 or finger, then press **Check order**. Dragging near the screen edge scrolls
 the page; dropping outside the list or pressing Escape cancels a move.
 Keyboard users can focus a word and use Up/Down, Home, or End to move it.
 **Undo move** reverses the last change. Incorrect checks leave the list editable,
 so players can fix their order without starting over.
 
+Text and word tiles are sized for young readers. A vertical A–Z reference bar
+stays pinned to the right side while scrolling, with space reserved so it does
+not cover the game on phones or tablets. A correct answer shows a short
+cheer and a random celebration before **Next level** is offered. With reduced
+motion turned on, a few still pieces appear instead. Finishing level 10 shows a dancing dinosaur and
+**Show your parent!**, then clears the saved quest so **Play again** starts at
+level 1.
+
+### Celebrations
+
+Cheers and effects are picked at random from `static/celebrations.json`
+(sparkles, flowers, stars, confetti, balloons, hearts, dinosaurs, and more).
+Add an effect with this structure:
+
+```json
+{"id": "flowers", "label": "Flowers", "motion": "shower", "count": 45, "symbols": ["🌸", "🌼"], "colors": []}
+```
+
+`motion` is `burst` (from a random corner), `shower` (falls from the top), or
+`rise` (floats up from the bottom). `count` is 1–150. An effect needs `symbols`,
+`colors`, or both; colors alone make confetti pieces, and colors tint text
+symbols such as `★`. If the file is missing or invalid, the game uses built-in
+confetti and sparkles.
+
 ## Themes and browser preferences
 
 Use **Pick your theme** before or during play. The default **ABC adventure (all
-topics)** keeps the beginner progression and final dinosaur challenge.
-Choosing a specific theme uses 12 randomly selected words from that theme for
-every round, without first- or second-letter restrictions. Changing themes
-starts a new game; retries preserve the current set and replays draw fresh sets.
+topics)** uses the letter rules above and the final dinosaur challenge.
+Choosing a specific theme keeps the same 10-level word counts, using randomly
+selected words from that theme without first- or second-letter restrictions.
+Each theme keeps its own saved level, so changing themes resumes that theme or
+starts it at level 1. Retries preserve the current set.
 Only curated themes with at least 12 non-advanced entries appear in the menu.
 Imported advanced vocabulary is never used by these themed rounds.
 
 The chosen theme is stored in `localStorage` under
 `kid-games.alphabetical-order.preferences`, as `{"version":1,"theme":"dinosaurs"}`.
-It stays on that browser and site origin; no player name, answers, or scores are
-stored or sent anywhere. Clearing site data removes the preference.
-If storage is blocked, full, or contains an invalid preference, the game shows
-a notice and remains playable. Unknown saved themes return to ABC adventure.
+Quest progress autosaves after each move, undo, and level change under
+`kid-games.alphabetical-order.progress`, as
+`{"version":1,"themes":{"dinosaurs":{"level":3,"roundWords":[...],"words":[...]}}}`.
+Reloading offers **Keep playing level N** with the same words and order;
+**Start a new quest** discards that theme's progress. Completing the quest
+clears it.
+
+Everything stays on that browser and site origin; no player name or scores are
+sent anywhere. Clearing site data removes the preference and progress.
+If storage is blocked, full, or contains invalid data, the game shows a notice
+and remains playable. Unknown saved themes return to ABC adventure, and invalid
+progress starts fresh.
 
 ## Alphabetical Adventure word bank
 
@@ -120,10 +164,10 @@ python3 tools/expand-word-bank.py --wordnet /path/to/extracted/wordnet
 The builder also verifies the noun database checksum. Rebuilding requires only
 Python's standard library and produces the same bank from the same inputs.
 
-Level one uses 12 different first letters. Level two uses six pairs with matching
-first letters but different second letters, so third letters are not needed.
-The dinosaur level includes at least one pair with matching first two letters.
-Selection validates the bank and reports loading errors instead of substituting
+ABC adventure levels use letters-only `general` words. Each comparison pair
+shares exactly the letters before the one being taught, and every other word has
+a unique first letter, so players never need a deeper letter than the level
+teaches. Selection validates the bank and reports loading errors instead of substituting
 a fixed word set.
 
 Run the word-bank checks (also run by CI) with:
@@ -146,7 +190,8 @@ npm run test:e2e
 Playwright builds Zola for localhost and starts its own static server. Tests run
 in Chromium, Safari's WebKit engine, and touch-enabled tablet Chromium.
 They cover dragging, real touch input and edge scrolling, keyboard sorting,
-checking and retrying, progression, theme persistence, and loading/storage
+checking and retrying, the full 10-level quest and finale, celebrations,
+autosave and resume, theme persistence, and loading/storage
 failures. Failure reports, screenshots, and traces are kept for seven days. Local reports appear
 in `playwright-report/`; use `npx playwright show-report` to open them.
 

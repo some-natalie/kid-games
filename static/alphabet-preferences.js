@@ -1,7 +1,7 @@
 export const PREFERENCES_KEY = "kid-games.alphabetical-order.preferences";
 export const DEFAULT_THEME = "general";
 
-function storageError(error) {
+export function isStorageError(error) {
   return error instanceof DOMException || error instanceof SyntaxError;
 }
 
@@ -17,7 +17,7 @@ export function loadPreferences(getStorage, themes) {
     }
     return { theme: preferences.theme, warning: "" };
   } catch (error) {
-    if (!storageError(error)) throw error;
+    if (!isStorageError(error)) throw error;
     console.warn("Unable to read Alphabetical Adventure preferences:", error);
     return { theme: DEFAULT_THEME, warning: "We couldn't read your saved theme. You can still choose one and play." };
   }
@@ -28,7 +28,7 @@ export function savePreferences(getStorage, theme) {
     getStorage().setItem(PREFERENCES_KEY, JSON.stringify({ version: 1, theme }));
     return "";
   } catch (error) {
-    if (!storageError(error)) throw error;
+    if (!isStorageError(error)) throw error;
     console.warn("Unable to save Alphabetical Adventure preferences:", error);
     return "Your theme works for now, but this browser couldn't save it for next time.";
   }
