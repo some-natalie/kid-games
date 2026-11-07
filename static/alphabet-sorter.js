@@ -59,11 +59,12 @@ export function attachSorter(list, onMove) {
   list.addEventListener("pointerdown", (event) => {
     const button = event.target.closest(".word-button");
     if (!button || button.disabled || drag || !event.isPrimary || event.button !== 0) return;
+    event.preventDefault();
     const item = button.parentElement;
     drag = { button, item, pointerId: event.pointerId, x: event.clientX, y: event.clientY,
       startX: event.clientX, startY: event.clientY, from: [...list.children].indexOf(item), active: false };
     button.setPointerCapture(event.pointerId);
-    button.focus();
+    button.focus({ preventScroll: true });
     frame = requestAnimationFrame(animate);
   });
   list.addEventListener("pointermove", (event) => {
@@ -100,6 +101,10 @@ export function attachSorter(list, onMove) {
   });
   list.addEventListener("pointercancel", cancel);
   list.addEventListener("lostpointercapture", cancel);
+  // Safari selection/callouts and native dragging must not steal a word drag.
+  for (const type of ["selectstart", "contextmenu", "dragstart"]) {
+    list.addEventListener(type, (event) => event.preventDefault());
+  }
   window.addEventListener("blur", cancel);
   list.addEventListener("keydown", (event) => {
     if (event.key === "Escape") {
