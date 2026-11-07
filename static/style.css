@@ -138,3 +138,12 @@ button:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
 footer { padding-block: 1.5rem; text-align: center; }
 .skip-link { position: absolute; left: 1rem; top: -5rem; padding: 0.5rem 1rem; background: var(--surface); }
 .skip-link:focus { top: 1rem; }
+
+.hint-badge { float: right; margin-left: 0.75rem; font-size: 0.85rem; font-weight: 700; }
+.answer-list li[data-hint="correct"] .word-button { border-color: #2f9c50; background: #e5f8e9; color: #1f5f31; }
+.answer-list li[data-hint="in-order"] .word-button { border-style: dashed; background: var(--badge); }
+.answer-list li[data-hint="move"] .word-button { border-color: #c2410c; background: #fff0e6; color: #7c2d12; }
+@media (prefers-color-scheme: dark) {
+  .answer-list li[data-hint="correct"] .word-button { background: #1f3b28; color: #c9f2b8; border-color: #4cc26d; }
+  .answer-list li[data-hint="move"] .word-button { background: #4a2512; color: #ffd8bf; border-color: #fb923c; }
+}
