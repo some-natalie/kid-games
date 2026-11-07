@@ -43,6 +43,7 @@ p { color: var(--muted); }
 .game-icon { display: block; font-size: 2.5rem; }
 .badge { display: inline-block; border-radius: 2rem; padding: 0.25rem 0.75rem; background: var(--badge); color: var(--accent); font-size: 0.85rem; font-weight: 700; }
 .back-link { display: inline-block; padding-block: 0.5rem; }
+.intro .back-link { display: block; text-align: left; }
 .alphabet-game { max-width: 48rem; margin-inline: auto; padding: clamp(1rem, 4vw, 2rem); border: 1px solid var(--border); border-radius: 1rem; background: var(--surface); }
 .theme-picker { padding-bottom: 1rem; margin-bottom: 1rem; border-bottom: 1px solid var(--border); }
 .theme-picker label { display: block; font-weight: 700; margin-bottom: 0.5rem; }
@@ -116,6 +117,22 @@ button:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
   .feedback.success, .dino-body, .dino-head, .dino-arm, .dino-leg, .dino-notes { animation: none; }
 }
 .game-actions { display: flex; flex-wrap: wrap; gap: 0.75rem; }
+.play-only { display: none; }
+.is-playing .site-header, .is-playing .intro, .is-playing #theme-help, .is-playing #preference-status:not(.warning) { display: none; }
+.is-playing main { padding-top: 0.75rem; }
+.is-playing .play-only { display: inline-block; }
+.is-playing .theme-picker { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 1rem; padding-bottom: 0.75rem; }
+.is-playing .theme-picker .back-link { margin-right: auto; padding-block: 0; }
+.is-playing .theme-picker label { display: inline; margin: 0; }
+.is-playing #preference-status { flex-basis: 100%; margin: 0; }
+.is-playing .level-map { margin-bottom: 0.5rem; }
+.is-playing .level-heading p, .is-playing .level-heading h2 { margin-block: 0.15rem; }
+.is-playing .progress { margin-block: 0.35rem; }
+.is-playing #play-area h3 { margin-block: 0.35rem; }
+.how-to-play { margin-bottom: 0.5rem; }
+.how-to-play summary { width: fit-content; min-height: 2.75rem; padding: 0.4rem 0; color: var(--accent); font-weight: 700; cursor: pointer; }
+.how-to-play summary:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+.how-to-play p { margin-top: 0.25rem; }
 [hidden] { display: none !important; }
 footer { padding-block: 1.5rem; text-align: center; }
 .skip-link { position: absolute; left: 1rem; top: -5rem; padding: 0.5rem 1rem; background: var(--surface); }

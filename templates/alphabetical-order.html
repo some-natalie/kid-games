@@ -12,8 +12,8 @@
     {% endfor %}
   </ol>
 </aside>
-<a class="back-link" href="{{ config.base_url }}/">← All games</a>
 <section class="intro">
+  <a class="back-link" href="{{ config.base_url }}/">← All games</a>
   <span class="game-icon" aria-hidden="true">{{ page.extra.icon }}</span>
   <h1>{{ page.title }}</h1>
   <p>{{ page.description }}</p>
@@ -21,6 +21,7 @@
 
 <section class="alphabet-game" aria-labelledby="game-heading">
   <div class="theme-picker">
+    <a class="back-link play-only" href="{{ config.base_url }}/">← All games</a>
     <label for="theme-select">Pick your theme</label>
     <select id="theme-select" aria-describedby="theme-help preference-status" disabled>
       <option value="general">ABC adventure (all topics)</option>
@@ -57,7 +58,11 @@
       <p id="level-hint"></p>
     </div>
     <p id="progress" class="progress" aria-live="polite"></p>
-    <p id="sort-instructions" class="game-instructions">Drag words up or down with your mouse or finger to put them in ABC order. Then choose Check order. With a keyboard, focus a word and use the Up and Down arrow keys; Home and End move it to the top or bottom.</p>
+    <details class="how-to-play">
+      <summary>How to play</summary>
+      <p id="sort-instructions" class="game-instructions">Drag words up or down with your mouse or finger to put them in ABC order. Then choose Check order. With a keyboard, focus a word and use the Up and Down arrow keys; Home and End move it to the top or bottom.</p>
+      <p>If two words start with the same letter, look at the next letter. Keep going until you find a letter that is different!</p>
+    </details>
     <h3>Your ABC list</h3>
     <ol id="answer-list" class="answer-list" aria-label="Words to arrange in alphabetical order" aria-describedby="sort-instructions"></ol>
     <p id="feedback" class="feedback" role="status" aria-live="polite"></p>

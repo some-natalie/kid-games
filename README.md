@@ -49,7 +49,10 @@ Keyboard users can focus a word and use Up/Down, Home, or End to move it.
 **Undo move** reverses the last change. Incorrect checks leave the list editable,
 so players can fix their order without starting over.
 
-Text and word tiles are sized for young readers. A vertical A–Z reference bar
+Text and word tiles are sized for young readers. Once a level starts, the site
+header, game intro, and theme help collapse into a slim bar with **← All games**
+and the theme picker; drag directions move into a **How to play** toggle.
+Storage warnings stay visible. A vertical A–Z reference bar
 stays pinned to the right side while scrolling, with space reserved so it does
 not cover the game on phones or tablets. A correct answer shows a short
 cheer and a random celebration before **Next level** is offered. With reduced

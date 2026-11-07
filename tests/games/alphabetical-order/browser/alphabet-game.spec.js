@@ -308,6 +308,46 @@ test("themes persist, use the level word counts, and keep separate progress", as
   expect(await words(page)).toEqual(dinosaurWords);
 });
 
+test("starting a level collapses the header, intro, and directions into a compact bar", async ({ page }) => {
+  await openGame(page);
+  for (const selector of [".site-header", ".intro", "#theme-help", "#preference-status", "#tutorial"]) {
+    await expect(page.locator(selector)).toBeVisible();
+  }
+  await page.locator("#start-game").click();
+  await expect(buttons(page)).toHaveCount(4);
+  for (const selector of [".site-header", ".intro", "#theme-help", "#preference-status", "#tutorial", "#sort-instructions"]) {
+    await expect(page.locator(selector)).toBeHidden();
+  }
+  const bar = page.locator(".theme-picker");
+  await expect(bar.getByRole("link", { name: "← All games" })).toBeVisible();
+  await expect(page.locator("#theme-select")).toBeVisible();
+  const [barBox, levelBox] = [await bar.boundingBox(), await page.locator("#level-map").boundingBox()];
+  expect(barBox.height).toBeLessThan(140);
+  expect(levelBox.y).toBeLessThan(page.viewportSize().height / 2);
+  await page.getByText("How to play").click();
+  await expect(page.locator("#sort-instructions")).toBeVisible();
+  await page.getByText("How to play").click();
+  await expect(page.locator("#sort-instructions")).toBeHidden();
+  await page.locator("#theme-select").selectOption("dinosaurs");
+  await expect(page.locator(".intro")).toBeHidden();
+  await expect(buttons(page)).toHaveCount(4);
+  await bar.getByRole("link", { name: "← All games" }).click();
+  await expect(page.locator(".game-tile")).toHaveCount(1);
+  await expect(page.locator(".site-header")).toBeVisible();
+});
+
+test("storage warnings stay visible in the compact bar", async ({ page }) => {
+  await page.addInitScript(() => {
+    Object.defineProperty(window, "localStorage", {
+      get() { throw new DOMException("Blocked for test", "SecurityError"); },
+    });
+  });
+  await startGame(page);
+  await expect(page.locator(".intro")).toBeHidden();
+  await expect(page.locator("#preference-status")).toBeVisible();
+  await expect(page.locator("#preference-status")).toContainText("couldn't save");
+});
+
 test("unavailable storage does not prevent play", async ({ page }) => {
   await page.addInitScript(() => {
     Object.defineProperty(window, "localStorage", {
