@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block title %}{{ page.title }} · {{ config.title }}{% endblock title %}
+{% block description %}{{ page.description }}{% endblock description %}
+
+{% block content %}
+<a class="back-link" href="{{ config.base_url }}/">← All games</a>
+<section class="intro">
+  <span class="game-icon" aria-hidden="true">{{ page.extra.icon }}</span>
+  <h1>{{ page.title }}</h1>
+  <p>{{ page.description }}</p>
+</section>
+
+<section class="alphabet-game" aria-labelledby="game-heading">
+  <div id="tutorial" class="tutorial">
+    <p class="eyebrow">A quick ABC lesson</p>
+    <h2 id="game-heading">What does alphabetical order mean?</h2>
+    <p>It means putting words in the same order as the letters in the alphabet. A comes before B, and B comes before C.</p>
+    <p><strong>apple</strong> comes before <strong>banana</strong> because A comes before B.</p>
+    <p>If two words start with the same letter, look at the next letter. Keep going until you find a letter that is different!</p>
+    <div class="alphabet-strip" aria-label="The alphabet, A through Z">
+      {% for letter in ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"] %}
+      <span>{{ letter }}</span>
+      {% endfor %}
+    </div>
+    <button id="start-game" class="primary-button" type="button">Let’s play!</button>
+    <p id="load-status" role="status" aria-live="polite"></p>
+  </div>
+
+  <div id="play-area" hidden>
+    <div class="level-heading">
+      <div>
+        <p id="level-count" class="eyebrow"></p>
+        <h2 id="level-title" tabindex="-1"></h2>
+      </div>
+      <p id="level-hint"></p>
+    </div>
+    <p id="progress" class="progress" aria-live="polite"></p>
+    <p class="game-instructions">Choose the words in ABC order. Your picks will appear in your answer list.</p>
+    <div id="word-bank" class="word-bank" aria-label="Words to put in alphabetical order"></div>
+    <h3>Your ABC list</h3>
+    <ol id="answer-list" class="answer-list" aria-live="polite"></ol>
+    <p id="feedback" class="feedback" role="status" aria-live="polite"></p>
+    <div class="game-actions">
+      <button id="undo-word" class="secondary-button" type="button">Undo last</button>
+      <button id="restart-level" class="secondary-button" type="button">Start over</button>
+      <button id="next-level" class="primary-button" type="button" hidden>Next level</button>
+      <button id="play-again" class="primary-button" type="button" hidden>Play again</button>
+    </div>
+  </div>
+</section>
+<script src="{{ get_url(path='alphabetical-order.js') }}" type="module"></script>
+{% endblock content %}

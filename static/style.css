@@ -43,6 +43,27 @@ p { color: var(--muted); }
 .badge { display: inline-block; border-radius: 2rem; padding: 0.25rem 0.75rem; background: var(--badge); color: var(--accent); font-size: 0.85rem; font-weight: 700; }
 .back-link { display: inline-block; padding-block: 0.5rem; }
 .game-placeholder { max-width: 44rem; margin-inline: auto; padding: 1.5rem; text-align: center; border: 1px dashed var(--border); border-radius: 1rem; background: var(--surface); }
+.alphabet-game { max-width: 48rem; margin-inline: auto; padding: clamp(1rem, 4vw, 2rem); border: 1px solid var(--border); border-radius: 1rem; background: var(--surface); }
+.tutorial { text-align: center; }
+.tutorial h2, .level-heading h2 { margin-top: 0.25rem; }
+.alphabet-strip { display: grid; grid-template-columns: repeat(auto-fit, minmax(2rem, 1fr)); gap: 0.35rem; margin: 1.5rem 0; }
+.alphabet-strip span { padding: 0.3rem; border-radius: 0.4rem; background: var(--badge); color: var(--accent); font-weight: 700; }
+.primary-button, .secondary-button, .word-button { min-height: 2.75rem; border: 2px solid var(--accent); border-radius: 0.65rem; padding: 0.55rem 1rem; font: inherit; font-weight: 700; cursor: pointer; }
+.primary-button { background: var(--accent); color: var(--surface); }
+.secondary-button, .word-button { background: var(--surface); color: var(--text); }
+.word-button { min-width: 5rem; }
+button:disabled { opacity: 0.55; cursor: not-allowed; }
+button:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+.level-heading { display: flex; flex-wrap: wrap; align-items: start; justify-content: space-between; gap: 0.5rem 2rem; }
+.level-heading > p { max-width: 22rem; }
+.game-instructions { margin-top: 0; }
+.progress { font-weight: 700; }
+.word-bank { display: flex; flex-wrap: wrap; gap: 0.6rem; padding: 1rem; border-radius: 0.75rem; background: var(--background); }
+.answer-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr)); gap: 0.4rem 1.5rem; padding-left: 2rem; }
+.answer-list li { padding: 0.25rem; }
+.feedback { min-height: 1.6rem; font-weight: 700; }
+.game-actions { display: flex; flex-wrap: wrap; gap: 0.75rem; }
+[hidden] { display: none !important; }
 canvas { display: block; width: 100%; height: auto; border: 1px solid var(--border); border-radius: 0.5rem; background: var(--background); }
 footer { padding-block: 1.5rem; text-align: center; }
 .skip-link { position: absolute; left: 1rem; top: -5rem; padding: 0.5rem 1rem; background: var(--surface); }
