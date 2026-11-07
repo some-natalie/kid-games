@@ -1,19 +1,21 @@
+import { readWordBank, selectWords, shuffled } from "./alphabet-word-lists.mjs";
+
 (() => {
   const levels = [
     {
       title: "First-letter friends",
       hint: "Look at the first letter of each word.",
-      words: ["apple", "ball", "cloud", "dolphin", "elephant", "flower", "garden", "happy", "island", "jacket", "kitten", "lemon"],
+      mode: "first-letter",
     },
     {
       title: "Look a little closer",
       hint: "Some words start with the same letter. Compare their second letters, too!",
-      words: ["bag", "bat", "bed", "bee", "big", "bin", "bog", "box", "bug", "bun", "cab", "cot"],
+      mode: "second-letter",
     },
     {
       title: "Dinosaur challenge",
       hint: "Dinosaur names can be long! Compare letters from the beginning until you find a difference.",
-      words: ["Ankylosaurus", "Apatosaurus", "Brachiosaurus", "Brontosaurus", "Compsognathus", "Corythosaurus", "Diplodocus", "Iguanodon", "Microraptor", "Stegosaurus", "Triceratops", "Tyrannosaurus"],
+      mode: "dinosaurs",
     },
   ];
 
@@ -27,26 +29,22 @@
   const restartButton = document.querySelector("#restart-level");
   const nextButton = document.querySelector("#next-level");
   const playAgainButton = document.querySelector("#play-again");
+  const startButton = document.querySelector("#start-game");
+  const loadStatus = document.querySelector("#load-status");
+  let bank;
+  let roundWords = [];
   let levelIndex = 0;
   let words = [];
   let answers = [];
   let completed = false;
 
-  function shuffled(items) {
-    const result = [...items];
-    for (let index = result.length - 1; index > 0; index -= 1) {
-      const otherIndex = Math.floor(Math.random() * (index + 1));
-      [result[index], result[otherIndex]] = [result[otherIndex], result[index]];
-    }
-    return result;
-  }
-
-  function startLevel(index) {
+  function startLevel(index, newRound = true) {
+    const level = levels[index];
+    if (newRound) roundWords = selectWords(bank, level.mode);
     levelIndex = index;
     answers = [];
     completed = false;
-    const level = levels[levelIndex];
-    words = shuffled(level.words);
+    words = shuffled(roundWords);
     document.querySelector("#level-count").textContent = `Level ${levelIndex + 1} of ${levels.length}`;
     document.querySelector("#level-title").textContent = level.title;
     document.querySelector("#level-hint").textContent = level.hint;
@@ -57,6 +55,7 @@
     restartButton.textContent = "Start over";
     undoButton.hidden = false;
     render();
+    document.querySelector("#level-title").focus();
   }
 
   function render() {
@@ -89,7 +88,7 @@
 
   function checkAnswers() {
     completed = true;
-    const expected = [...levels[levelIndex].words].sort((first, second) =>
+    const expected = [...roundWords].sort((first, second) =>
       first.localeCompare(second, "en", { sensitivity: "base" }),
     );
     const correct = answers.filter((word, index) => word === expected[index]).length;
@@ -106,18 +105,32 @@
     render();
   }
 
-  document.querySelector("#start-game").addEventListener("click", () => {
-    tutorial.hidden = true;
-    playArea.hidden = false;
-    startLevel(0);
-    document.querySelector("#level-title").focus();
+  startButton.addEventListener("click", async () => {
+    startButton.disabled = true;
+    loadStatus.textContent = "Getting your words ready...";
+    try {
+      const response = await fetch(new URL("./words.json", import.meta.url));
+      if (!response.ok) throw new Error(`Word bank request failed (${response.status}).`);
+      bank = readWordBank(await response.json());
+      levels.forEach((level) => selectWords(bank, level.mode));
+      tutorial.hidden = true;
+      playArea.hidden = false;
+      startLevel(0);
+      loadStatus.textContent = "";
+    } catch (error) {
+      console.error("Unable to start Alphabetical Adventure:", error);
+      tutorial.hidden = false;
+      playArea.hidden = true;
+      loadStatus.textContent = "We couldn't load the words. Please try again.";
+      startButton.disabled = false;
+    }
   });
   undoButton.addEventListener("click", () => {
     answers.pop();
     feedback.textContent = "";
     render();
   });
-  restartButton.addEventListener("click", () => startLevel(levelIndex));
+  restartButton.addEventListener("click", () => startLevel(levelIndex, false));
   nextButton.addEventListener("click", () => startLevel(levelIndex + 1));
   playAgainButton.addEventListener("click", () => startLevel(0));
 })();

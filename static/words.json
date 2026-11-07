@@ -1,0 +1,276 @@
+{
+  "groups": [
+    {
+      "tags": ["general", "animals"],
+      "words": [
+        "ant", "anteater", "antelope", "ape", "armadillo", "badger", "bat", "bear", "beaver", "beetle",
+        "bird", "bison", "buffalo", "butterfly", "camel", "canary", "cat", "caterpillar", "cheetah", "chicken",
+        "chimpanzee", "chipmunk", "cobra", "cod", "cougar", "cow", "coyote", "crab", "crane", "cricket",
+        "crocodile", "crow", "deer", "dog", "dolphin", "donkey", "dove", "dragonfly", "duck", "eagle",
+        "eel", "elephant", "elk", "emu", "falcon", "ferret", "finch", "fish", "flamingo", "fly",
+        "fox", "frog", "gazelle", "gerbil", "giraffe", "goat", "goldfish", "goose", "gorilla", "grasshopper",
+        "hamster", "hare", "hawk", "hedgehog", "hen", "hippopotamus", "horse", "hummingbird", "hyena", "iguana",
+        "jaguar", "jellyfish", "kangaroo", "kingfisher", "kitten", "koala", "ladybug", "lamb", "lemur", "leopard",
+        "lion", "lizard", "llama", "lobster", "lynx", "macaw", "magpie", "manatee", "mole", "monkey",
+        "moose", "moth", "mouse", "mule", "narwhal", "newt", "octopus", "opossum", "orangutan", "ostrich",
+        "otter", "owl", "oyster", "panda", "panther", "parrot", "peacock", "pelican", "penguin", "pig",
+        "pigeon", "platypus", "pony", "porcupine", "puffin", "puppy", "quail", "rabbit", "raccoon", "ram",
+        "rat", "raven", "reindeer", "rhinoceros", "robin", "rooster", "salamander", "salmon", "sardine", "seal",
+        "seahorse", "shark", "sheep", "shrimp", "skunk", "sloth", "slug", "snail", "snake", "sparrow",
+        "spider", "squid", "squirrel", "starfish", "stork", "swan", "tadpole", "tiger", "toad", "tortoise",
+        "toucan", "trout", "tuna", "turkey", "turtle", "vulture", "walrus", "wasp", "weasel", "whale",
+        "wolf", "wombat", "woodpecker", "worm", "yak", "zebra"
+      ]
+    },
+    {
+      "tags": ["general", "food"],
+      "words": [
+        "almond", "apple", "apricot", "artichoke", "asparagus", "avocado", "bagel", "banana", "bean", "beet",
+        "berry", "biscuit", "blackberry", "blueberry", "bread", "broccoli", "brownie", "bun", "burrito", "butter",
+        "cabbage", "cake", "cantaloupe", "carrot", "cashew", "cauliflower", "celery", "cereal", "cheese", "cherry",
+        "chestnut", "chickpea", "chocolate", "cinnamon", "clementine", "coconut", "cookie", "corn", "cracker", "cranberry",
+        "cream", "cucumber", "cupcake", "date", "dumpling", "egg", "eggplant", "fig", "flour", "garlic",
+        "ginger", "grape", "grapefruit", "gravy", "guava", "hamburger", "hazelnut", "honey", "hummus", "jam",
+        "jelly", "juice", "kale", "ketchup", "kiwi", "lemon", "lentil", "lettuce", "lime", "macaroni",
+        "mango", "marshmallow", "melon", "milk", "mint", "muffin", "mushroom", "mustard", "nectarine", "noodle",
+        "oat", "oatmeal", "olive", "onion", "orange", "pancake", "papaya", "parsley", "pasta", "pea",
+        "peach", "peanut", "pear", "pecan", "pepper", "pickle", "pie", "pineapple", "pizza", "plum",
+        "popcorn", "potato", "pretzel", "pudding", "pumpkin", "radish", "raisin", "raspberry", "rice", "roll",
+        "salad", "salt", "sandwich", "sauce", "smoothie", "soup", "spinach", "squash", "strawberry", "sugar",
+        "taco", "toast", "tomato", "turnip", "vanilla", "waffle", "walnut", "watermelon", "wheat", "yogurt", "zucchini"
+      ]
+    },
+    {
+      "tags": ["general", "nature"],
+      "words": [
+        "acorn", "air", "algae", "aster", "autumn", "bamboo", "bark", "bay", "beach", "birch",
+        "blossom", "boulder", "branch", "breeze", "brook", "bud", "bush", "cactus", "canyon", "cave",
+        "cedar", "clay", "cliff", "cloud", "clover", "coast", "coral", "creek", "crystal", "daffodil",
+        "daisy", "dandelion", "dawn", "desert", "dew", "dirt", "dune", "dusk", "earth", "elm",
+        "fern", "field", "fire", "flower", "fog", "forest", "fossil", "frost", "garden", "glacier",
+        "grass", "gravel", "grove", "hail", "hill", "horizon", "ice", "icicle", "island", "ivy",
+        "jungle", "lake", "lava", "leaf", "lightning", "lily", "log", "maple", "marigold", "marsh",
+        "meadow", "meteor", "moon", "moss", "mountain", "mud", "oak", "ocean", "orchid", "palm",
+        "pebble", "petal", "pine", "plain", "plant", "pond", "poppy", "prairie", "puddle", "rain",
+        "rainbow", "reed", "reef", "river", "rock", "root", "rose", "sand", "sap", "sea",
+        "seed", "shell", "shore", "sky", "snow", "snowflake", "soil", "sprout", "star", "stem",
+        "stone", "storm", "stream", "sun", "sunflower", "sunrise", "sunset", "thistle", "thorn", "thunder",
+        "tide", "tree", "tulip", "twig", "valley", "vine", "violet", "volcano", "water", "waterfall",
+        "wave", "weed", "willow", "wind", "winter", "wood"
+      ]
+    },
+    {
+      "tags": ["general", "school"],
+      "words": [
+        "alphabet", "answer", "art", "atlas", "backpack", "bell", "board", "book", "bookmark", "brush",
+        "calculator", "calendar", "chalk", "chapter", "chart", "class", "classroom", "clip", "clock", "coach",
+        "color", "computer", "count", "crayon", "cube", "desk", "dictionary", "digit", "drawing", "eraser",
+        "folder", "globe", "glue", "graph", "group", "homework", "ink", "journal", "keyboard", "label",
+        "laptop", "lesson", "letter", "library", "locker", "lunch", "map", "marker", "math", "music",
+        "name", "notebook", "number", "page", "paint", "paper", "paragraph", "pattern", "pen", "pencil",
+        "picture", "playground", "poem", "poster", "principal", "project", "pupil", "puzzle", "question", "quiz",
+        "recess", "ruler", "school", "science", "scissors", "sentence", "shape", "shelf", "sketch", "song",
+        "spelling", "square", "stapler", "sticker", "story", "student", "study", "table", "teacher", "team",
+        "test", "text", "title", "triangle", "uniform", "vocabulary", "word", "worksheet", "writing", "zero"
+      ]
+    },
+    {
+      "tags": ["general", "home"],
+      "words": [
+        "attic", "bag", "balcony", "basket", "bath", "bathroom", "bed", "bedroom", "bench", "blanket",
+        "blender", "bottle", "bowl", "box", "broom", "bucket", "cabinet", "candle", "carpet", "ceiling",
+        "chair", "chimney", "closet", "couch", "counter", "cup", "cupboard", "curtain", "cushion", "dish",
+        "door", "doormat", "drawer", "dryer", "fan", "faucet", "fence", "fireplace", "floor", "fork",
+        "fridge", "garage", "gate", "glass", "hall", "hammer", "hanger", "home", "house", "jar",
+        "jug", "kettle", "key", "kitchen", "ladder", "lamp", "laundry", "lid", "lock", "mat",
+        "mirror", "mop", "napkin", "oven", "pan", "pillow", "plate", "porch", "pot", "quilt",
+        "radio", "rake", "ribbon", "roof", "room", "rug", "screen", "shampoo", "shower", "sink",
+        "soap", "sofa", "sponge", "spoon", "stairs", "stool", "stove", "tape", "telephone", "television",
+        "toaster", "toilet", "toothbrush", "toothpaste", "towel", "tray", "vase", "wall", "wardrobe", "washer",
+        "window", "yard", "zipper"
+      ]
+    },
+    {
+      "tags": ["general", "clothing"],
+      "words": [
+        "apron", "belt", "blouse", "boot", "button", "cap", "cloak", "coat", "collar", "costume",
+        "dress", "earmuff", "glove", "gown", "hat", "helmet", "hood", "jacket", "jeans", "lace",
+        "mitten", "necklace", "overall", "pajamas", "pants", "pocket", "raincoat", "ring", "robe", "sandal",
+        "scarf", "shirt", "shoe", "shorts", "skirt", "sleeve", "slipper", "sneaker", "sock", "suit",
+        "sweater", "tie", "vest", "watch"
+      ]
+    },
+    {
+      "tags": ["general", "play"],
+      "words": [
+        "acrobat", "adventure", "ball", "balloon", "baseball", "basketball", "bike", "block", "boat", "bowling",
+        "bubble", "canoe", "card", "cart", "castle", "checkers", "chess", "circus", "concert", "craft",
+        "dance", "dice", "doll", "domino", "drum", "fair", "festival", "flute", "football", "frisbee",
+        "game", "goal", "guitar", "gym", "harmonica", "hobby", "hoop", "hopscotch", "jigsaw", "kite",
+        "marble", "mask", "maze", "microphone", "movie", "net", "orchestra", "paddle", "park", "party",
+        "piano", "picnic", "pool", "prize", "puppet", "race", "racket", "ramp", "recorder", "robot",
+        "rope", "scooter", "seesaw", "skate", "skateboard", "sled", "slide", "soccer", "sport", "stage",
+        "swing", "tambourine", "tennis", "tent", "toy", "trampoline", "trophy", "trumpet", "tunnel", "violin",
+        "volleyball", "wagon", "whistle", "yo-yo"
+      ]
+    },
+    {
+      "tags": ["general", "places"],
+      "words": [
+        "airport", "aquarium", "bakery", "bank", "barn", "bridge", "building", "bus", "cabin", "camp",
+        "car", "city", "clinic", "country", "dock", "elevator", "engine", "factory", "farm", "ferry",
+        "fountain", "harbor", "helicopter", "highway", "hospital", "hotel", "jeep", "journey", "kayak", "lighthouse",
+        "market", "museum", "neighborhood", "office", "palace", "path", "plane", "port", "restaurant", "road",
+        "rocket", "sailboat", "ship", "sidewalk", "station", "store", "street", "submarine", "subway", "taxi",
+        "theater", "tower", "town", "tractor", "trail", "train", "tram", "truck", "village", "zoo"
+      ]
+    },
+    {
+      "tags": ["general", "actions"],
+      "words": [
+        "add", "agree", "ask", "bake", "balance", "bounce", "bow", "bring", "build", "carry",
+        "catch", "cheer", "choose", "clap", "clean", "climb", "close", "collect", "come", "compare",
+        "cook", "crawl", "create", "cut", "dig", "discover", "draw", "dream", "drink", "drop",
+        "eat", "enjoy", "explore", "feed", "fetch", "find", "finish", "fit", "float", "fold",
+        "follow", "gather", "give", "go", "greet", "grow", "guess", "help", "hide", "hold",
+        "hop", "hug", "hum", "imagine", "invite", "join", "jog", "jump", "keep", "kick",
+        "knit", "laugh", "learn", "lend", "lift", "listen", "look", "march", "match", "measure",
+        "mix", "move", "nod", "notice", "open", "pack", "pass", "pat", "peek", "pick",
+        "plan", "play", "point", "pour", "practice", "pull", "push", "read", "reach", "remember",
+        "rest", "ride", "rinse", "rise", "row", "run", "save", "say", "search", "see",
+        "share", "shine", "show", "sing", "sit", "skip", "sleep", "smile", "sort", "spin",
+        "splash", "stand", "start", "stay", "step", "stir", "stop", "stretch", "swim", "take",
+        "talk", "teach", "tell", "think", "throw", "tickle", "touch", "try", "turn", "use",
+        "visit", "wait", "walk", "wash", "wave", "wear", "win", "wish", "work", "write"
+      ]
+    },
+    {
+      "tags": ["general", "describing"],
+      "words": [
+        "able", "afraid", "awake", "awesome", "best", "big", "blue", "bold", "brave", "bright",
+        "brown", "busy", "calm", "careful", "cheerful", "chilly", "clever", "cold", "cool", "cozy",
+        "curious", "cute", "deep", "different", "dry", "early", "easy", "empty", "equal", "excited",
+        "fair", "fancy", "fast", "fine", "flat", "fluffy", "fresh", "friendly", "full", "fun",
+        "funny", "gentle", "glad", "gold", "good", "gray", "great", "green", "happy", "hard",
+        "heavy", "helpful", "high", "hot", "huge", "hungry", "jolly", "kind", "large", "late",
+        "light", "little", "long", "loud", "lovely", "low", "lucky", "messy", "mild", "narrow",
+        "neat", "new", "nice", "old", "oval", "patient", "pink", "polite", "pretty", "proud",
+        "purple", "quick", "quiet", "ready", "red", "round", "safe", "salty", "shiny", "short",
+        "shy", "silly", "silver", "sleepy", "slow", "small", "smart", "smooth", "soft", "solid",
+        "special", "spotty", "sticky", "strong", "sunny", "sweet", "tall", "tasty", "thick", "thin",
+        "tiny", "tired", "warm", "wet", "white", "wide", "wild", "wise", "wonderful", "yellow", "young"
+      ]
+    },
+    {
+      "tags": ["general", "people"],
+      "words": [
+        "artist", "aunt", "baby", "baker", "brother", "captain", "carpenter", "child", "cousin", "dentist",
+        "doctor", "driver", "family", "farmer", "father", "firefighter", "friend", "grandfather", "grandmother", "guest",
+        "helper", "inventor", "kid", "librarian", "lifeguard", "mother", "neighbor", "nurse", "parent", "pilot",
+        "plumber", "sailor", "scientist", "singer", "sister", "uncle", "visitor"
+      ]
+    },
+    {
+      "tags": ["general", "everyday"],
+      "words": [
+        "age", "ankle", "arm", "back", "birthday", "body", "bone", "brain", "breath", "chance",
+        "cheek", "chin", "circle", "coin", "day", "diamond", "direction", "ear", "elbow", "end",
+        "energy", "evening", "example", "eye", "face", "fact", "feather", "feeling", "finger", "foot",
+        "hair", "hand", "head", "heart", "heel", "hole", "hour", "idea", "inch", "knee",
+        "leg", "life", "line", "list", "luck", "memory", "minute", "month", "morning", "mouth",
+        "neck", "night", "nose", "pair", "part", "peace", "place", "power", "promise", "reason",
+        "rule", "second", "shadow", "shoulder", "side", "size", "skin", "smell", "sound", "space",
+        "speed", "surprise", "taste", "thought", "thumb", "time", "toe", "tongue", "tooth", "top",
+        "voice", "week", "weekend", "weight", "wheel", "world", "year"
+      ]
+    },
+    {
+      "tags": ["general", "two-letter-blend"],
+      "words": [
+        "black", "blade", "blame", "blank", "blast", "blend", "bless", "blind", "blink", "blot", "blush",
+        "brag", "brake", "brand", "brass", "brick", "bride", "brim", "broad", "broil",
+        "claim", "clam", "clan", "clear", "cling", "clog", "clue",
+        "crack", "cramp", "crash", "crate", "crazy", "crest", "croak", "crop", "crust",
+        "draft", "drag", "drain", "drake", "drip", "drive", "drone",
+        "flag", "flake", "flame", "flap", "flash", "flee", "flip", "flock", "flop", "flow", "flush",
+        "gleam", "glide", "glitter", "gloom", "glow",
+        "grab", "grade", "grain", "grand", "grasp", "grin", "grip", "grub",
+        "plank", "plead", "please", "plot", "plug", "plump", "plus",
+        "press", "price", "print", "prop", "prove",
+        "scab", "scale", "scan", "scar", "scare", "score", "scout",
+        "skill", "skinny", "slab", "slam", "slant", "slap", "slate", "slim", "slip", "slope", "slot",
+        "smack", "smash", "smoke", "snack", "snap", "sneak", "sniff", "snip", "snore", "snug",
+        "span", "spark", "speak", "spell", "spice", "spike", "spill", "spoke", "spot",
+        "stack", "staff", "stamp", "steam", "steep", "stick", "sting", "stomp",
+        "swallow", "sway", "sweep", "swift", "track", "trade", "trap", "treat", "trim", "trip", "trust", "twin"
+      ]
+    },
+    {
+      "tags": ["general", "two-letter-blend"],
+      "words": [
+        "blanket", "block", "blossom", "blue", "branch", "bread", "breeze", "bright", "bring", "broccoli", "broom", "brown", "brush",
+        "clap", "class", "clay", "clean", "cliff", "climb", "clip", "clock", "close", "cloud", "clover",
+        "crab", "crane", "crayon", "cream", "creek", "cricket", "crow",
+        "dream", "dress", "drink", "drop", "drum", "dry",
+        "flat", "float", "floor", "flower", "fluffy", "flute", "fly", "glad", "glass", "globe", "glove", "glue",
+        "grape", "grass", "gravel", "gray", "great", "green", "group", "grow",
+        "place", "plain", "plan", "plane", "plant", "plate", "play", "plum",
+        "practice", "pretzel", "prize", "proud", "scarf", "scooter", "skate", "sketch", "skip", "skirt", "sky",
+        "sled", "sleep", "slide", "slow", "slug", "small", "smell", "smile", "smooth", "snail", "snake", "snow",
+        "space", "sparrow", "spelling", "spider", "spin", "spoon", "sport", "star", "start", "stay", "step", "sticker", "stir", "stop", "store",
+        "swim", "swing", "sweet", "tractor", "trail", "train", "tree", "trout", "truck", "twig"
+      ]
+    },
+    {
+      "tags": ["general", "three-letter-blend"],
+      "words": [
+        "scramble", "scrap", "scrape", "scratch", "scream", "screen", "script", "scrub",
+        "splash", "split", "splinter", "splendid", "spray", "spread", "spring", "sprinkle", "sprint", "sprout",
+        "square", "squash", "squeak", "squeeze", "squid", "squint", "squirrel",
+        "strand", "strap", "straw", "strawberry", "stray", "stream", "street", "stretch", "string", "stripe", "stroke", "strong",
+        "thrift", "thrill", "thrive", "throat", "throw"
+      ]
+    },
+    {
+      "tags": ["general", "vowel-team"],
+      "words": [
+        "aim", "bait", "braid", "chain", "claim", "drain", "gain", "grain", "mail", "main", "nail", "pail", "paint", "plain", "rain", "sail", "snail", "tail", "trail", "train",
+        "beam", "beach", "bead", "bean", "beast", "beat", "bleach", "bread", "cheat", "clean", "cream", "dream", "each", "ear", "east", "eat", "feast", "head", "heap", "leaf", "lean", "leap", "meal", "mean", "neat", "peach", "pea", "peak", "reach", "read", "sea", "seal", "seat", "steam", "team", "teach", "thread", "treat", "weak", "wheat",
+        "bee", "beef", "beet", "cheek", "cheer", "cheese", "creek", "deep", "deer", "feed", "feel", "feet", "flee", "free", "green", "heel", "jeep", "keep", "kneel", "need", "peek", "peel", "reed", "reef", "seed", "see", "sheep", "sheet", "sleep", "sneeze", "speed", "steep", "street", "sweet", "teeth", "tree", "weed", "week", "wheel",
+        "boat", "boast", "coat", "coast", "croak", "float", "foam", "goal", "goat", "loaf", "load", "oak", "oat", "road", "roam", "soap", "soak", "toast", "toad",
+        "book", "boom", "boot", "broom", "cook", "cool", "food", "foot", "goose", "hook", "hoop", "look", "moon", "noon", "pool", "roof", "room", "root", "school", "scoop", "spoon", "stool", "tooth", "wood",
+        "blue", "clue", "glue", "true", "fruit", "suit", "juice", "coin", "join", "oil", "point", "soil", "toy", "joy", "boy",
+        "cloud", "count", "couch", "house", "loud", "mouse", "mouth", "round", "sound", "south",
+        "brown", "cow", "crown", "down", "frown", "gown", "grow", "low", "owl", "row", "show", "slow", "snow", "town", "flower",
+        "claw", "draw", "dawn", "hawk", "lawn", "paw", "saw", "straw", "yawn", "haul", "pause", "sauce"
+      ]
+    },
+    {
+      "tags": ["dinosaurs"],
+      "words": [
+        "Achelousaurus", "Acrocanthosaurus", "Albertosaurus", "Allosaurus", "Alvarezsaurus", "Amargasaurus", "Ankylosaurus", "Apatosaurus", "Archaeopteryx", "Argentinosaurus", "Austroraptor",
+        "Bambiraptor", "Baryonyx", "Beipiaosaurus", "Brachiosaurus", "Brontosaurus",
+        "Camarasaurus", "Carcharodontosaurus", "Carnotaurus", "Centrosaurus", "Ceratosaurus", "Chasmosaurus", "Coelophysis", "Compsognathus", "Concavenator", "Corythosaurus",
+        "Deinonychus", "Dilophosaurus", "Diplodocus", "Dracorex", "Dreadnoughtus", "Dromaeosaurus",
+        "Edmontonia", "Edmontosaurus", "Eoraptor", "Euoplocephalus",
+        "Gallimimus", "Giganotosaurus", "Gorgosaurus", "Gryposaurus",
+        "Hadrosaurus", "Herrerasaurus", "Heterodontosaurus", "Hypsilophodon",
+        "Iguanodon", "Kentrosaurus", "Lambeosaurus", "Lesothosaurus", "Maiasaura", "Megalosaurus", "Microraptor", "Minmi", "Monolophosaurus", "Mussaurus",
+        "Nasutoceratops", "Nigersaurus", "Nodosaurus", "Ornithomimus", "Oviraptor",
+        "Pachycephalosaurus", "Pachyrhinosaurus", "Parasaurolophus", "Plateosaurus", "Protoceratops", "Psittacosaurus",
+        "Rajasaurus", "Saurolophus", "Shunosaurus", "Sinoceratops", "Sinosauropteryx", "Spinosaurus", "Stegosaurus", "Styracosaurus", "Suchomimus",
+        "Tarbosaurus", "Therizinosaurus", "Torosaurus", "Triceratops", "Troodon", "Tyrannosaurus", "Utahraptor", "Velociraptor", "Yangchuanosaurus", "Zuniceratops"
+      ]
+    },
+    {
+      "tags": ["halloween"],
+      "words": [
+        "bat", "black", "broom", "candy", "cape", "cat", "cauldron", "cobweb", "costume", "creepy",
+        "crow", "dark", "decoration", "doorbell", "dragon", "fang", "flashlight", "ghost", "glow", "goblin",
+        "hat", "hayride", "hoot", "howl", "lantern", "mask", "midnight", "monster", "moon", "mummy",
+        "night", "October", "owl", "party", "pumpkin", "raven", "scarecrow", "shadow", "skeleton", "spider",
+        "spooky", "sweets", "treat", "trick", "vampire", "wand", "web", "werewolf", "witch", "wizard"
+      ]
+    }
+  ]
+}

@@ -24,6 +24,7 @@
       {% endfor %}
     </div>
     <button id="start-game" class="primary-button" type="button">Let’s play!</button>
+    <p id="load-status" role="status" aria-live="polite"></p>
   </div>
 
   <div id="play-area" hidden>
@@ -48,5 +49,5 @@
     </div>
   </div>
 </section>
-<script src="{{ get_url(path='alphabetical-order.js') }}" defer></script>
+<script src="{{ get_url(path='alphabetical-order.js') }}" type="module"></script>
 {% endblock content %}

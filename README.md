@@ -29,8 +29,36 @@ existing game directory and edit its title, description, weight (tile order),
 and icon. The root page lists these games automatically. The shared
 `templates/game.html` provides an HTML5 canvas placeholder. The alphabetical
 game uses `templates/alphabetical-order.html` and `static/alphabetical-order.js`;
-its word sets are defined in the `levels` array so more or custom sets can be
-added without changing the sorting and gameplay logic.
+it loads the curated word bank from `static/words.json`. Each new round randomly
+selects 12 appropriate words; retries keep the same set in a new order.
+
+## Alphabetical Adventure word bank
+
+`static/words.json` contains tagged groups of words. Groups keep the bank compact:
+each word inherits the group's `tags`. When a word appears in multiple groups,
+`static/alphabet-word-lists.mjs` merges its tags case-insensitively, so it is never
+selected twice in one round. Add words or groups using this structure:
+
+```json
+{"tags": ["general", "vowel-team"], "words": ["rain", "boat", "seed"]}
+```
+
+The `general` tag makes a word eligible for the first two levels. Other tags
+include `two-letter-blend`, `three-letter-blend`, `vowel-team`, `dinosaurs`,
+`halloween`, and everyday themes such as `animals` and `food`. Phonics tags
+describe consonant blends and vowel spelling patterns; words may have several
+tags. Two-letter digraphs such as `sh` and `ch` are not consonant blends.
+Theme-only words are excluded from the general pool unless also tagged
+`general`. These groups are authored here, with no external dictionary or runtime
+service required. Future custom lists can use the same format.
+
+Level one uses 12 different first letters. Level two uses six pairs with matching
+first letters but different second letters, so third letters are not needed.
+The dinosaur level includes at least one pair with matching first two letters.
+Selection validates the bank and reports loading errors instead of substituting
+a fixed word set.
+
+Run the word-bank and selection checks with `node --test tests/*.test.mjs`.
 
 For a standalone HTML5 game, place its HTML, JavaScript, and assets in
 `static/<game-name>/`; Zola copies these unchanged into the matching output
