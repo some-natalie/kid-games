@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
-import { playableThemes, readWordBank, selectThemeWords, selectWords, WORD_COUNT } from "../../../static/alphabet-word-lists.js";
+import { playableThemes, QUEST_LEVELS, readWordBank, selectLevelWords, selectThemeWords } from "../../../static/alphabet-word-lists.js";
 
 const data = JSON.parse(await readFile(new URL("../../../static/words.json", import.meta.url), "utf8"));
 const bank = readWordBank(data);
@@ -59,32 +59,50 @@ test("tag merging is case-insensitive and preserves the original spelling", () =
   assert.deepEqual([...entries[0].tags], ["general", "halloween"]);
 });
 
+test("the quest has 10 levels that ramp from 4 to 12 words", () => {
+  assert.equal(QUEST_LEVELS.length, 10);
+  const counts = QUEST_LEVELS.map((level) => level.count);
+  assert.equal(counts[0], 4);
+  assert.equal(counts.at(-1), 12);
+  assert.ok(counts.every((count, index) => index === 0 || count >= counts[index - 1]));
+  assert.ok(QUEST_LEVELS.at(-1).dinosaurs);
+  const depths = QUEST_LEVELS.map((level) => Math.max(1, ...(level.clusters ?? [])));
+  assert.ok(depths.slice(0, -1).every((depth, index) => index === 0 || depth >= depths[index - 1]));
+});
+
+function sharedPrefix(first, second) {
+  let length = 0;
+  while (length < first.length && length < second.length &&
+    first[length].toLowerCase() === second[length].toLowerCase()) length += 1;
+  return length;
+}
+
 test("hundreds of rounds satisfy each level's exact comparison rules", () => {
-  for (const mode of ["first-letter", "second-letter", "dinosaurs"]) {
+  const entries = new Map(bank.map((entry) => [entry.word, entry]));
+  for (const [index, level] of QUEST_LEVELS.entries()) {
     const sets = new Set();
     for (let round = 0; round < 300; round += 1) {
-      const words = selectWords(bank, mode);
-      assert.equal(words.length, WORD_COUNT);
-      assert.equal(new Set(words).size, WORD_COUNT);
+      const words = selectLevelWords(bank, level);
+      assert.equal(words.length, level.count);
+      assert.equal(new Set(words).size, level.count);
       sets.add([...words].sort().join(","));
-      const tag = mode === "dinosaurs" ? "dinosaurs" : "general";
-      assert.ok(words.every((word) => bank.find((entry) => entry.word === word).tags.has(tag)));
-      const firstLetters = new Map();
-      for (const word of words) {
-        const first = word[0].toLowerCase();
-        firstLetters.set(first, (firstLetters.get(first) ?? 0) + 1);
+      const tag = level.dinosaurs ? "dinosaurs" : "general";
+      assert.ok(words.every((word) => entries.get(word).tags.has(tag)), `level ${index + 1}`);
+      if (level.dinosaurs) {
+        assert.ok(new Set(words.map((word) => word.slice(0, 2).toLowerCase())).size < level.count);
+        continue;
       }
-      if (mode === "first-letter") {
-        assert.equal(firstLetters.size, 12);
-      } else if (mode === "second-letter") {
-        assert.equal(firstLetters.size, 6);
-        assert.ok([...firstLetters.values()].every((count) => count === 2));
-        assert.equal(new Set(words.map((word) => word.slice(0, 2).toLowerCase())).size, 12);
-      } else {
-        assert.ok(new Set(words.map((word) => word.slice(0, 2).toLowerCase())).size < 12);
+      assert.ok(words.every((word) => /^[a-z]+$/i.test(word)));
+      const byFirst = Map.groupBy(words, (word) => word[0].toLowerCase());
+      const clusters = [...byFirst.values()].filter((group) => group.length > 1);
+      assert.ok([...byFirst.values()].every((group) => group.length <= 2));
+      assert.deepEqual(clusters.map(([first, second]) => sharedPrefix(first, second) + 1).sort(),
+        [...level.clusters].sort());
+      for (const [first, second] of clusters) {
+        assert.ok(Math.min(first.length, second.length) > sharedPrefix(first, second), `${first}/${second}`);
       }
     }
-    assert.ok(sets.size > 290, `Too little variation for ${mode}: ${sets.size} sets`);
+    assert.ok(sets.size > 250, `Too little variation for level ${index + 1}: ${sets.size} sets`);
   }
 });
 
@@ -95,13 +113,16 @@ test("malformed and insufficient word banks fail explicitly", () => {
     assert.throws(() => readWordBank(value));
   }
   const smallBank = readWordBank({ groups: [{ tags: ["general", "dinosaurs"], words: ["cat"] }] });
-  for (const mode of ["first-letter", "second-letter", "dinosaurs"]) {
-    assert.throws(() => selectWords(smallBank, mode));
+  for (const level of QUEST_LEVELS) {
+    assert.throws(() => selectLevelWords(smallBank, level));
   }
-  assert.throws(() => selectWords(bank, "unknown"), /Unknown/);
+  for (const count of [0, 1, 13, 4.5]) {
+    assert.throws(() => selectLevelWords(bank, { count, clusters: [] }), /between 2 and 12/);
+    assert.throws(() => selectThemeWords(bank, "dinosaurs", count), RangeError);
+  }
 });
 
-test("every dropdown theme supports 12 unique curated words without level restrictions", () => {
+test("every dropdown theme supports each quest level with unique curated words", () => {
   const themes = playableThemes(bank);
   assert.ok(themes.some((theme) => theme.id === "dinosaurs"));
   assert.ok(themes.some((theme) => theme.id === "flowers"));
@@ -110,9 +131,10 @@ test("every dropdown theme supports 12 unique curated words without level restri
   assert.ok(!themes.some((theme) => ["general", "advanced", "wordnet", "vowel-team"].includes(theme.id)));
   for (const theme of themes) {
     for (let round = 0; round < 10; round += 1) {
-      const words = selectThemeWords(bank, theme.id);
-      assert.equal(words.length, WORD_COUNT);
-      assert.equal(new Set(words).size, WORD_COUNT);
+      const count = QUEST_LEVELS[round].count;
+      const words = selectThemeWords(bank, theme.id, count);
+      assert.equal(words.length, count);
+      assert.equal(new Set(words).size, count);
       assert.ok(words.every((word) => {
         const entry = bank.find((item) => item.word === word);
         return entry.tags.has(theme.id) && !entry.tags.has("advanced");

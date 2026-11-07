@@ -8,6 +8,7 @@
   --border: #d9deed;
   --badge: #eeeafa;
   font-family: system-ui, sans-serif;
+  font-size: clamp(1.125rem, 1rem + 0.6vw, 1.375rem);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -34,7 +35,7 @@ main { padding-block: 1.5rem 3rem; }
 .intro { text-align: center; margin-bottom: 2rem; }
 .eyebrow { color: var(--accent); font-weight: 700; }
 h1 { font-size: clamp(1.8rem, 5vw, 3rem); line-height: 1.2; }
-h2 { font-size: 1.2rem; }
+h2 { font-size: 1.5rem; }
 p { color: var(--muted); }
 .game-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr)); gap: 1rem; }
 .game-tile { display: block; padding: 1.5rem; border: 1px solid var(--border); border-radius: 1rem; background: var(--surface); color: var(--text); text-decoration: none; }
@@ -51,26 +52,65 @@ p { color: var(--muted); }
 .tutorial { text-align: center; }
 .tutorial h2, .level-heading h2 { margin-top: 0.25rem; }
 .alphabet-strip { display: grid; grid-template-columns: repeat(auto-fit, minmax(2rem, 1fr)); gap: 0.35rem; margin: 1.5rem 0; }
-.alphabet-strip span { padding: 0.3rem; border-radius: 0.4rem; background: var(--badge); color: var(--accent); font-weight: 700; }
+.alphabet-strip span { padding: 0.3rem; font-size: 1.2rem; border-radius: 0.4rem; background: var(--badge); color: var(--accent); font-weight: 700; }
 .primary-button, .secondary-button, .word-button { min-height: 2.75rem; border: 2px solid var(--accent); border-radius: 0.65rem; padding: 0.55rem 1rem; font: inherit; font-weight: 700; cursor: pointer; }
 .primary-button { background: var(--accent); color: var(--surface); }
 .secondary-button, .word-button { background: var(--surface); color: var(--text); }
-.word-button { width: 100%; text-align: left; cursor: grab; touch-action: none; user-select: none; -webkit-user-select: none; overflow-wrap: anywhere; }
+.word-button { width: 100%; min-height: 3.25rem; font-size: 1.35rem; text-align: left; cursor: grab; touch-action: none; user-select: none; -webkit-user-select: none; overflow-wrap: anywhere; }
 .answer-list, .answer-list *, .drag-ghost, .drag-ghost * { user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }
 .drag-handle { margin-right: 0.75rem; color: var(--accent); }
 .dragging { opacity: 0.35; }
+.answer-list.solved .word-button:disabled { opacity: 1; border-color: #2f9c50; background: #e5f8e9; color: #1f5f31; cursor: default; }
+@media (prefers-color-scheme: dark) { .answer-list.solved .word-button:disabled { background: #1f3b28; color: #c9f2b8; border-color: #4cc26d; } }
 .drag-ghost { position: fixed; z-index: 10; pointer-events: none; transform: translate(-50%, -50%); box-shadow: 0 0.3rem 1rem #0004; opacity: 0.95; }
 .answer-list li.drop-before { border-top: 3px solid var(--accent); }
 .answer-list li.drop-after { border-bottom: 3px solid var(--accent); }
 button:disabled { opacity: 0.55; cursor: not-allowed; }
 button:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+[tabindex="-1"]:focus { outline: none; }
 .level-heading { display: flex; flex-wrap: wrap; align-items: start; justify-content: space-between; gap: 0.5rem 2rem; }
 .level-heading > p { max-width: 22rem; }
 .game-instructions { margin-top: 0; }
 .progress { font-weight: 700; }
 .answer-list { display: grid; gap: 0.4rem; padding-left: 2rem; }
 .answer-list li { padding: 0.15rem; border-top: 3px solid transparent; border-bottom: 3px solid transparent; }
-.feedback { min-height: 1.6rem; font-weight: 700; }
+.feedback { min-height: 1.6rem; font-weight: 700; font-size: 1.15rem; }
+.feedback.success { color: var(--accent); font-size: 1.4rem; animation: pop-in 0.45s ease-out; }
+.game-actions.centered { justify-content: center; }
+.level-map { display: flex; flex-wrap: wrap; gap: 0.35rem; padding: 0; margin: 0 0 1rem; list-style: none; }
+.level-map li { display: grid; place-items: center; width: 2.1rem; height: 2.1rem; border: 2px solid var(--border); border-radius: 50%; color: var(--muted); font-size: 0.9rem; font-weight: 700; }
+.level-map li.current { border-color: var(--accent); color: var(--accent); }
+.level-map li.done { border-color: var(--accent); background: var(--accent); color: var(--surface); }
+.celebration { position: fixed; inset: 0; z-index: 20; overflow: hidden; pointer-events: none; }
+.confetti-piece { position: absolute; width: 0.7rem; height: 1rem; margin: -0.5rem; border-radius: 0.15rem; }
+.sparkle { position: absolute; top: 0; line-height: 1; text-shadow: 0 0 0.4rem #fff8; }
+.sparkle.still { font-size: 2rem; }
+.quest-complete { text-align: center; }
+.quest-complete h2 { font-size: clamp(2rem, 6vw, 3rem); margin: 0.25rem 0; color: var(--accent); }
+.quest-theme { font-weight: 700; color: var(--text); }
+.dancing-dino { width: min(18rem, 80%); height: auto; overflow: visible; }
+.dino-skin { fill: #4cc26d; }
+.dino-spikes { fill: #2f9c50; }
+.dino-belly { fill: #c9f2b8; }
+.dino-arm { fill: none; stroke: #4cc26d; stroke-width: 9; stroke-linecap: round; }
+.dino-notes { fill: var(--accent); font-size: 1.6rem; }
+.dino-body, .dino-head, .dino-arm, .dino-leg, .dino-notes { transform-box: fill-box; }
+.dino-body { transform-origin: 50% 100%; animation: dino-sway 0.9s ease-in-out infinite alternate; }
+.dino-head { transform-origin: 0% 100%; animation: dino-nod 0.45s ease-in-out infinite alternate; }
+.dino-arm { transform-origin: 0% 100%; animation: dino-wave 0.45s ease-in-out infinite alternate; }
+.dino-arm-right { animation-delay: -0.22s; }
+.dino-leg { transform-origin: 50% 0%; animation: dino-step 0.45s ease-in-out infinite alternate; }
+.dino-leg-right { animation-delay: -0.45s; }
+.dino-notes { animation: dino-notes 1.8s ease-in-out infinite; }
+@keyframes pop-in { from { transform: scale(0.7); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+@keyframes dino-sway { from { transform: rotate(-6deg) translateY(0); } to { transform: rotate(6deg) translateY(-10px); } }
+@keyframes dino-nod { from { transform: rotate(-5deg); } to { transform: rotate(8deg); } }
+@keyframes dino-wave { from { transform: rotate(-25deg); } to { transform: rotate(20deg); } }
+@keyframes dino-step { from { transform: translateY(0); } to { transform: translateY(-8px); } }
+@keyframes dino-notes { 0%, 100% { transform: translateY(0); opacity: 0.4; } 50% { transform: translateY(-10px); opacity: 1; } }
+@media (prefers-reduced-motion: reduce) {
+  .feedback.success, .dino-body, .dino-head, .dino-arm, .dino-leg, .dino-notes { animation: none; }
+}
 .game-actions { display: flex; flex-wrap: wrap; gap: 0.75rem; }
 [hidden] { display: none !important; }
 footer { padding-block: 1.5rem; text-align: center; }

@@ -1,28 +1,14 @@
-import { playableThemes, readWordBank, selectThemeWords, selectWords, shuffled } from "./alphabet-word-lists.js";
+import { playableThemes, QUEST_LEVELS, readWordBank, selectLevelWords, selectThemeWords, shuffled } from "./alphabet-word-lists.js";
 import { DEFAULT_THEME, loadPreferences, savePreferences } from "./alphabet-preferences.js";
+import { clearProgress, loadProgress, saveProgress } from "./alphabet-progress.js";
 import { attachSorter, moveWord } from "./alphabet-sorter.js";
+import { celebrate, stopCelebration } from "./alphabet-celebration.js";
 
 (() => {
-  const levels = [
-    {
-      title: "First-letter friends",
-      hint: "Look at the first letter of each word.",
-      mode: "first-letter",
-    },
-    {
-      title: "Look a little closer",
-      hint: "Some words start with the same letter. Compare their second letters, too!",
-      mode: "second-letter",
-    },
-    {
-      title: "Dinosaur challenge",
-      hint: "Dinosaur names can be long! Compare letters from the beginning until you find a difference.",
-      mode: "dinosaurs",
-    },
-  ];
-
+  const levels = QUEST_LEVELS;
   const tutorial = document.querySelector("#tutorial");
   const playArea = document.querySelector("#play-area");
+  const questComplete = document.querySelector("#quest-complete");
   const answerList = document.querySelector("#answer-list");
   const progress = document.querySelector("#progress");
   const feedback = document.querySelector("#feedback");
@@ -30,16 +16,19 @@ import { attachSorter, moveWord } from "./alphabet-sorter.js";
   const checkButton = document.querySelector("#check-order");
   const restartButton = document.querySelector("#restart-level");
   const nextButton = document.querySelector("#next-level");
-  const playAgainButton = document.querySelector("#play-again");
   const startButton = document.querySelector("#start-game");
+  const newQuestButton = document.querySelector("#new-quest");
+  const playAgainButton = document.querySelector("#play-again");
   const loadStatus = document.querySelector("#load-status");
   const themeSelect = document.querySelector("#theme-select");
   const preferenceStatus = document.querySelector("#preference-status");
+  const levelMap = document.querySelector("#level-map");
   const getStorage = () => window.localStorage;
-  const savedMessage = "Your choice is saved only in this browser.";
+  const savedMessage = "Your theme and level are saved only in this browser.";
   let themes = [];
   let selectedTheme = DEFAULT_THEME;
   let bank;
+  let entries;
   let roundWords = [];
   let levelIndex = 0;
   let words = [];
@@ -50,32 +39,108 @@ import { attachSorter, moveWord } from "./alphabet-sorter.js";
     words = moveWord(words, from, to);
     feedback.textContent = "";
     render(to);
+    persist();
     progress.textContent = `${words[to]} moved to position ${to + 1} of ${words.length}.`;
   });
 
-  function startLevel(index, newRound = true) {
+  const themed = () => selectedTheme !== DEFAULT_THEME;
+  const themeLabel = () => themes.find((theme) => theme.id === selectedTheme)?.label;
+
+  function showStatus(warning) {
+    preferenceStatus.textContent = warning || savedMessage;
+  }
+
+  function allowedWord(word, index) {
+    const entry = entries.get(word.toLowerCase());
+    if (!entry || entry.word !== word) return false;
+    if (themed()) return entry.tags.has(selectedTheme) && !entry.tags.has("advanced");
+    return entry.tags.has(levels[index].dinosaurs ? "dinosaurs" : "general");
+  }
+
+  function validProgress(saved) {
+    if (!saved || typeof saved !== "object" || !Number.isInteger(saved.level) ||
+        saved.level < 0 || saved.level >= levels.length) return false;
+    if (saved.roundWords === undefined && saved.words === undefined) return true;
+    const { roundWords: round, words: order } = saved;
+    return Array.isArray(round) && Array.isArray(order) && round.length === levels[saved.level].count &&
+      round.every((word) => typeof word === "string" && allowedWord(word, saved.level)) &&
+      new Set(round).size === round.length && order.length === round.length &&
+      [...order].sort().join("\n") === [...round].sort().join("\n");
+  }
+
+  function savedProgress() {
+    const result = loadProgress(getStorage, selectedTheme, validProgress);
+    if (result.warning) {
+      showStatus(result.warning);
+      clearProgress(getStorage, selectedTheme);
+    }
+    return result.progress;
+  }
+
+  function persist(nextLevel) {
+    const state = nextLevel === undefined ? { level: levelIndex, roundWords, words } : { level: nextLevel };
+    const warning = saveProgress(getStorage, selectedTheme, state);
+    if (warning) showStatus(warning);
+  }
+
+  function updateStart() {
+    const saved = bank && savedProgress();
+    if (saved && saved.level > 0 || saved?.roundWords) {
+      startButton.textContent = `Keep playing level ${saved.level + 1}`;
+      newQuestButton.hidden = false;
+    } else {
+      startButton.textContent = "Let’s play!";
+      newQuestButton.hidden = true;
+    }
+  }
+
+  function renderLevelMap() {
+    levelMap.replaceChildren(...levels.map((level, index) => {
+      const step = document.createElement("li");
+      step.textContent = String(index + 1);
+      step.className = index < levelIndex || (index === levelIndex && completed) ? "done" :
+        index === levelIndex ? "current" : "";
+      if (index === levelIndex) step.setAttribute("aria-current", "step");
+      return step;
+    }));
+    levelMap.setAttribute("aria-label", `Quest map: level ${levelIndex + 1} of ${levels.length}`);
+  }
+
+  function showPlay() {
+    tutorial.hidden = true;
+    questComplete.hidden = true;
+    playArea.hidden = false;
+  }
+
+  function startLevel(index, { order, round } = {}) {
     cancelDrag();
+    stopCelebration();
     const level = levels[index];
-    const themed = selectedTheme !== DEFAULT_THEME;
-    if (newRound) roundWords = themed ? selectThemeWords(bank, selectedTheme) : selectWords(bank, level.mode);
     levelIndex = index;
+    if (round) roundWords = round;
+    else roundWords = themed() ? selectThemeWords(bank, selectedTheme, level.count) : selectLevelWords(bank, level);
     history = [];
     completed = false;
-    words = shuffled(roundWords);
-    document.querySelector("#level-count").textContent = `${themed ? "Round" : "Level"} ${levelIndex + 1} of ${levels.length}`;
-    document.querySelector("#level-title").textContent = themed ?
-      `${themes.find((theme) => theme.id === selectedTheme).label} adventure` : level.title;
-    document.querySelector("#level-hint").textContent = themed ?
+    words = order ?? shuffled(roundWords);
+    showPlay();
+    document.querySelector("#level-count").textContent = `Level ${index + 1} of ${levels.length} · ${level.count} words`;
+    document.querySelector("#level-title").textContent = themed() ? `${themeLabel()} adventure` : level.title;
+    document.querySelector("#level-hint").textContent = themed() ?
       "Compare letters from the beginning until you find a difference. Shorter words come first when all their letters match." : level.hint;
-    nextButton.textContent = themed ? "Next round" : "Next level";
     feedback.textContent = "";
+    feedback.classList.remove("success");
     nextButton.hidden = true;
-    playAgainButton.hidden = true;
     restartButton.hidden = false;
-    restartButton.textContent = "Start over";
     undoButton.hidden = false;
     render();
+    persist();
     document.querySelector("#level-title").focus();
+  }
+
+  function resumeOrStart() {
+    const saved = savedProgress();
+    if (saved?.roundWords) startLevel(saved.level, { round: saved.roundWords, order: saved.words });
+    else startLevel(saved?.level ?? 0);
   }
 
   function render(focusIndex) {
@@ -98,8 +163,20 @@ import { attachSorter, moveWord } from "./alphabet-sorter.js";
     progress.textContent = `${words.length} words to put in ABC order`;
     undoButton.disabled = completed || history.length === 0;
     checkButton.disabled = completed;
-    restartButton.disabled = false;
+    answerList.classList.toggle("solved", completed);
+    renderLevelMap();
     if (focusIndex !== undefined) answerList.children[focusIndex].querySelector("button").focus();
+  }
+
+  function finishQuest() {
+    const warning = clearProgress(getStorage, selectedTheme);
+    if (warning) showStatus(warning);
+    playArea.hidden = true;
+    questComplete.hidden = false;
+    document.querySelector("#quest-theme").textContent = themed() ?
+      `You sorted every ${themeLabel()} level!` : "You sorted every level, all the way to the dinosaurs!";
+    document.querySelector("#quest-heading").focus();
+    celebrate();
   }
 
   function checkAnswers() {
@@ -109,18 +186,28 @@ import { attachSorter, moveWord } from "./alphabet-sorter.js";
     );
     const correct = words.filter((word, index) => word === expected[index]).length;
     completed = correct === words.length;
-    if (correct === words.length) {
-      feedback.textContent = "Fantastic! Every word is in the right place!";
+    if (completed) {
+      const { message } = celebrate();
+      const last = levelIndex === levels.length - 1;
+      feedback.textContent = `${message} Every word is in the right place! 🎉`;
+      feedback.classList.add("success");
       restartButton.hidden = true;
-      if (levelIndex === levels.length - 1) playAgainButton.hidden = false;
-      else nextButton.hidden = false;
+      undoButton.hidden = true;
+      if (last) {
+        render();
+        setTimeout(finishQuest, 1200);
+        return;
+      }
+      persist(levelIndex + 1);
+      nextButton.hidden = false;
+      render();
+      nextButton.focus();
     } else {
+      feedback.classList.remove("success");
       feedback.textContent = `Great try! ${correct} of ${words.length} words are in the right place. Keep dragging to fix the order, then check again!`;
+      render();
+      checkButton.focus();
     }
-    undoButton.hidden = completed;
-    render();
-    if (completed) (nextButton.hidden ? playAgainButton : nextButton).focus();
-    else checkButton.focus();
   }
 
   async function loadBank() {
@@ -130,7 +217,8 @@ import { attachSorter, moveWord } from "./alphabet-sorter.js";
       const response = await fetch(new URL("./words.json", import.meta.url));
       if (!response.ok) throw new Error(`Word bank request failed (${response.status}).`);
       bank = readWordBank(await response.json());
-      levels.forEach((level) => selectWords(bank, level.mode));
+      entries = new Map(bank.map((entry) => [entry.word.toLowerCase(), entry]));
+      levels.forEach((level) => selectLevelWords(bank, level));
       themes = playableThemes(bank);
       themeSelect.replaceChildren();
       const defaultOption = document.createElement("option");
@@ -146,11 +234,11 @@ import { attachSorter, moveWord } from "./alphabet-sorter.js";
       const preferences = loadPreferences(getStorage, [DEFAULT_THEME, ...themes.map((theme) => theme.id)]);
       selectedTheme = preferences.theme;
       themeSelect.value = selectedTheme;
-      preferenceStatus.textContent = preferences.warning || savedMessage;
+      showStatus(preferences.warning);
       themeSelect.disabled = false;
       startButton.disabled = false;
-      startButton.textContent = "Let’s play!";
       loadStatus.textContent = "";
+      updateStart();
       return true;
     } catch (error) {
       console.error("Unable to load Alphabetical Adventure:", error);
@@ -167,23 +255,24 @@ import { attachSorter, moveWord } from "./alphabet-sorter.js";
 
   startButton.addEventListener("click", async () => {
     if (!bank && !await loadBank()) return;
-    tutorial.hidden = true;
-    playArea.hidden = false;
-    startLevel(0);
+    resumeOrStart();
   });
+  newQuestButton.addEventListener("click", () => startLevel(0));
   themeSelect.addEventListener("change", () => {
     selectedTheme = themeSelect.value;
-    preferenceStatus.textContent = savePreferences(getStorage, selectedTheme) || savedMessage;
-    if (!playArea.hidden) startLevel(0);
+    showStatus(savePreferences(getStorage, selectedTheme));
+    if (playArea.hidden && questComplete.hidden) updateStart();
+    else resumeOrStart();
   });
   undoButton.addEventListener("click", () => {
     cancelDrag();
     words = history.pop();
     feedback.textContent = "";
     render();
+    persist();
   });
   checkButton.addEventListener("click", checkAnswers);
-  restartButton.addEventListener("click", () => startLevel(levelIndex, false));
+  restartButton.addEventListener("click", () => startLevel(levelIndex, { round: roundWords }));
   nextButton.addEventListener("click", () => startLevel(levelIndex + 1));
   playAgainButton.addEventListener("click", () => startLevel(0));
   loadBank();
