@@ -1,6 +1,6 @@
-import { playableThemes, readWordBank, selectThemeWords, selectWords, shuffled } from "./alphabet-word-lists.mjs";
-import { DEFAULT_THEME, loadPreferences, savePreferences } from "./alphabet-preferences.mjs";
-import { attachSorter, moveWord } from "./alphabet-sorter.mjs";
+import { playableThemes, readWordBank, selectThemeWords, selectWords, shuffled } from "./alphabet-word-lists.js";
+import { DEFAULT_THEME, loadPreferences, savePreferences } from "./alphabet-preferences.js";
+import { attachSorter, moveWord } from "./alphabet-sorter.js";
 
 (() => {
   const levels = [

@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
 import { readFileSync } from "node:fs";
-import { readWordBank } from "../../../../static/alphabet-word-lists.mjs";
+import { readWordBank } from "../../../../static/alphabet-word-lists.js";
 
 const bank = readWordBank(JSON.parse(readFileSync(new URL("../../../../static/words.json", import.meta.url), "utf8")));
 const entries = new Map(bank.map((entry) => [entry.word, entry]));
@@ -30,6 +30,24 @@ async function solve(page) {
   await page.locator("#check-order").click();
   await expect(page.locator("#feedback")).toContainText("Fantastic!");
 }
+
+test("game starts when the static host serves mjs files as binary downloads", async ({ page }) => {
+  await page.route("**/*.mjs", async (route) => {
+    const response = await route.fetch();
+    await route.fulfill({
+      response,
+      headers: {
+        ...response.headers(),
+        "content-type": "application/octet-stream",
+        "x-content-type-options": "nosniff",
+      },
+    });
+  });
+  await startGame(page, "dinosaurs");
+  await expect(page.locator("#level-title")).toContainText("Dinosaur");
+  await buttons(page).last().press("Home");
+  await expect(page.locator("#undo-word")).toBeEnabled();
+});
 
 test("only the alphabet game is listed; tutorial and all three levels work", async ({ page }) => {
   await page.goto("/");
