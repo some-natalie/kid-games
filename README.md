@@ -195,6 +195,11 @@ kinds: capital letters, misplaced commas and periods, spacing between words,
 spacing after punctuation, commonly misspelled words, flipped (mirrored) letters
 and numbers, and sound-alike words (there/their/they're and similar).
 
+Each level holds 11 hand-written variants (`variants` in
+`static/proofreading-levels.js`); one is picked at random every time a level
+starts. New variants must keep the level's sentence and mistake counts, which
+the unit tests enforce.
+
 An incorrect check keeps the marks editable and shows which marks were right
 (✓), which marked spots were already correct (✗), how many mistakes remain, and
 which sentences still hide some. Any change clears those results. A correct

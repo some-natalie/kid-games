@@ -5,9 +5,14 @@ import { LEVELS } from "../../../../static/proofreading-levels.js";
 const progressKey = "kid-games.proofreading.progress";
 const token = (page, sentence, index) => page.locator(`[data-token="${tokenKey(sentence, index)}"]`);
 
-function positions(levelIndex, wanted) {
+// The game picks a random variant per play; tests pin it to the first (or last) one.
+test.beforeEach(async ({ page }) => {
+  await page.addInitScript(() => { Math.random = () => 0; });
+});
+
+function positions(levelIndex, wanted, variant = 0) {
   const found = [];
-  buildRound(LEVELS[levelIndex]).sentences.forEach((sentence, s) => sentence.tokens.forEach((item, t) => {
+  buildRound({ sentences: LEVELS[levelIndex].variants[variant] }).sentences.forEach((sentence, s) => sentence.tokens.forEach((item, t) => {
     if ((item.kind === "mistake") === wanted) found.push([s, t]);
   }));
   return found;
@@ -25,8 +30,8 @@ async function startAtLevel(page, level) {
   await expect(page.locator("#level-count")).toHaveText(`Level ${level + 1} of ${LEVELS.length}`);
 }
 
-async function markMistakes(page, level) {
-  for (const [s, t] of positions(level, true)) await token(page, s, t).click();
+async function markMistakes(page, level, variant = 0) {
+  for (const [s, t] of positions(level, true, variant)) await token(page, s, t).click();
 }
 
 test("home page lists the game and links to it", async ({ page }) => {
@@ -134,5 +139,21 @@ test("every level can be solved by marking exactly its mistakes", async ({ page 
     await page.locator("#check-marks").click();
     await expect(page.locator("#feedback")).toContainText("You found all");
     await expect(page.locator("#next-level")).toBeVisible();
+  }
+});
+
+test("each play can pick a different variant of the same level", async ({ page }) => {
+  await page.addInitScript(() => { Math.random = () => 0.999999; });
+  for (const level of [0, 3, 9]) {
+    const last = LEVELS[level].variants.length - 1;
+    await startAtLevel(page, level);
+    expect(last).toBeGreaterThan(0);
+    const shown = await page.locator("#proof-text").textContent();
+    const expected = buildRound({ sentences: LEVELS[level].variants[last] }).sentences
+      .map((sentence) => sentence.tokens.map((item) => item.text).join("")).join(" ");
+    expect(shown.replace(/\s+/g, " ").trim()).toBe(expected.replace(/\s+/g, " ").trim());
+    await markMistakes(page, level, last);
+    await page.locator("#check-marks").click();
+    await expect(page.locator("#feedback")).toContainText("You found all");
   }
 });

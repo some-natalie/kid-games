@@ -1,5 +1,5 @@
 import { celebrate, DEFAULT_CELEBRATIONS, readCelebrations, stopCelebration } from "./alphabet-celebration.js";
-import { buildRound, describeFix, gradeRound, MISTAKE_TYPES, tokenKey } from "./proofreading-engine.js";
+import { buildRound, describeFix, gradeRound, MISTAKE_TYPES, pickVariant, tokenKey } from "./proofreading-engine.js";
 import { CELEBRATION_MESSAGES, LEVELS } from "./proofreading-levels.js";
 import { clearProgress, loadProgress, saveProgress } from "./proofreading-progress.js";
 
@@ -167,7 +167,7 @@ import { clearProgress, loadProgress, saveProgress } from "./proofreading-progre
   function startLevel(index) {
     stopCelebration();
     levelIndex = index;
-    round = buildRound(LEVELS[index]);
+    round = buildRound({ sentences: pickVariant(LEVELS[index]) });
     marked = new Set();
     completed = false;
     setPlaying(true);

@@ -89,6 +89,9 @@ export function buildRound(level) {
   return { sentences, total: sentences.reduce((sum, sentence) => sum + sentence.mistakes, 0) };
 }
 
+export const pickVariant = (level, random = Math.random) =>
+  level.variants[Math.floor(random() * level.variants.length)];
+
 export const tokenKey = (sentenceIndex, tokenIndex) => `${sentenceIndex}.${tokenIndex}`;
 
 export function gradeRound(round, marked) {
