@@ -61,7 +61,7 @@ a notice and remains playable. Unknown saved themes return to ABC adventure.
 These include scientific names and established multiword names, not invented
 inflections or filler. Groups keep the bank compact:
 each word inherits the group's `tags`. When a word appears in multiple groups,
-`static/alphabet-word-lists.mjs` merges its tags case-insensitively, so it is never
+`static/alphabet-word-lists.js` merges its tags case-insensitively, so it is never
 selected twice in one round. Add words or groups using this structure:
 
 ```json
@@ -166,6 +166,10 @@ The Pages workflow builds once, then fans out:
 Each game keeps its tests in `tests/games/<game>/`, with browser specs in a
 `browser/` subdirectory. A new game joins the matrix automatically; the build
 fails if a game has no browser specs.
+
+Browser ES modules use the `.js` extension so static hosts serve them with a
+JavaScript content type. Browser tests also cover hosts that serve `.mjs` files
+as binary downloads; those files cannot be imported by browsers.
 
 ### Workflow security and updates
 

@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
-import { playableThemes, readWordBank, selectThemeWords, selectWords, WORD_COUNT } from "../../../static/alphabet-word-lists.mjs";
+import { playableThemes, readWordBank, selectThemeWords, selectWords, WORD_COUNT } from "../../../static/alphabet-word-lists.js";
 
 const data = JSON.parse(await readFile(new URL("../../../static/words.json", import.meta.url), "utf8"));
 const bank = readWordBank(data);

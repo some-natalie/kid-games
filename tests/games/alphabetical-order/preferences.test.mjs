@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { DEFAULT_THEME, loadPreferences, PREFERENCES_KEY, savePreferences } from "../../../static/alphabet-preferences.mjs";
+import { DEFAULT_THEME, loadPreferences, PREFERENCES_KEY, savePreferences } from "../../../static/alphabet-preferences.js";
 
 function storage() {
   const values = new Map();

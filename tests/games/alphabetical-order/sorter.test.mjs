@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { moveWord } from "../../../static/alphabet-sorter.mjs";
+import { moveWord } from "../../../static/alphabet-sorter.js";
 
 test("moving words works in both directions without changing the source or losing words", () => {
   const words = ["cat", "apple", "bee", "dog"];
