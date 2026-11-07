@@ -30,6 +30,8 @@ jobs:
           echo "${RUNNER_TEMP}" >> "${GITHUB_PATH}"
       - name: Test word selection
         run: node --test tests/*.test.mjs
+      - name: Check word-bank content guards
+        run: python3 -m unittest discover -s tests -p '*_test.py'
       - name: Check site
         run: zola check
       - name: Configure Pages

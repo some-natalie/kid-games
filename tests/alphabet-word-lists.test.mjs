@@ -6,8 +6,8 @@ import { readWordBank, selectWords, WORD_COUNT } from "../static/alphabet-word-l
 const data = JSON.parse(await readFile(new URL("../static/words.json", import.meta.url), "utf8"));
 const bank = readWordBank(data);
 
-test("the bank contains over 1,000 unique words and all requested tags", () => {
-  assert.ok(bank.length > 1000, `Only ${bank.length} unique words`);
+test("the bank contains about 25,000 unique entries and all requested tags", () => {
+  assert.ok(bank.length >= 24500 && bank.length <= 25500, `${bank.length} unique entries`);
   assert.equal(new Set(bank.map((entry) => entry.word.toLowerCase())).size, bank.length);
   for (const tag of ["general", "two-letter-blend", "three-letter-blend", "vowel-team", "dinosaurs", "halloween"]) {
     assert.ok(bank.filter((entry) => entry.tags.has(tag)).length >= 12, tag);
@@ -16,6 +16,37 @@ test("the bank contains over 1,000 unique words and all requested tags", () => {
   assert.ok(bank.find((entry) => entry.word === "train").tags.has("vowel-team"));
   assert.ok(bank.find((entry) => entry.word === "pumpkin").tags.has("general"));
   assert.ok(bank.find((entry) => entry.word === "pumpkin").tags.has("halloween"));
+});
+
+test("expanded themes have enough terms and the advanced pool stays out of elementary rounds", () => {
+  for (const tag of [
+    "spring", "summer", "autumn", "winter", "new-year", "valentines-day",
+    "earth-day", "arbor-day", "independence-day", "labor-day", "thanksgiving",
+    "birthday", "flowers", "trees", "space", "rocks", "weather", "ocean",
+    "world-book-day", "world-oceans-day", "international-day-of-peace", "world-kindness-day",
+    "habitats", "insects", "chemistry", "physics", "inventions", "computing",
+    "robotics", "mathematics", "archaeology", "ancient-egypt", "ancient-greece",
+    "ancient-rome", "medieval-history", "exploration", "fossils", "maps",
+    "landforms", "visual-art", "music", "crafts", "stories", "sports", "pets",
+  ]) {
+    assert.ok(bank.filter((entry) => entry.tags.has(tag)).length >= 12, tag);
+  }
+  const advanced = bank.filter((entry) => entry.tags.has("advanced"));
+  assert.ok(advanced.length > 22000);
+  assert.ok(advanced.every((entry) => !entry.tags.has("general") && !entry.tags.has("dinosaurs")));
+  assert.equal(bank.filter((entry) => entry.tags.has("general")).length, 1439);
+  assert.equal(bank.filter((entry) => entry.tags.has("dinosaurs")).length, 84);
+  assert.ok(data.sources.some((source) => source.name === "Princeton WordNet 3.0" && source.license));
+});
+
+test("scientific names and compound terms retain their spelling without accepting malformed separators", () => {
+  const entries = readWordBank({ groups: [
+    { tags: ["flowers"], words: ["sweet pea", "black-eyed susan", "rosa canina"] },
+  ] });
+  assert.equal(entries.length, 3);
+  for (const word of [" sweet pea", "sweet pea ", "sweet  pea", "sweet_pea", "sweet--pea"]) {
+    assert.throws(() => readWordBank({ groups: [{ tags: ["flowers"], words: [word] }] }));
+  }
 });
 
 test("tag merging is case-insensitive and preserves the original spelling", () => {

@@ -21,8 +21,8 @@ export function readWordBank(data) {
       throw new Error("Each word group must have words and valid tags.");
     }
     for (const word of group.words) {
-      if (typeof word !== "string" || !/^[a-z]+(?:-[a-z]+)*$/i.test(word)) {
-        throw new Error("Word entries must be single words or hyphenated words.");
+      if (typeof word !== "string" || !/^[a-z]+(?:[ -][a-z]+)*$/i.test(word)) {
+        throw new Error("Word entries must contain words separated by single spaces or hyphens.");
       }
       const key = word.toLowerCase();
       if (!entries.has(key)) entries.set(key, { word, tags: new Set() });
