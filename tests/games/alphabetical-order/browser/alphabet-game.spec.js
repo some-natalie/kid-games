@@ -182,6 +182,26 @@ test("word-bank network failures show a retry and recover", async ({ page }) => 
   await expect(buttons(page)).toHaveCount(12);
 });
 
+test("word list blocks native selection and callouts without blocking the rest of the page", async ({ page }) => {
+  await startGame(page);
+  const behavior = await buttons(page).first().evaluate((button) => {
+    const targets = [button.closest("ol"), button.parentElement, button, button.querySelector(".drag-handle")];
+    return targets.map((target) => ({
+      userSelect: getComputedStyle(target).userSelect || getComputedStyle(target).webkitUserSelect,
+      events: ["selectstart", "contextmenu", "dragstart"].map((type) =>
+        target.dispatchEvent(new Event(type, { bubbles: true, cancelable: true })),
+      ),
+    }));
+  });
+  for (const target of behavior) {
+    expect(target.userSelect).toBe("none");
+    expect(target.events).toEqual([false, false, false]);
+  }
+  expect(await page.locator("#sort-instructions").evaluate((element) =>
+    element.dispatchEvent(new Event("contextmenu", { bubbles: true, cancelable: true })),
+  )).toBe(true);
+});
+
 test("real touch dragging reorders and auto-scrolls without scrolling during an ordinary drag", async ({ page, context }, testInfo) => {
   test.skip(testInfo.project.name !== "touch-chromium", "CDP sends real touch input to the mobile Chromium project.");
   await startGame(page);
@@ -196,6 +216,9 @@ test("real touch dragging reorders and auto-scrolls without scrolling during an 
   const x = source.x + source.width / 2;
   const before = await page.evaluate(() => scrollY);
   await touch("touchStart", x, source.y + source.height / 2);
+  // A child may rest a finger on the word before beginning to move it.
+  await page.waitForTimeout(800);
+  expect(await page.evaluate(() => window.getSelection().toString())).toBe("");
   await touch("touchMove", x, target.y + 5);
   await expect(page.locator(".drag-ghost")).toHaveCount(1);
   await touch("touchEnd");

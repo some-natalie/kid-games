@@ -171,6 +171,10 @@ Browser ES modules use the `.js` extension so static hosts serve them with a
 JavaScript content type. Browser tests also cover hosts that serve `.mjs` files
 as binary downloads; those files cannot be imported by browsers.
 
+The word list disables text selection, Safari long-press callouts, and native
+browser dragging so they do not interrupt finger dragging. These protections
+are limited to the word list; other page text remains selectable.
+
 ### Workflow security and updates
 
 Every action is pinned to a full commit SHA with its version in a comment.
