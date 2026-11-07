@@ -28,6 +28,7 @@ import { clearProgress, loadProgress, saveProgress } from "./proofreading-progre
   let levelIndex = 0;
   let round;
   let marked = new Set();
+  let corrected = new Set();
   let results = null;
   let notes = [];
   let completed = false;
@@ -85,10 +86,20 @@ import { clearProgress, loadProgress, saveProgress } from "./proofreading-progre
     button.className = "proof-token";
     button.dataset.token = tokenKey(sentenceIndex, tokenIndex);
     button.dataset.kind = token.kind === "word" || token.kind === "mistake" && /\w/.test(token.text) ? "word" : "mark";
+    if (button.dataset.kind === "word" && token.text.length === 1) button.dataset.kind = "letter";
     button.setAttribute("aria-pressed", "false");
     button.tabIndex = -1;
-    if (token.kind === "mistake" && token.text.trim() === "") {
-      button.classList.add("proof-gap");
+    fillToken(button, token);
+    return button;
+  }
+
+  function fillToken(button, token, fixed = false) {
+    button.replaceChildren();
+    button.classList.toggle("proof-gap", !fixed && token.kind === "mistake" && token.text.trim() === "");
+    if (fixed) {
+      button.textContent = token.right;
+      button.hidden = token.right === "";
+    } else if (token.kind === "mistake" && token.text.trim() === "") {
       button.textContent = " ";
     } else if (token.parts) {
       for (const part of token.parts) {
@@ -100,7 +111,6 @@ import { clearProgress, loadProgress, saveProgress } from "./proofreading-progre
     } else {
       button.textContent = token.text;
     }
-    return button;
   }
 
   function renderText() {
@@ -142,18 +152,26 @@ import { clearProgress, loadProgress, saveProgress } from "./proofreading-progre
     for (const button of buttons) {
       const key = button.dataset.token;
       const isMarked = marked.has(key);
-      const result = results?.get(key);
+      const fixed = corrected.has(key);
+      const token = tokenFor(button);
+      const result = fixed ? "found" : results?.get(key);
+      fillToken(button, token, fixed);
       button.setAttribute("aria-pressed", String(isMarked));
-      button.disabled = completed;
+      button.disabled = completed || fixed;
       if (result) button.dataset.result = result;
       else delete button.dataset.result;
-      const status = result === "found" ? ", a mistake, correct" : result === "false" ? ", not a mistake" :
+      const status = result === "false" ? ", not a mistake" :
         isMarked ? ", marked" : "";
-      button.setAttribute("aria-label", labelFor(tokenFor(button)) + status);
+      button.setAttribute("aria-label", fixed ? `${token.right || punctuationNames[token.text] || token.text}, corrected` :
+        labelFor(token) + status);
     }
     progress.textContent = `${plural(round.total, "mistake")} to find · ${marked.size} marked`;
     checkButton.disabled = completed;
-    clearButton.disabled = completed || marked.size === 0;
+    clearButton.disabled = completed || marked.size === corrected.size;
+    const available = buttons.filter((button) => !button.disabled && !button.hidden);
+    if (!available.some((button) => button.tabIndex === 0)) {
+      for (const button of buttons) button.tabIndex = button === available[0] ? 0 : -1;
+    }
     renderLevelMap();
   }
 
@@ -161,7 +179,10 @@ import { clearProgress, loadProgress, saveProgress } from "./proofreading-progre
     results = null;
     feedback.textContent = "";
     feedback.classList.remove("success");
-    for (const note of notes) note.hidden = true;
+    for (const note of notes) {
+      note.hidden = true;
+      note.textContent = "";
+    }
   }
 
   function startLevel(index) {
@@ -169,6 +190,7 @@ import { clearProgress, loadProgress, saveProgress } from "./proofreading-progre
     levelIndex = index;
     round = buildRound({ sentences: pickVariant(LEVELS[index]) });
     marked = new Set();
+    corrected = new Set();
     completed = false;
     setPlaying(true);
     tutorial.hidden = true;
@@ -187,7 +209,7 @@ import { clearProgress, loadProgress, saveProgress } from "./proofreading-progre
   }
 
   function toggle(button) {
-    if (completed) return;
+    if (completed || corrected.has(button.dataset.token)) return;
     const key = button.dataset.token;
     if (marked.has(key)) marked.delete(key);
     else marked.add(key);
@@ -196,23 +218,26 @@ import { clearProgress, loadProgress, saveProgress } from "./proofreading-progre
   }
 
   function focusToken(index) {
-    const target = buttons[Math.max(0, Math.min(buttons.length - 1, index))];
+    const available = buttons.filter((button) => !button.disabled && !button.hidden);
+    const target = available[Math.max(0, Math.min(available.length - 1, index))];
+    if (!target) return;
     for (const button of buttons) button.tabIndex = button === target ? 0 : -1;
     target.focus();
   }
 
   function showFixes() {
     fixList.replaceChildren();
-    for (const sentence of round.sentences) {
-      for (const token of sentence.tokens.filter((item) => item.kind === "mistake")) {
+    round.sentences.forEach((sentence, sentenceIndex) => {
+      sentence.tokens.forEach((token, tokenIndex) => {
+        if (!corrected.has(tokenKey(sentenceIndex, tokenIndex))) return;
         const item = document.createElement("li");
         const kind = document.createElement("strong");
         kind.textContent = `${MISTAKE_TYPES[token.type].label}: `;
         item.append(kind, `${describeFix(token)} ${MISTAKE_TYPES[token.type].tip}`);
         fixList.append(item);
-      }
-    }
-    fixes.hidden = false;
+      });
+    });
+    fixes.hidden = corrected.size === 0;
   }
 
   function finishQuest() {
@@ -231,6 +256,8 @@ import { clearProgress, loadProgress, saveProgress } from "./proofreading-progre
       return;
     }
     const grade = gradeRound(round, marked);
+    for (const key of grade.found) corrected.add(key);
+    showFixes();
     completed = grade.complete;
     if (completed) {
       const { message } = celebrate(celebrations);
@@ -238,7 +265,6 @@ import { clearProgress, loadProgress, saveProgress } from "./proofreading-progre
       feedback.classList.add("success");
       results = new Map(grade.found.map((key) => [key, "found"]));
       paint();
-      showFixes();
       if (levelIndex === LEVELS.length - 1) {
         setTimeout(finishQuest, 4000);
         return;
@@ -280,22 +306,23 @@ import { clearProgress, loadProgress, saveProgress } from "./proofreading-progre
 
   proofText.addEventListener("click", (event) => {
     const button = event.target.closest(".proof-token");
-    if (button) {
+    if (button && !button.disabled) {
       toggle(button);
-      focusToken(buttons.indexOf(button));
+      focusToken(buttons.filter((item) => !item.disabled && !item.hidden).indexOf(button));
     }
   });
   proofText.addEventListener("keydown", (event) => {
-    const current = buttons.indexOf(event.target.closest(".proof-token"));
+    const current = buttons.filter((button) => !button.disabled && !button.hidden)
+      .indexOf(event.target.closest(".proof-token"));
     const moves = { ArrowRight: current + 1, ArrowDown: current + 1, ArrowLeft: current - 1, ArrowUp: current - 1,
-      Home: 0, End: buttons.length - 1 };
+      Home: 0, End: buttons.filter((button) => !button.disabled && !button.hidden).length - 1 };
     if (current === -1 || !(event.key in moves)) return;
     event.preventDefault();
     focusToken(moves[event.key]);
   });
   checkButton.addEventListener("click", checkMarks);
   clearButton.addEventListener("click", () => {
-    marked = new Set();
+    marked = new Set(corrected);
     clearResults();
     paint();
   });

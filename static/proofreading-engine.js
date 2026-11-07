@@ -36,7 +36,7 @@ export const MISTAKE_TYPES = Object.freeze({
 // Authoring format: plain text with mistakes written as {wrong>right#type}.
 // Inside `wrong`, a ^ mirrors the character after it, as in {^3>3#flipped}.
 const MISTAKE = /\{([^{}>#]*)>([^{}>#]*)#([a-z-]+)\}/g;
-const PIECE = /[A-Za-z0-9'’]+|[^\sA-Za-z0-9'’]|\s+/g;
+const PIECE = /[^\s]|\s+/g;
 const WORD_START = /^[A-Za-z0-9'’]/;
 
 function splitMirrored(text) {
@@ -77,7 +77,27 @@ export function parseSentence(source) {
     if (text === right && !parts.some((part) => part.mirrored)) {
       throw new TypeError(`The mistake "${wrong}" matches its fix.`);
     }
-    tokens.push({ kind: "mistake", text, parts, right, type });
+    if (type === "capitalization" || type === "flipped") {
+      let start = 0;
+      let end = text.length;
+      let rightEnd = right.length;
+      const characters = parts.flatMap((part) =>
+        [...part.text].map((character) => ({ text: character, mirrored: part.mirrored })));
+      while (start < end && text[start] === right[start] && !characters[start].mirrored) start += 1;
+      while (end > start && rightEnd > start && text[end - 1] === right[rightEnd - 1] &&
+        !characters[end - 1].mirrored) {
+        end -= 1;
+        rightEnd -= 1;
+      }
+      addPlain(text.slice(0, start));
+      tokens.push({
+        kind: "mistake", text: text.slice(start, end),
+        parts: characters.slice(start, end), right: right.slice(start, rightEnd), type,
+      });
+      addPlain(text.slice(end));
+    } else {
+      tokens.push({ kind: "mistake", text, parts, right, type });
+    }
     last = match.index + match[0].length;
   }
   addPlain(source.slice(last));
