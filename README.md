@@ -57,6 +57,9 @@ motion turned on, a few still pieces appear instead. Finishing level 10 shows a 
 **Show your parent!**, then clears the saved quest so **Play again** starts at
 level 1.
 
+The stylesheet URL includes Zola's content hash, so browsers fetch updated
+styles after deployment instead of reusing a cached version of the layout.
+
 ### Celebrations
 
 Cheers and effects are picked at random from `static/celebrations.json`
