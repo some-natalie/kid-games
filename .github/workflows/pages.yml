@@ -19,6 +19,8 @@ jobs:
     permissions:
       contents: read
       pages: read
+    outputs:
+      games: ${{ steps.games.outputs.games }}
     steps:
       - uses: actions/checkout@v4.2.2
       - name: Install Zola
@@ -31,19 +33,32 @@ jobs:
           echo "8f5132b3522412d04e395e0b25f6d68613ad272a873e54a2b3ebf664873024a4  ${RUNNER_TEMP}/zola.tar.gz" | sha256sum --check
           tar -xzf "${RUNNER_TEMP}/zola.tar.gz" -C "${RUNNER_TEMP}"
           echo "${RUNNER_TEMP}" >> "${GITHUB_PATH}"
-      - name: Test word selection
-        run: node --test tests/*.test.mjs
-      - name: Check word-bank content guards
-        run: python3 -m unittest discover -s tests -p '*_test.py'
       - name: Check site
         run: zola check
+      - name: Find games
+        id: games
+        run: |
+          games="$(find content -mindepth 2 -maxdepth 2 -name index.md -printf '%h\n' | xargs -n1 basename | sort)"
+          for game in $games; do
+            if ! ls "tests/games/${game}/browser/"*.spec.js >/dev/null 2>&1; then
+              echo "::error::${game} has no browser tests in tests/games/${game}/browser/"
+              exit 1
+            fi
+          done
+          echo "games=$(printf '%s\n' $games | jq --raw-input --slurp --compact-output 'split("\n") | map(select(length > 0))')" >> "${GITHUB_OUTPUT}"
+      - name: Build test site
+        run: zola build --base-url http://127.0.0.1:8880 --output-dir test-site
+      - name: Upload test site
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-site
+          path: test-site
+          retention-days: 1
+          if-no-files-found: error
       - name: Configure Pages
         id: pages
         if: github.event_name != 'pull_request'
         uses: actions/configure-pages@v5.0.0
-      - name: Build preview
-        if: github.event_name == 'pull_request'
-        run: zola build
       - name: Build for Pages
         if: github.event_name != 'pull_request'
         env:
@@ -55,9 +70,61 @@ jobs:
         with:
           path: public
 
+  test:
+    name: test (${{ matrix.game }}, ${{ matrix.project }})
+    needs: build
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        game: ${{ fromJSON(needs.build.outputs.games) }}
+        project: [chromium, webkit, touch-chromium]
+    env:
+      GAME_TESTS: tests/games/${{ matrix.game }}
+    steps:
+      - uses: actions/checkout@v4.2.2
+      - uses: actions/download-artifact@v4
+        with:
+          name: test-site
+          path: public
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Install browser test dependencies
+        run: npm ci
+      - name: Run unit tests
+        if: matrix.project == 'chromium'
+        run: |
+          if ls "${GAME_TESTS}"/*.test.mjs >/dev/null 2>&1; then
+            node --test "${GAME_TESTS}"/*.test.mjs
+          fi
+          if ls "${GAME_TESTS}"/*_test.py >/dev/null 2>&1; then
+            python3 -m unittest discover -s "${GAME_TESTS}" -p '*_test.py'
+          fi
+      - name: Install Playwright browser
+        env:
+          PROJECT: ${{ matrix.project }}
+        run: npx playwright install --with-deps "$([ "$PROJECT" = webkit ] && echo webkit || echo chromium)"
+      - name: Run browser tests
+        env:
+          PREBUILT_SITE: "1"
+          PROJECT: ${{ matrix.project }}
+        run: npx playwright test --project="$PROJECT" "${GAME_TESTS}/browser/"
+      - name: Upload browser test diagnostics
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-${{ matrix.game }}-${{ matrix.project }}
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 7
+          if-no-files-found: ignore
+
   deploy:
     if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
-    needs: build
+    needs: [build, test]
     runs-on: ubuntu-latest
     permissions:
       pages: write

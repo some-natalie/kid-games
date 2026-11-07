@@ -42,8 +42,12 @@ p { color: var(--muted); }
 .game-icon { display: block; font-size: 2.5rem; }
 .badge { display: inline-block; border-radius: 2rem; padding: 0.25rem 0.75rem; background: var(--badge); color: var(--accent); font-size: 0.85rem; font-weight: 700; }
 .back-link { display: inline-block; padding-block: 0.5rem; }
-.game-placeholder { max-width: 44rem; margin-inline: auto; padding: 1.5rem; text-align: center; border: 1px dashed var(--border); border-radius: 1rem; background: var(--surface); }
 .alphabet-game { max-width: 48rem; margin-inline: auto; padding: clamp(1rem, 4vw, 2rem); border: 1px solid var(--border); border-radius: 1rem; background: var(--surface); }
+.theme-picker { padding-bottom: 1rem; margin-bottom: 1rem; border-bottom: 1px solid var(--border); }
+.theme-picker label { display: block; font-weight: 700; margin-bottom: 0.5rem; }
+.theme-picker select { max-width: 100%; min-height: 2.75rem; padding: 0.5rem; border: 2px solid var(--accent); border-radius: 0.65rem; background: var(--surface); color: var(--text); font: inherit; }
+.theme-picker select:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+.theme-picker p { font-size: 0.9rem; }
 .tutorial { text-align: center; }
 .tutorial h2, .level-heading h2 { margin-top: 0.25rem; }
 .alphabet-strip { display: grid; grid-template-columns: repeat(auto-fit, minmax(2rem, 1fr)); gap: 0.35rem; margin: 1.5rem 0; }
@@ -51,20 +55,23 @@ p { color: var(--muted); }
 .primary-button, .secondary-button, .word-button { min-height: 2.75rem; border: 2px solid var(--accent); border-radius: 0.65rem; padding: 0.55rem 1rem; font: inherit; font-weight: 700; cursor: pointer; }
 .primary-button { background: var(--accent); color: var(--surface); }
 .secondary-button, .word-button { background: var(--surface); color: var(--text); }
-.word-button { min-width: 5rem; }
+.word-button { width: 100%; text-align: left; cursor: grab; touch-action: none; user-select: none; -webkit-user-select: none; overflow-wrap: anywhere; }
+.drag-handle { margin-right: 0.75rem; color: var(--accent); }
+.dragging { opacity: 0.35; }
+.drag-ghost { position: fixed; z-index: 10; pointer-events: none; transform: translate(-50%, -50%); box-shadow: 0 0.3rem 1rem #0004; opacity: 0.95; }
+.answer-list li.drop-before { border-top: 3px solid var(--accent); }
+.answer-list li.drop-after { border-bottom: 3px solid var(--accent); }
 button:disabled { opacity: 0.55; cursor: not-allowed; }
 button:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
 .level-heading { display: flex; flex-wrap: wrap; align-items: start; justify-content: space-between; gap: 0.5rem 2rem; }
 .level-heading > p { max-width: 22rem; }
 .game-instructions { margin-top: 0; }
 .progress { font-weight: 700; }
-.word-bank { display: flex; flex-wrap: wrap; gap: 0.6rem; padding: 1rem; border-radius: 0.75rem; background: var(--background); }
-.answer-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr)); gap: 0.4rem 1.5rem; padding-left: 2rem; }
-.answer-list li { padding: 0.25rem; }
+.answer-list { display: grid; gap: 0.4rem; padding-left: 2rem; }
+.answer-list li { padding: 0.15rem; border-top: 3px solid transparent; border-bottom: 3px solid transparent; }
 .feedback { min-height: 1.6rem; font-weight: 700; }
 .game-actions { display: flex; flex-wrap: wrap; gap: 0.75rem; }
 [hidden] { display: none !important; }
-canvas { display: block; width: 100%; height: auto; border: 1px solid var(--border); border-radius: 0.5rem; background: var(--background); }
 footer { padding-block: 1.5rem; text-align: center; }
 .skip-link { position: absolute; left: 1rem; top: -5rem; padding: 0.5rem 1rem; background: var(--surface); }
 .skip-link:focus { top: 1rem; }

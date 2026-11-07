@@ -1,9 +1,9 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
-import { readWordBank, selectWords, WORD_COUNT } from "../static/alphabet-word-lists.mjs";
+import { playableThemes, readWordBank, selectThemeWords, selectWords, WORD_COUNT } from "../../../static/alphabet-word-lists.mjs";
 
-const data = JSON.parse(await readFile(new URL("../static/words.json", import.meta.url), "utf8"));
+const data = JSON.parse(await readFile(new URL("../../../static/words.json", import.meta.url), "utf8"));
 const bank = readWordBank(data);
 
 test("the bank contains about 25,000 unique entries and all requested tags", () => {
@@ -99,4 +99,34 @@ test("malformed and insufficient word banks fail explicitly", () => {
     assert.throws(() => selectWords(smallBank, mode));
   }
   assert.throws(() => selectWords(bank, "unknown"), /Unknown/);
+});
+
+test("every dropdown theme supports 12 unique curated words without level restrictions", () => {
+  const themes = playableThemes(bank);
+  assert.ok(themes.some((theme) => theme.id === "dinosaurs"));
+  assert.ok(themes.some((theme) => theme.id === "flowers"));
+  assert.ok(themes.some((theme) => theme.id === "halloween"));
+  assert.ok(themes.some((theme) => theme.id === "winter"));
+  assert.ok(!themes.some((theme) => ["general", "advanced", "wordnet", "vowel-team"].includes(theme.id)));
+  for (const theme of themes) {
+    for (let round = 0; round < 10; round += 1) {
+      const words = selectThemeWords(bank, theme.id);
+      assert.equal(words.length, WORD_COUNT);
+      assert.equal(new Set(words).size, WORD_COUNT);
+      assert.ok(words.every((word) => {
+        const entry = bank.find((item) => item.word === word);
+        return entry.tags.has(theme.id) && !entry.tags.has("advanced");
+      }));
+    }
+  }
+  assert.throws(() => selectThemeWords(bank, "unknown"), /Not enough curated/);
+});
+
+test("advanced-only and undersized themes never appear in the dropdown", () => {
+  const entries = readWordBank({ groups: [
+    { tags: ["tiny-theme"], words: ["cat"] },
+    { tags: ["advanced", "advanced-theme"], words: Array.from({ length: 12 }, (_, index) => `word${String.fromCharCode(97 + index)}`) },
+  ] });
+  assert.deepEqual(playableThemes(entries), []);
+  assert.throws(() => selectThemeWords(entries, "advanced-theme"), /Not enough curated/);
 });

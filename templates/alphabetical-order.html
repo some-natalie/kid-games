@@ -12,6 +12,15 @@
 </section>
 
 <section class="alphabet-game" aria-labelledby="game-heading">
+  <div class="theme-picker">
+    <label for="theme-select">Pick your theme</label>
+    <select id="theme-select" aria-describedby="theme-help preference-status" disabled>
+      <option value="general">ABC adventure (all topics)</option>
+    </select>
+    <p id="theme-help">ABC adventure starts easy and ends with dinosaurs. A theme uses its words for every round and may be trickier! Changing themes starts a new game.</p>
+    <p id="preference-status" role="status" aria-live="polite">Your choice is saved only in this browser.</p>
+  </div>
+  <p id="load-status" role="status" aria-live="polite"></p>
   <div id="tutorial" class="tutorial">
     <p class="eyebrow">A quick ABC lesson</p>
     <h2 id="game-heading">What does alphabetical order mean?</h2>
@@ -23,8 +32,7 @@
       <span>{{ letter }}</span>
       {% endfor %}
     </div>
-    <button id="start-game" class="primary-button" type="button">Let’s play!</button>
-    <p id="load-status" role="status" aria-live="polite"></p>
+    <button id="start-game" class="primary-button" type="button" disabled>Let’s play!</button>
   </div>
 
   <div id="play-area" hidden>
@@ -36,13 +44,13 @@
       <p id="level-hint"></p>
     </div>
     <p id="progress" class="progress" aria-live="polite"></p>
-    <p class="game-instructions">Choose the words in ABC order. Your picks will appear in your answer list.</p>
-    <div id="word-bank" class="word-bank" aria-label="Words to put in alphabetical order"></div>
+    <p id="sort-instructions" class="game-instructions">Drag words up or down with your mouse or finger to put them in ABC order. Then choose Check order. With a keyboard, focus a word and use the Up and Down arrow keys; Home and End move it to the top or bottom.</p>
     <h3>Your ABC list</h3>
-    <ol id="answer-list" class="answer-list" aria-live="polite"></ol>
+    <ol id="answer-list" class="answer-list" aria-label="Words to arrange in alphabetical order" aria-describedby="sort-instructions"></ol>
     <p id="feedback" class="feedback" role="status" aria-live="polite"></p>
     <div class="game-actions">
-      <button id="undo-word" class="secondary-button" type="button">Undo last</button>
+      <button id="check-order" class="primary-button" type="button">Check order</button>
+      <button id="undo-word" class="secondary-button" type="button">Undo move</button>
       <button id="restart-level" class="secondary-button" type="button">Start over</button>
       <button id="next-level" class="primary-button" type="button" hidden>Next level</button>
       <button id="play-again" class="primary-button" type="button" hidden>Play again</button>
