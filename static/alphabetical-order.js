@@ -35,9 +35,11 @@ import { celebrate, DEFAULT_CELEBRATIONS, readCelebrations, stopCelebration } fr
   let words = [];
   let history = [];
   let completed = false;
+  let hints = null;
   const cancelDrag = attachSorter(answerList, (from, to) => {
     history.push([...words]);
     words = moveWord(words, from, to);
+    hints = null;
     feedback.textContent = "";
     render(to);
     persist();
@@ -130,6 +132,7 @@ import { celebrate, DEFAULT_CELEBRATIONS, readCelebrations, stopCelebration } fr
     else roundWords = themed() ? selectThemeWords(bank, selectedTheme, level.count) : selectLevelWords(bank, level);
     history = [];
     completed = false;
+    hints = null;
     words = order ?? shuffled(roundWords);
     showPlay();
     document.querySelector("#level-count").textContent = `Level ${index + 1} of ${levels.length} · ${level.count} words`;
@@ -166,6 +169,15 @@ import { celebrate, DEFAULT_CELEBRATIONS, readCelebrations, stopCelebration } fr
       button.append(handle, document.createTextNode(word));
       button.setAttribute("aria-label", `${word}, position ${index + 1} of ${words.length}. Drag or use arrow keys to move.`);
       button.disabled = completed;
+      if (hints) {
+        const hint = hints[index];
+        item.dataset.hint = hint.state;
+        const badge = document.createElement("span");
+        badge.className = "hint-badge";
+        badge.textContent = hint.label;
+        button.append(badge);
+        button.setAttribute("aria-label", `${button.getAttribute("aria-label")} ${hint.label}.`);
+      }
       item.append(button);
       answerList.append(item);
     });
@@ -188,6 +200,28 @@ import { celebrate, DEFAULT_CELEBRATIONS, readCelebrations, stopCelebration } fr
     celebrate(celebrations);
   }
 
+  // Words outside the longest run that is already in relative order are the ones to move.
+  function buildHints(expected) {
+    const ranks = words.map((word) => expected.indexOf(word));
+    const best = ranks.map(() => 1);
+    const previous = ranks.map(() => -1);
+    ranks.forEach((rank, i) => {
+      for (let j = 0; j < i; j += 1) {
+        if (ranks[j] < rank && best[j] + 1 > best[i]) {
+          best[i] = best[j] + 1;
+          previous[i] = j;
+        }
+      }
+    });
+    const keep = new Set();
+    for (let i = best.indexOf(Math.max(...best)); i !== -1; i = previous[i]) keep.add(i);
+    return words.map((word, index) => {
+      if (word === expected[index]) return { state: "correct", label: "✓ Right spot" };
+      if (keep.has(index)) return { state: "in-order", label: "In order, but shifted" };
+      return { state: "move", label: "Move me" };
+    });
+  }
+
   function checkAnswers() {
     cancelDrag();
     const expected = [...roundWords].sort((first, second) =>
@@ -195,6 +229,7 @@ import { celebrate, DEFAULT_CELEBRATIONS, readCelebrations, stopCelebration } fr
     );
     const correct = words.filter((word, index) => word === expected[index]).length;
     completed = correct === words.length;
+    hints = completed ? null : buildHints(expected);
     if (completed) {
       const { message } = celebrate(celebrations);
       const last = levelIndex === levels.length - 1;
@@ -213,7 +248,7 @@ import { celebrate, DEFAULT_CELEBRATIONS, readCelebrations, stopCelebration } fr
       nextButton.focus();
     } else {
       feedback.classList.remove("success");
-      feedback.textContent = `Great try! ${correct} of ${words.length} words are in the right place. Keep dragging to fix the order, then check again!`;
+      feedback.textContent = `Great try! ${correct} of ${words.length} words are in the right place. Words marked “Move me” are the ones to move; the others are already in order with each other. Then check again!`;
       render();
       checkButton.focus();
     }
@@ -290,6 +325,7 @@ import { celebrate, DEFAULT_CELEBRATIONS, readCelebrations, stopCelebration } fr
   undoButton.addEventListener("click", () => {
     cancelDrag();
     words = history.pop();
+    hints = null;
     feedback.textContent = "";
     render();
     persist();
