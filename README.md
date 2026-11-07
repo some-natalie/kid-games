@@ -81,6 +81,19 @@ confetti and sparkles.
 
 ## Themes and browser preferences
 
+Choose **Use OpenDyslexic font** in the footer on any page to opt in; uncheck it
+to return to the default system font. The choice applies across the site,
+including game words and controls, and is saved only in this browser under
+`kid-games.font` (`opendyslexic` or `default`). The control stays available during
+play. If storage is unavailable, the choice still works on the current page
+and a notice explains that it cannot be saved.
+
+OpenDyslexic's regular, bold, italic, and bold italic fonts are served locally
+from `static/fonts/`, with no third-party font requests. The unmodified WOFF2
+files come from the upstream `antijingoist/opendyslexic` repository at revision
+`1824da5c0e41dc3e13ffc7f3a636dcaf695d61b7` and are redistributed under the
+SIL Open Font License 1.1, preserved in `static/fonts/OFL.txt`.
+
 Use **Pick your theme** before or during play. The default **ABC adventure (all
 topics)** uses the letter rules above and the final dinosaur challenge.
 Choosing a specific theme keeps the same 10-level word counts, using randomly
