@@ -7,7 +7,7 @@ Guidance for AI coding agents (and humans) working in this repository.
 kid-games.dev is a static [Zola](https://www.getzola.org/) site (pinned to 0.23.6) of
 small browser games for kids, with responsive tiles and automatic light/dark styling.
 There is no bundler or framework: games are plain ES modules in `static/`.
-The only game today is Alphabetical Adventure, a 10-level drag-and-drop ABC-order quest.
+Games today: Alphabetical Adventure (10-level drag-and-drop ABC order) and Proofreading Detectives (10-level tap-the-mistakes proofreading). Each game's content directory name matches its `tests/games/<game>/` directory.
 
 ## Layout
 
