@@ -1,8 +1,8 @@
 # kid-games
 
 A small Zola site for kid-games.dev, with responsive game tiles and automatic
-light/dark styling based on the device preference. The games are placeholders,
-not playable games yet.
+light/dark styling based on the device preference. Alphabetical Adventure is
+the first playable game; the other game pages are placeholders.
 
 ## Local development
 
@@ -27,7 +27,10 @@ Generated files go into `public/` and are not committed.
 Each game has a directory under `content/`, containing an `index.md`. Copy an
 existing game directory and edit its title, description, weight (tile order),
 and icon. The root page lists these games automatically. The shared
-`templates/game.html` provides an HTML5 canvas placeholder.
+`templates/game.html` provides an HTML5 canvas placeholder. The alphabetical
+game uses `templates/alphabetical-order.html` and `static/alphabetical-order.js`;
+its word sets are defined in the `levels` array so more or custom sets can be
+added without changing the sorting and gameplay logic.
 
 For a standalone HTML5 game, place its HTML, JavaScript, and assets in
 `static/<game-name>/`; Zola copies these unchanged into the matching output

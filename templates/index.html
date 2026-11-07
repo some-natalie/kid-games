@@ -4,7 +4,7 @@
 <section class="intro">
   <p class="eyebrow">Welcome to your play corner</p>
   <h1>{{ section.title }}</h1>
-  <p>Explore a game below. We’re getting everything ready for play!</p>
+  <p>Pick a game and let the fun begin!</p>
 </section>
 <section aria-label="Games" class="game-grid">
   {% for game in section.pages %}
@@ -12,7 +12,7 @@
     <span class="game-icon" aria-hidden="true">{{ game.extra.icon }}</span>
     <h2>{{ game.title }}</h2>
     <p>{{ game.description }}</p>
-    <span class="badge">Coming soon</span>
+    <span class="badge">{% if game.extra.playable %}Play now{% else %}Coming soon{% endif %}</span>
   </a>
   {% endfor %}
 </section>
