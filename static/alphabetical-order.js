@@ -248,7 +248,7 @@ import { celebrate, DEFAULT_CELEBRATIONS, readCelebrations, stopCelebration } fr
       nextButton.focus();
     } else {
       feedback.classList.remove("success");
-      feedback.textContent = `Great try! ${correct} of ${words.length} words are in the right place. Words marked “Move me” are the ones to move; the others are already in order with each other. Then check again!`;
+      feedback.textContent = `Great try! ${correct} of ${words.length} words are in the right place. Keep dragging the words marked “Move me”; the others are already in order with each other. Then check again!`;
       render();
       checkButton.focus();
     }
