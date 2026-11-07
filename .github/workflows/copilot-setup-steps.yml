@@ -8,9 +8,14 @@ on:
 
 permissions: {}
 
+concurrency:
+  group: copilot-setup-steps-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   # The job must be named copilot-setup-steps for Copilot to pick it up.
   copilot-setup-steps:
+    name: Copilot setup steps
     runs-on: ubuntu-latest
     permissions:
       contents: read # check out the repository
