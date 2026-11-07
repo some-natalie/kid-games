@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block title %}{{ page.title }} · {{ config.title }}{% endblock title %}
+{% block description %}{{ page.description }}{% endblock description %}
+
+{% block content %}
+<section class="intro">
+  <a class="back-link" href="{{ config.base_url }}/">← All games</a>
+  <span class="game-icon" aria-hidden="true">{{ page.extra.icon }}</span>
+  <h1>{{ page.title }}</h1>
+  <p>{{ page.description }}</p>
+</section>
+
+<section class="alphabet-game proofreading-game" aria-labelledby="game-heading">
+  <div class="theme-picker">
+    <a class="back-link play-only" href="{{ config.base_url }}/">← All games</a>
+    <p id="preference-status" role="status" aria-live="polite">Your level is saved only in this browser.</p>
+  </div>
+  <div id="tutorial" class="tutorial">
+    <p class="eyebrow">Be a mistake detective</p>
+    <h2 id="game-heading">What is proofreading?</h2>
+    <p>Proofreading means reading carefully to catch mistakes before you share your writing.</p>
+    <p>Tap every word, letter, or punctuation mark that looks wrong. Then choose <strong>Check</strong> to see how you did.</p>
+    <p>Here are the kinds of mistakes to hunt for:</p>
+    <ul class="mistake-kinds">
+      <li><strong>Capital letters</strong> that are missing or in the wrong place</li>
+      <li><strong>Commas</strong> and <strong>periods</strong> in the wrong spot</li>
+      <li><strong>Spacing</strong> between words, and after punctuation</li>
+      <li><strong>Spelling</strong> of tricky words</li>
+      <li><strong>Flipped</strong> letters or numbers</li>
+      <li><strong>Sound-alike words</strong>, like there, their, and they’re</li>
+    </ul>
+    <p>Finish all 10 levels to complete the case! The mistakes start small, and the last level is a whole paragraph.</p>
+    <div class="game-actions centered">
+      <button id="start-game" class="primary-button" type="button">Let’s play!</button>
+      <button id="new-quest" class="secondary-button" type="button" hidden>Start a new case</button>
+    </div>
+  </div>
+
+  <div id="play-area" hidden>
+    <ol id="level-map" class="level-map"></ol>
+    <div class="level-heading">
+      <div>
+        <p id="level-count" class="eyebrow"></p>
+        <h2 id="level-title" tabindex="-1"></h2>
+      </div>
+      <p id="level-hint"></p>
+    </div>
+    <p id="progress" class="progress" aria-live="polite"></p>
+    <details class="how-to-play">
+      <summary>How to play</summary>
+      <p id="proof-instructions" class="game-instructions">Tap a word, letter, punctuation mark, or wide gap that looks wrong to mark it. Tap again to unmark it. Then choose Check. With a keyboard, use the Left and Right arrow keys to move between items, and Space or Enter to mark one.</p>
+    </details>
+    <h3>Find the mistakes</h3>
+    <p id="proof-text" class="proof-text" role="group" aria-label="Text to proofread" aria-describedby="proof-instructions"></p>
+    <p id="feedback" class="feedback" role="status" aria-live="polite"></p>
+    <div id="fixes" class="fixes" hidden>
+      <h3>What was fixed</h3>
+      <ul id="fix-list"></ul>
+    </div>
+    <div class="game-actions">
+      <button id="check-marks" class="primary-button" type="button">Check</button>
+      <button id="clear-marks" class="secondary-button" type="button">Clear marks</button>
+      <button id="next-level" class="primary-button" type="button" hidden>Next level</button>
+    </div>
+  </div>
+
+  <div id="quest-complete" class="quest-complete" hidden>
+    <span class="detective" aria-hidden="true">🔍</span>
+    <p class="eyebrow">Case closed!</p>
+    <h2 id="quest-heading" tabindex="-1">Show your parent!</h2>
+    <p>You found every mistake in all 10 levels. You are a proofreading champion!</p>
+    <button id="play-again" class="primary-button" type="button">Play again</button>
+  </div>
+</section>
+<script src="{{ get_url(path='proofreading.js') }}" type="module"></script>
+{% endblock content %}

@@ -147,3 +147,28 @@ footer { padding-block: 1.5rem; text-align: center; }
   .answer-list li[data-hint="correct"] .word-button { background: #1f3b28; color: #c9f2b8; border-color: #4cc26d; }
   .answer-list li[data-hint="move"] .word-button { background: #4a2512; color: #ffd8bf; border-color: #fb923c; }
 }
+.mistake-kinds { display: inline-block; max-width: 100%; margin: 0 0 1rem; padding-left: 1.25rem; text-align: left; color: var(--muted); }
+.proof-text { margin: 0.5rem 0 1rem; padding: 0.75rem; border: 2px solid var(--border); border-radius: 0.65rem; color: var(--text); font-size: 1.5rem; line-height: 2.6; white-space: pre-wrap; user-select: none; -webkit-user-select: none; }
+.proof-chunk { white-space: nowrap; }
+.proof-token { position: relative; min-height: 2.5rem; margin: 0 -2px; padding: 0.1rem 0.1rem; border: 2px solid transparent; border-radius: 0.5rem; background: transparent; color: inherit; font: inherit; white-space: pre; cursor: pointer; }
+.proof-token[data-kind="mark"] { padding-inline: 0; }
+.proof-token[data-kind="mark"]::before { content: ""; position: absolute; inset: 0 -0.25rem; }
+.proof-token:hover { border-color: var(--border); }
+.proof-token[aria-pressed="true"] { border-color: var(--accent); background: var(--badge); color: var(--accent); font-weight: 700; }
+.proof-token:disabled { opacity: 1; cursor: default; }
+.proof-token .mirrored { display: inline-block; transform: scaleX(-1); }
+.proof-gap { min-width: 1.4rem; border-bottom: 3px dotted var(--muted); border-radius: 0.5rem 0.5rem 0 0; }
+.proof-token[data-result="found"] { border-color: #2f9c50; background: #e5f8e9; color: #1f5f31; }
+.proof-token[data-result="found"]::after { content: " ✓"; }
+.proof-token[data-result="false"] { border-color: #c2410c; background: #fff0e6; color: #7c2d12; }
+.proof-token[data-result="false"]::after { content: " ✗"; }
+.sentence-note { color: #7c2d12; font-size: 1rem; font-weight: 700; }
+.fixes { text-align: left; }
+.fixes li { margin-bottom: 0.5rem; }
+.detective { display: block; font-size: 4rem; animation: dino-sway 0.9s ease-in-out infinite alternate; }
+@media (prefers-color-scheme: dark) {
+  .proof-token[data-result="found"] { background: #1f3b28; color: #c9f2b8; border-color: #4cc26d; }
+  .proof-token[data-result="false"] { background: #4a2512; color: #ffd8bf; border-color: #fb923c; }
+  .sentence-note { color: #ffd8bf; }
+}
+@media (prefers-reduced-motion: reduce) { .detective { animation: none; } }
