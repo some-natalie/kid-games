@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block title %}{{ page.title }} · {{ config.title }}{% endblock title %}
+{% block description %}{{ page.description }}{% endblock description %}
+
+{% block content %}
+<a class="back-link" href="{{ config.base_url }}/">← All games</a>
+<section class="intro">
+  <span class="game-icon" aria-hidden="true">{{ page.extra.icon }}</span>
+  <h1>{{ page.title }}</h1>
+  <p>{{ page.description }}</p>
+</section>
+<section class="game-placeholder" aria-label="Game placeholder">
+  <h2>Coming soon</h2>
+  <p>This is a placeholder for an HTML5 game. There’s nothing to play just yet.</p>
+  <canvas width="640" height="360" aria-label="Reserved game canvas">
+    This space is reserved for the future game.
+  </canvas>
+</section>
+{% endblock content %}

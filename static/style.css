@@ -1,0 +1,49 @@
+:root {
+  color-scheme: light dark;
+  --background: #f6f7fc;
+  --surface: #ffffff;
+  --text: #22243a;
+  --muted: #555c73;
+  --accent: #5546b8;
+  --border: #d9deed;
+  --badge: #eeeafa;
+  font-family: system-ui, sans-serif;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #171923;
+    --surface: #242735;
+    --text: #f4f3ff;
+    --muted: #bec3d6;
+    --accent: #c2b8ff;
+    --border: #44495e;
+    --badge: #36304f;
+  }
+}
+
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--background); color: var(--text); line-height: 1.6; }
+a { color: var(--accent); }
+a:focus-visible { outline: 3px solid var(--accent); outline-offset: 5px; }
+.site-header, main, footer { width: min(100% - 2rem, 64rem); margin-inline: auto; }
+.site-header { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1rem; padding-block: 1.5rem; }
+.brand { font-size: 1.4rem; font-weight: 800; text-decoration: none; }
+.site-header > span, footer { color: var(--muted); font-size: 0.9rem; }
+main { padding-block: 1.5rem 3rem; }
+.intro { text-align: center; margin-bottom: 2rem; }
+.eyebrow { color: var(--accent); font-weight: 700; }
+h1 { font-size: clamp(1.8rem, 5vw, 3rem); line-height: 1.2; }
+h2 { font-size: 1.2rem; }
+p { color: var(--muted); }
+.game-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr)); gap: 1rem; }
+.game-tile { display: block; padding: 1.5rem; border: 1px solid var(--border); border-radius: 1rem; background: var(--surface); color: var(--text); text-decoration: none; }
+.game-tile:hover { border-color: var(--accent); }
+.game-icon { display: block; font-size: 2.5rem; }
+.badge { display: inline-block; border-radius: 2rem; padding: 0.25rem 0.75rem; background: var(--badge); color: var(--accent); font-size: 0.85rem; font-weight: 700; }
+.back-link { display: inline-block; padding-block: 0.5rem; }
+.game-placeholder { max-width: 44rem; margin-inline: auto; padding: 1.5rem; text-align: center; border: 1px dashed var(--border); border-radius: 1rem; background: var(--surface); }
+canvas { display: block; width: 100%; height: auto; border: 1px solid var(--border); border-radius: 0.5rem; background: var(--background); }
+footer { padding-block: 1.5rem; text-align: center; }
+.skip-link { position: absolute; left: 1rem; top: -5rem; padding: 0.5rem 1rem; background: var(--surface); }
+.skip-link:focus { top: 1rem; }

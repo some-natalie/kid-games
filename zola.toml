@@ -1,0 +1,6 @@
+base_url = "https://kid-games.dev"
+title = "Kid Games"
+description = "A little home for playful HTML5 games."
+default_language = "en"
+compile_sass = false
+build_search_index = false

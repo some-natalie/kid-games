@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="{{ config.default_language }}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <meta name="description" content="{% block description %}{{ config.description }}{% endblock description %}">
+  <title>{% block title %}{{ config.title }}{% endblock title %}</title>
+  <link rel="stylesheet" href="{{ get_url(path='style.css') }}">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header">
+    <a class="brand" href="{{ config.base_url }}/"><span aria-hidden="true">🎈</span> {{ config.title }}</a>
+    <span>Little games. Big smiles.</span>
+  </header>
+  <main id="main">
+    {% block content %}{% endblock content %}
+  </main>
+  <footer>Made for curious minds. Games are coming soon!</footer>
+</body>
+</html>
