@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-import { buildRound, tokenKey } from "../../../../static/proofreading-engine.js";
+import { buildRound, correctedText, tokenKey } from "../../../../static/proofreading-engine.js";
 import { LEVELS } from "../../../../static/proofreading-levels.js";
 
 const progressKey = "kid-games.proofreading.progress";
@@ -48,7 +48,9 @@ test("level 1 can be solved and advances", async ({ page }) => {
   await page.locator("#check-marks").click();
   await expect(page.locator("#feedback")).toContainText("You found all 1 mistake!");
   await expect(page.locator("#fix-list li")).toHaveCount(1);
-  await expect(page.locator("#fix-list")).toContainText("“my” should be “My”");
+  await expect(page.locator("#fix-list")).toContainText("“m” should be “M”");
+  await expect(page.locator(".proof-token").first()).toHaveText("M");
+  await expect(page.locator("#proof-text")).toContainText("My cat likes to nap in the sun.");
   await page.locator("#next-level").click();
   await expect(page.locator("#level-count")).toHaveText("Level 2 of 10");
   expect(await page.evaluate((key) => localStorage.getItem(key), progressKey)).toContain('"level":1');
@@ -58,6 +60,51 @@ test("checking with nothing marked asks the player to mark something", async ({ 
   await startAtLevel(page, 0);
   await page.locator("#check-marks").click();
   await expect(page.locator("#feedback")).toContainText("Tap the words");
+});
+
+test("only the b in birds is marked and changes to B after checking", async ({ page }) => {
+  await page.addInitScript(() => { Math.random = () => 3 / 11; });
+  await startAtLevel(page, 0);
+  const letters = page.locator(".proof-chunk").first().locator(".proof-token");
+  await expect(letters).toHaveText(["b", "i", "r", "d", "s"]);
+  await letters.nth(1).click();
+  await page.locator("#check-marks").click();
+  await expect(letters.nth(1)).toHaveAttribute("data-result", "false");
+  await expect(letters.first()).toHaveText("b");
+  await page.locator("#clear-marks").click();
+  await letters.first().click();
+  await expect(letters.first()).toHaveAttribute("aria-pressed", "true");
+  await expect(letters.nth(1)).toHaveAttribute("aria-pressed", "false");
+  await page.locator("#check-marks").click();
+  await expect(letters.first()).toHaveText("B");
+  await expect(letters.first()).toHaveAccessibleName("B, corrected");
+  await expect(page.locator("#proof-text")).toHaveText("Birds sing in the morning. ");
+});
+
+test("partial corrections survive clearing marks and keyboard navigation skips them", async ({ page }) => {
+  await startAtLevel(page, 3);
+  const [first, mirrored, homonym] = positions(3, true);
+  await token(page, ...first).click();
+  await token(page, ...mirrored).click();
+  await page.locator("#check-marks").click();
+  await expect(token(page, ...first)).toHaveText("W");
+  await expect(token(page, ...mirrored)).toHaveText("7");
+  await expect(page.locator(".mirrored")).toHaveCount(0);
+  await expect(page.locator("#fix-list li")).toHaveCount(2);
+  await token(page, ...homonym).click();
+  await page.locator("#clear-marks").click();
+  await expect(token(page, ...first)).toHaveText("W");
+  await expect(token(page, ...first)).toBeDisabled();
+  await expect(token(page, ...homonym)).toHaveAttribute("aria-pressed", "false");
+  await expect(page.locator("#progress")).toContainText("2 marked");
+  const available = page.locator(".proof-token:enabled");
+  await available.last().focus();
+  await page.keyboard.press("Home");
+  await expect(available.first()).toBeFocused();
+  await token(page, ...homonym).click();
+  await page.locator("#check-marks").click();
+  await expect(token(page, ...homonym)).toHaveText("Their");
+  await expect(page.locator("#feedback")).toContainText("You found all 3 mistakes!");
 });
 
 test("wrong answers show what was right, what was fine, and what is still hiding", async ({ page }) => {
@@ -74,9 +121,10 @@ test("wrong answers show what was right, what was fine, and what is still hiding
   await expect(token(page, ...fine)).toHaveAttribute("data-result", "false");
   await expect(token(page, ...second)).not.toHaveAttribute("data-result", /.*/);
   await expect(page.locator("#next-level")).toBeHidden();
-  // Changing a mark clears the stale results so the player can retry.
+  // Corrected marks stay fixed while other results are cleared for a retry.
   await token(page, ...fine).click();
-  await expect(token(page, ...first)).not.toHaveAttribute("data-result", /.*/);
+  await expect(token(page, ...first)).toHaveAttribute("data-result", "found");
+  await expect(token(page, ...first)).toBeDisabled();
   await token(page, ...second).click();
   await page.locator("#check-marks").click();
   await expect(page.locator("#feedback")).toContainText("You found all 2 mistakes!");
@@ -139,6 +187,8 @@ test("every level can be solved by marking exactly its mistakes", async ({ page 
     await page.locator("#check-marks").click();
     await expect(page.locator("#feedback")).toContainText("You found all");
     await expect(page.locator("#next-level")).toBeVisible();
+    const clean = LEVELS[level].variants[0].map((source) => correctedText(buildRound({ sentences: [source] }).sentences[0])).join(" ");
+    await expect(page.locator("#proof-text")).toHaveText(`${clean} `);
   }
 });
 

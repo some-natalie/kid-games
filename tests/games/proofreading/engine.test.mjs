@@ -8,15 +8,39 @@ import { LEVELS } from "../../../static/proofreading-levels.js";
 test("parseSentence splits words, punctuation, spaces, and mistakes", () => {
   const { tokens, mistakes } = parseSentence("{my>My#capitalization} cat, hi.");
   assert.equal(mistakes, 1);
-  assert.deepEqual(tokens.map((token) => token.kind), ["mistake", "space", "word", "punct", "space", "word", "punct"]);
-  assert.equal(tokens[0].text, "my");
-  assert.equal(tokens[0].right, "My");
+  assert.deepEqual(tokens.map((token) => token.kind),
+    ["mistake", "word", "space", "word", "word", "word", "punct", "space", "word", "word", "punct"]);
+  assert.equal(tokens[0].text, "m");
+  assert.equal(tokens[0].right, "M");
   assert.equal(correctedText({ tokens }), "My cat, hi.");
 });
 
-test("parseSentence keeps apostrophes inside words", () => {
+test("parseSentence makes correct letters and apostrophes individually selectable", () => {
   const { tokens } = parseSentence("They're here.");
-  assert.equal(tokens[0].text, "They're");
+  assert.equal(tokens.slice(0, 7).map((token) => token.text).join(""), "They're");
+  assert.ok(tokens.slice(0, 7).every((token) => token.text.length === 1));
+});
+
+test("letter mistakes isolate only the changed characters without losing the word", () => {
+  for (const [source, wrong, right, clean] of [
+    ["{birds>Birds#capitalization}", "b", "B", "Birds"],
+    ["{SunDay>Sunday#capitalization}", "D", "d", "Sunday"],
+    ["{dig>big#flipped}", "d", "b", "big"],
+    ["{a^bc>abc#flipped}", "b", "b", "abc"],
+  ]) {
+    const sentence = parseSentence(source);
+    const [mistake] = sentence.tokens.filter((token) => token.kind === "mistake");
+    assert.equal(sentence.mistakes, 1);
+    assert.equal(mistake.text, wrong);
+    assert.equal(mistake.right, right);
+    assert.equal(correctedText(sentence), clean);
+  }
+});
+
+test("spelling and sound-alike mistakes remain selectable as words", () => {
+  const sentence = parseSentence("{freind>friend#spelling} {there>their#homonym}");
+  assert.equal(sentence.tokens[0].text, "freind");
+  assert.equal(sentence.tokens[2].text, "there");
 });
 
 test("parseSentence supports mirrored characters, extra spaces, and removals", () => {
@@ -25,7 +49,7 @@ test("parseSentence supports mirrored characters, extra spaces, and removals", (
   const gap = parseSentence("a{  > #spacing}b").tokens[1];
   assert.equal(gap.text, "  ");
   assert.equal(describeFix(gap), "Use one space here, not two.");
-  const comma = parseSentence("hi{,>#comma} there").tokens[1];
+  const comma = parseSentence("hi{,>#comma} there").tokens.find((token) => token.kind === "mistake");
   assert.equal(describeFix(comma), "Take out the “,”.");
   assert.match(describeFix(mirrored), /mirrored/);
 });
@@ -47,7 +71,9 @@ test("gradeRound separates found, false alarms, and missed mistakes", () => {
   assert.deepEqual(grade.missedBySentence, [1, 0]);
   assert.equal(grade.total, 2);
   assert.equal(grade.complete, false);
-  assert.equal(gradeRound(round, new Set([tokenKey(0, 0), tokenKey(0, 4)])).complete, true);
+  const mistakeKeys = round.sentences[0].tokens.flatMap((token, index) =>
+    token.kind === "mistake" ? [tokenKey(0, index)] : []);
+  assert.equal(gradeRound(round, new Set(mistakeKeys)).complete, true);
 });
 
 const rounds = LEVELS.map((level) => level.variants.map((sentences) => buildRound({ sentences })));
@@ -95,6 +121,19 @@ test("every kind of mistake appears in the game", () => {
   const used = new Set(rounds.flat().flatMap((round) => round.sentences)
     .flatMap((sentence) => sentence.tokens.filter((token) => token.kind === "mistake").map((token) => token.type)));
   assert.deepEqual([...used].sort(), Object.keys(MISTAKE_TYPES).sort());
+});
+
+test("every capitalization or flipped-character mistake targets a single character", () => {
+  for (const round of rounds.flat()) {
+    for (const sentence of round.sentences) {
+      for (const token of sentence.tokens) {
+        if (token.type === "capitalization" || token.type === "flipped") {
+          assert.equal(token.text.length, 1, token.text);
+          assert.equal(token.right.length, 1, token.right);
+        }
+      }
+    }
+  }
 });
 
 test("corrected text is clean: capitalized, punctuated, and well spaced", () => {
