@@ -7,6 +7,7 @@
   <meta name="description" content="{% block description %}{{ config.description }}{% endblock description %}">
   <title>{% block title %}{{ config.title }}{% endblock title %}</title>
   <link rel="stylesheet" href="{{ get_url(path='style.css', cachebust=true) }}">
+  <script src="{{ get_url(path='site-font.js', cachebust=true) }}" defer></script>
 </head>
 <body class="{% block body_class %}{% endblock body_class %}">
   <a class="skip-link" href="#main">Skip to content</a>
@@ -17,6 +18,12 @@
   <main id="main">
     {% block content %}{% endblock content %}
   </main>
-  <footer>Made for curious minds.</footer>
+  <footer>
+    <div class="font-preference" hidden>
+      <label><input id="opendyslexic-toggle" type="checkbox" aria-describedby="font-status"> Use OpenDyslexic font</label>
+      <p id="font-status" role="status" aria-live="polite"></p>
+    </div>
+    <p>Made for curious minds.</p>
+  </footer>
 </body>
 </html>
