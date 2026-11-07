@@ -2,8 +2,16 @@
 
 {% block title %}{{ page.title }} · {{ config.title }}{% endblock title %}
 {% block description %}{{ page.description }}{% endblock description %}
+{% block body_class %}with-alphabet-rail{% endblock body_class %}
 
 {% block content %}
+<aside class="alphabet-rail" aria-label="Alphabet reference">
+  <ol aria-label="The alphabet, A through Z">
+    {% for letter in ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"] %}
+    <li>{{ letter }}</li>
+    {% endfor %}
+  </ol>
+</aside>
 <a class="back-link" href="{{ config.base_url }}/">← All games</a>
 <section class="intro">
   <span class="game-icon" aria-hidden="true">{{ page.extra.icon }}</span>

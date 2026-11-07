@@ -96,6 +96,33 @@ test("only the alphabet game is listed; the tutorial leads into a 10-level quest
   await expect(buttons(page).first()).toBeEnabled();
 });
 
+test("the side alphabet stays in order and visible while scrolling at small and tablet sizes", async ({ page }) => {
+  await startAtLevel(page, 8);
+  const rail = page.getByRole("complementary", { name: "Alphabet reference" });
+  await expect(rail.locator("li")).toHaveText([..."ABCDEFGHIJKLMNOPQRSTUVWXYZ"]);
+  for (const viewport of [{ width: 320, height: 568 }, { width: 1024, height: 768 }, { width: 844, height: 390 }]) {
+    await page.setViewportSize(viewport);
+    await page.evaluate(() => window.scrollTo(0, 0));
+    const before = await rail.boundingBox();
+    await page.locator("#check-order").scrollIntoViewIfNeeded();
+    const after = await rail.boundingBox();
+    expect(after).toEqual(before);
+    expect(after.x + after.width).toBeLessThanOrEqual(viewport.width);
+    expect(after.y).toBeGreaterThanOrEqual(0);
+    expect(after.y + after.height).toBeLessThanOrEqual(viewport.height);
+    for (const letter of await rail.locator("li").all()) {
+      const bounds = await letter.boundingBox();
+      expect(bounds.y).toBeGreaterThanOrEqual(after.y);
+      expect(bounds.y + bounds.height).toBeLessThanOrEqual(after.y + after.height);
+    }
+    const game = await page.locator(".alphabet-game").boundingBox();
+    expect(game.x + game.width).toBeLessThan(after.x);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(viewport.width);
+    await page.locator("#check-order").click();
+    await expect(page.locator("#feedback")).not.toBeEmpty();
+  }
+});
+
 test("each success shows a random celebration and stops before the next level", async ({ page }) => {
   const effects = new Set();
   const origins = new Set();

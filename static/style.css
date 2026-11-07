@@ -53,6 +53,10 @@ p { color: var(--muted); }
 .tutorial h2, .level-heading h2 { margin-top: 0.25rem; }
 .alphabet-strip { display: grid; grid-template-columns: repeat(auto-fit, minmax(2rem, 1fr)); gap: 0.35rem; margin: 1.5rem 0; }
 .alphabet-strip span { padding: 0.3rem; font-size: 1.2rem; border-radius: 0.4rem; background: var(--badge); color: var(--accent); font-weight: 700; }
+.with-alphabet-rail { padding-right: 2.5rem; }
+.alphabet-rail { position: fixed; top: 0.5rem; right: 0.25rem; width: 2rem; height: calc(100vh - 1rem); height: calc(100dvh - 1rem); z-index: 5; border: 1px solid var(--border); border-radius: 0.5rem; background: var(--badge); color: var(--accent); pointer-events: none; }
+.alphabet-rail ol { display: grid; grid-template-rows: repeat(26, 1fr); height: 100%; margin: 0; padding: 0; list-style: none; }
+.alphabet-rail li { display: grid; place-items: center; font-size: min(1.2rem, calc((100vh - 1rem) / 32)); font-size: min(1.2rem, calc((100dvh - 1rem) / 32)); line-height: 1; font-weight: 700; }
 .primary-button, .secondary-button, .word-button { min-height: 2.75rem; border: 2px solid var(--accent); border-radius: 0.65rem; padding: 0.55rem 1rem; font: inherit; font-weight: 700; cursor: pointer; }
 .primary-button { background: var(--accent); color: var(--surface); }
 .secondary-button, .word-button { background: var(--surface); color: var(--text); }

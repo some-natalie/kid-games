@@ -49,7 +49,9 @@ Keyboard users can focus a word and use Up/Down, Home, or End to move it.
 **Undo move** reverses the last change. Incorrect checks leave the list editable,
 so players can fix their order without starting over.
 
-Text and word tiles are sized for young readers. A correct answer shows a short
+Text and word tiles are sized for young readers. A vertical A–Z reference bar
+stays pinned to the right side while scrolling, with space reserved so it does
+not cover the game on phones or tablets. A correct answer shows a short
 cheer plus either confetti bursting from a random corner or a sparkle shower
 before **Next level** is offered. With reduced motion turned on, a few still
 sparkles appear instead. Finishing level 10 shows a dancing dinosaur and
