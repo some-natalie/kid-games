@@ -1,0 +1,13 @@
+{
+  "name": "kid-games",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test tests/games/*/*.test.mjs",
+    "test:python": "for game in tests/games/*/; do if ls \"$game\"*_test.py >/dev/null 2>&1; then python3 -m unittest discover -s \"$game\" -p '*_test.py' || exit 1; fi; done",
+    "test:e2e": "playwright test"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.56.1"
+  }
+}

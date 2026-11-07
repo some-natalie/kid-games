@@ -2,7 +2,7 @@
 
 A small Zola site for kid-games.dev, with responsive game tiles and automatic
 light/dark styling based on the device preference. Alphabetical Adventure is
-the first playable game; the other game pages are placeholders.
+the site's alphabetical-order game.
 
 ## Local development
 
@@ -24,13 +24,36 @@ Generated files go into `public/` and are not committed.
 
 ## Add a game
 
-Each game has a directory under `content/`, containing an `index.md`. Copy an
-existing game directory and edit its title, description, weight (tile order),
-and icon. The root page lists these games automatically. The shared
-`templates/game.html` provides an HTML5 canvas placeholder. The alphabetical
+Each game has a directory under `content/`, containing an `index.md`. Set its
+title, description, weight (tile order), template, and icon. The root page lists
+these games automatically. The alphabetical
 game uses `templates/alphabetical-order.html` and `static/alphabetical-order.js`;
 it loads the tagged word bank from `static/words.json`. Each new round randomly
 selects 12 appropriate words; retries keep the same set in a new order.
+
+Arrange the full 12-word list by dragging words up or down with a mouse, pen,
+or finger, then press **Check order**. Dragging near the screen edge scrolls
+the page; dropping outside the list or pressing Escape cancels a move.
+Keyboard users can focus a word and use Up/Down, Home, or End to move it.
+**Undo move** reverses the last change. Incorrect checks leave the list editable,
+so players can fix their order without starting over.
+
+## Themes and browser preferences
+
+Use **Pick your theme** before or during play. The default **ABC adventure (all
+topics)** keeps the beginner progression and final dinosaur challenge.
+Choosing a specific theme uses 12 randomly selected words from that theme for
+every round, without first- or second-letter restrictions. Changing themes
+starts a new game; retries preserve the current set and replays draw fresh sets.
+Only curated themes with at least 12 non-advanced entries appear in the menu.
+Imported advanced vocabulary is never used by these themed rounds.
+
+The chosen theme is stored in `localStorage` under
+`kid-games.alphabetical-order.preferences`, as `{"version":1,"theme":"dinosaurs"}`.
+It stays on that browser and site origin; no player name, answers, or scores are
+stored or sent anywhere. Clearing site data removes the preference.
+If storage is blocked, full, or contains an invalid preference, the game shows
+a notice and remains playable. Unknown saved themes return to ABC adventure.
 
 ## Alphabetical Adventure word bank
 
@@ -106,13 +129,47 @@ a fixed word set.
 Run the word-bank checks (also run by CI) with:
 
 ```sh
-node --test tests/*.test.mjs
-python3 -m unittest discover -s tests -p '*_test.py'
+npm test
+npm run test:python
 ```
+
+## Browser tests
+
+With Zola on `PATH`, install and run the Playwright suite:
+
+```sh
+npm ci
+npx playwright install --with-deps chromium webkit
+npm run test:e2e
+```
+
+Playwright builds Zola for localhost and starts its own static server. Tests run
+in Chromium, Safari's WebKit engine, and touch-enabled tablet Chromium.
+They cover dragging, real touch input and edge scrolling, keyboard sorting,
+checking and retrying, progression, theme persistence, and loading/storage
+failures. Failure reports, screenshots, and traces are kept for seven days. Local reports appear
+in `playwright-report/`; use `npx playwright show-report` to open them.
+
+### Continuous integration
+
+The Pages workflow builds once, then fans out:
+
+1. `build` runs `zola check`, finds every game in `content/<game>/index.md`,
+   builds a localhost copy of the site, and uploads it as the `test-site`
+   artifact (plus the Pages artifact on `main`).
+2. `test` runs a matrix of every game × `chromium`, `webkit`, and
+   `touch-chromium`. Each job downloads the built site, serves it with
+   `PREBUILT_SITE=1`, and runs only `tests/games/<game>/browser/`. The Chromium
+   job also runs that game's Node (`*.test.mjs`) and Python (`*_test.py`) tests.
+3. `deploy` publishes only after every matrix job passes.
+
+Each game keeps its tests in `tests/games/<game>/`, with browser specs in a
+`browser/` subdirectory. A new game joins the matrix automatically; the build
+fails if a game has no browser specs.
 
 For a standalone HTML5 game, place its HTML, JavaScript, and assets in
 `static/<game-name>/`; Zola copies these unchanged into the matching output
-directory. Remove the corresponding content placeholder first so that both
+directory. Avoid a corresponding content page so that both
 sources do not generate the same URL.
 
 ## GitHub Pages

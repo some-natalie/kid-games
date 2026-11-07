@@ -32,6 +32,27 @@ export function readWordBank(data) {
   return [...entries.values()];
 }
 
+export function playableThemes(bank) {
+  const excluded = new Set(["general", "advanced", "wordnet", "two-letter-blend", "three-letter-blend", "vowel-team"]);
+  const counts = new Map();
+  for (const entry of bank) {
+    if (entry.tags.has("advanced")) continue;
+    for (const tag of entry.tags) {
+      if (!excluded.has(tag)) counts.set(tag, (counts.get(tag) ?? 0) + 1);
+    }
+  }
+  return [...counts].filter(([, count]) => count >= WORD_COUNT).map(([tag]) => ({
+    id: tag,
+    label: tag.split("-").map((word) => word[0].toUpperCase() + word.slice(1)).join(" "),
+  })).sort((first, second) => first.label.localeCompare(second.label, "en"));
+}
+
+export function selectThemeWords(bank, theme) {
+  const pool = bank.filter((entry) => !entry.tags.has("advanced") && entry.tags.has(theme));
+  if (pool.length < WORD_COUNT) throw new Error(`Not enough curated words for theme: ${theme}`);
+  return shuffled(pool).slice(0, WORD_COUNT).map((entry) => entry.word);
+}
+
 function groupedBy(items, key) {
   const groups = new Map();
   for (const item of items) {
