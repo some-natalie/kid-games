@@ -1,6 +1,7 @@
 import { test, expect } from "@playwright/test";
 import { readFileSync } from "node:fs";
 import { QUEST_LEVELS, readWordBank } from "../../../../static/alphabet-word-lists.js";
+import { VICTORY_SCENES } from "../../../../static/alphabet-victory.js";
 
 const bank = readWordBank(JSON.parse(readFileSync(new URL("../../../../static/words.json", import.meta.url), "utf8")));
 const entries = new Map(bank.map((entry) => [entry.word, entry]));
@@ -90,7 +91,7 @@ test("the alphabet game is listed; the tutorial leads into a 10-level quest with
   }
   await expect(page.locator("#quest-complete")).toBeVisible();
   await expect(page.locator("#quest-heading")).toHaveText("Show your parent!");
-  await expect(page.locator(".dancing-dino")).toBeVisible();
+  await expect(page.locator("[data-victory-scene]:visible")).toHaveCount(1);
   await expect(page.locator("#play-area")).toBeHidden();
   expect(await page.evaluate((key) => JSON.parse(localStorage.getItem(key)), progressKey))
     .toEqual({ version: 1, themes: {} });
@@ -192,11 +193,47 @@ test("a missing or invalid celebrations file falls back to built-in celebrations
 test("reduced motion shows still celebration pieces and a still dinosaur", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await startAtLevel(page, 9);
+  await page.evaluate(() => { Math.random = () => 0; });
   await solve(page);
   await expect(page.locator(".celebration .celebration-symbol.still")).toHaveCount(5);
   await expect(page.locator("#quest-complete")).toBeVisible();
+  await expect(page.locator(".dancing-dino")).toBeVisible();
   expect(await page.locator(".dino-body").evaluate((element) => getComputedStyle(element).animationName)).toBe("none");
 });
+
+for (const [index, scene] of VICTORY_SCENES.entries()) {
+  test(`the ${scene} victory is selected at quest completion and replay starts fresh`, async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: "no-preference", colorScheme: "dark" });
+    await page.setViewportSize({ width: 320, height: 568 });
+    await startAtLevel(page, 9);
+    await page.evaluate((value) => { Math.random = () => value; }, (index + 0.5) / VICTORY_SCENES.length);
+    await solve(page);
+    const finale = page.locator("#quest-complete");
+    await expect(finale).toBeVisible();
+    await expect(finale).toHaveAttribute("data-victory", scene);
+    const selected = finale.locator("[data-victory-scene]:visible");
+    await expect(selected).toHaveCount(1);
+    await expect(selected).toHaveAttribute("data-victory-scene", scene);
+    await expect(finale.getByRole("img")).toHaveCount(1);
+    expect(await finale.getByRole("img").getAttribute(scene === "dinosaur" ? "aria-labelledby" : "aria-label")).toBeTruthy();
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(320);
+    const characters = selected.locator(".victory-character");
+    for (const character of await characters.all()) {
+      expect(await character.evaluate((element) => getComputedStyle(element).animationName)).not.toBe("none");
+    }
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    for (const character of await characters.all()) {
+      expect(await character.evaluate((element) => getComputedStyle(element).animationName)).toBe("none");
+    }
+    await expect(page.locator("#quest-heading")).toBeFocused();
+    expect(await page.evaluate((key) => JSON.parse(localStorage.getItem(key)), progressKey))
+      .toEqual({ version: 1, themes: {} });
+    await page.locator("#play-again").click();
+    await expect(finale).toBeHidden();
+    await expect(page.locator("#level-title")).toHaveText("ABC warm-up");
+    await expect(buttons(page)).toHaveCount(4);
+  });
+}
 
 test("the current level and word order autosave and resume after reloading", async ({ page }) => {
   await startGame(page);

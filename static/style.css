@@ -129,6 +129,25 @@ button:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
 .quest-complete { text-align: center; }
 .quest-complete h2 { font-size: clamp(2rem, 6vw, 3rem); margin: 0.25rem 0; color: var(--accent); }
 .quest-theme { font-weight: 700; color: var(--text); }
+.victory-scene { width: min(22rem, 100%); margin-inline: auto; }
+.victory-stage { display: flex; align-items: center; justify-content: center; gap: 0.25rem; min-height: 10rem; padding: 1.5rem 0.5rem; border-radius: 50%; background: var(--badge); overflow: hidden; }
+.victory-character { display: inline-block; font-size: clamp(2.25rem, 10vw, 4rem); line-height: 1.5; animation: victory-bob 1.6s ease-in-out infinite alternate; }
+.victory-character:nth-child(2) { font-size: clamp(3rem, 14vw, 6rem); animation-delay: -0.6s; }
+.victory-character:nth-child(3) { animation-delay: -1.2s; }
+.victory-caption { font-weight: 700; color: var(--accent); }
+.victory-dance .victory-character { animation-name: victory-dance; }
+.victory-launch .victory-character:nth-child(2) { animation-name: victory-launch; animation-duration: 2s; }
+.victory-flutter .victory-character:not(:nth-child(2)) { animation-name: victory-flutter; }
+.victory-swim .victory-character { animation-name: victory-swim; }
+.victory-glow .victory-character { animation-name: victory-glow; }
+.victory-bloom .victory-character { animation-name: victory-bloom; }
+@keyframes victory-bob { from { transform: translateY(0); } to { transform: translateY(-0.75rem); } }
+@keyframes victory-dance { from { transform: rotate(-12deg) translateY(0); } to { transform: rotate(12deg) translateY(-0.5rem); } }
+@keyframes victory-launch { from { transform: translate(-0.5rem, 1rem) rotate(-15deg); } to { transform: translate(0.5rem, -1rem) rotate(5deg); } }
+@keyframes victory-flutter { from { transform: translateY(0.5rem) rotate(-15deg) scaleX(0.8); } to { transform: translateY(-0.75rem) rotate(15deg) scaleX(1); } }
+@keyframes victory-swim { from { transform: translateX(-0.5rem) rotate(-8deg); } to { transform: translateX(0.5rem) rotate(8deg); } }
+@keyframes victory-glow { from { transform: scale(0.9); opacity: 0.7; } to { transform: scale(1.05); opacity: 1; } }
+@keyframes victory-bloom { from { transform: scale(0.8) rotate(-5deg); } to { transform: scale(1) rotate(5deg); } }
 .dancing-dino { width: min(18rem, 80%); height: auto; overflow: visible; }
 .dino-skin { fill: #4cc26d; }
 .dino-spikes { fill: #2f9c50; }
@@ -150,7 +169,8 @@ button:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
 @keyframes dino-step { from { transform: translateY(0); } to { transform: translateY(-8px); } }
 @keyframes dino-notes { 0%, 100% { transform: translateY(0); opacity: 0.4; } 50% { transform: translateY(-10px); opacity: 1; } }
 @media (prefers-reduced-motion: reduce) {
-  .feedback.success, .dino-body, .dino-head, .dino-arm, .dino-leg, .dino-notes { animation: none; }
+  .feedback.success, .dino-body, .dino-head, .dino-arm, .dino-leg, .dino-notes,
+  .quest-complete .victory-stage .victory-character { animation: none; }
 }
 .game-actions { display: flex; flex-wrap: wrap; gap: 0.75rem; }
 .play-only { display: none; }
