@@ -49,6 +49,7 @@ import { celebrate, DEFAULT_CELEBRATIONS, readCelebrations, stopCelebration } fr
 
   function showStatus(warning) {
     preferenceStatus.textContent = warning || savedMessage;
+    preferenceStatus.classList.toggle("warning", Boolean(warning));
   }
 
   function allowedWord(word, index) {
@@ -107,7 +108,14 @@ import { celebrate, DEFAULT_CELEBRATIONS, readCelebrations, stopCelebration } fr
     levelMap.setAttribute("aria-label", `Quest map: level ${levelIndex + 1} of ${levels.length}`);
   }
 
+  function setPlaying(playing) {
+    const wasPlaying = document.body.classList.contains("is-playing");
+    document.body.classList.toggle("is-playing", playing);
+    if (playing && !wasPlaying) document.querySelector(".alphabet-game").scrollIntoView({ block: "start" });
+  }
+
   function showPlay() {
+    setPlaying(true);
     tutorial.hidden = true;
     questComplete.hidden = true;
     playArea.hidden = false;
@@ -257,6 +265,7 @@ import { celebrate, DEFAULT_CELEBRATIONS, readCelebrations, stopCelebration } fr
     } catch (error) {
       console.error("Unable to load Alphabetical Adventure:", error);
       bank = undefined;
+      setPlaying(false);
       tutorial.hidden = false;
       playArea.hidden = true;
       loadStatus.textContent = "We couldn't load the words. Please try again.";
