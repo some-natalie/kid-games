@@ -167,6 +167,23 @@ Each game keeps its tests in `tests/games/<game>/`, with browser specs in a
 `browser/` subdirectory. A new game joins the matrix automatically; the build
 fails if a game has no browser specs.
 
+### Workflow security and updates
+
+Every action is pinned to a full commit SHA with its version in a comment.
+Workflows start with no token permissions and grant each job only what it
+needs, with a comment explaining each permission. The `GitHub Actions security`
+workflow runs [zizmor](https://docs.zizmor.sh/) in pedantic mode on every
+workflow and on `dependabot.yml`. Run it locally with:
+
+```sh
+GH_TOKEN="$(gh auth token)" zizmor --persona=pedantic --collect=all .
+```
+
+Dependabot checks the GitHub Actions and npm manifests weekly. It waits until a
+release is 7 days old and groups updates into one PR per ecosystem, with a
+separate group for security fixes. The zizmor version is pinned in
+`zizmor.yml`; Dependabot does not update it, so update it manually.
+
 For a standalone HTML5 game, place its HTML, JavaScript, and assets in
 `static/<game-name>/`; Zola copies these unchanged into the matching output
 directory. Avoid a corresponding content page so that both
