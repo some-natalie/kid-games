@@ -22,7 +22,7 @@ test("OpenDyslexic is opt-in, persists across pages, and can be turned off with 
   expect(fontRequests.every((url) => new URL(url).origin === new URL(page.url()).origin)).toBe(true);
   expect(await page.evaluate((key) => localStorage.getItem(key), fontKey)).toBe("opendyslexic");
 
-  await page.locator(".game-tile").click();
+  await page.getByRole("link", { name: /Alphabetical Adventure/ }).click();
   await expect(toggle).toBeChecked();
   await expect(page.locator("#start-game")).toBeEnabled();
   await page.locator("#start-game").click();
