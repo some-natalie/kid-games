@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block title %}{{ page.title }} · {{ config.title }}{% endblock title %}
+{% block description %}{{ page.description }}{% endblock description %}
+
+{% block content %}
+<section class="intro">
+  <a class="back-link" href="{{ get_url(path='/') }}">← All games</a>
+  <span class="game-icon" aria-hidden="true">{{ page.extra.icon }}</span>
+  <h1>{{ page.title }}</h1>
+  <p>{{ page.description }}</p>
+</section>
+<section class="alphabet-game fraction-bridge" aria-label="{{ page.title }}">
+  <div class="theme-picker">
+    <a class="back-link play-only" href="{{ get_url(path='/') }}">← All games</a>
+    <p id="preference-status" role="status">Your level is saved only in this browser.</p>
+  </div>
+  <div id="tutorial" class="tutorial">
+    <p class="eyebrow">A number-line adventure</p>
+    <h2>Help Tilly cross the fraction bridge</h2>
+    <p>Fractions are numbers with positions. Help Tilly find where each fraction belongs between 0 and 1.</p>
+    <div class="trail-example fraction-example">
+      <h3>Worked example: find one half</h3>
+      <p>Split the space from 0 to 1 into <strong>two equal intervals</strong>. Count one interval from 0: <strong>1/2</strong> is halfway across.</p>
+      <p class="fraction-example-line" aria-label="Zero, one half, one">0 <span aria-hidden="true">—|—</span> 1/2 <span aria-hidden="true">—|—</span> 1</p>
+      <p>The denominator tells how many <strong>equal intervals</strong> make one whole. Count the spaces between tick marks, not the tick marks.</p>
+    </div>
+    <p>Eight untimed levels start with halves and quarters, then explore thirds, sixths, eighths, equivalent fractions, ordering, and comparing. Guides fade as you learn; a hint can bring the equal partitions back.</p>
+    <p>There is no timer. Tap a position or use Tab and Enter or Space. You can try as often as you like—there are no lost points.</p>
+    <div class="game-actions centered">
+      <button id="start-game" class="primary-button" type="button">Let’s cross!</button>
+      <button id="new-quest" class="secondary-button" type="button" hidden>Start a new bridge</button>
+    </div>
+  </div>
+  <div id="play-area" hidden>
+    <ol id="level-map" class="level-map" aria-label="Bridge levels"></ol>
+    <p id="level-count" class="eyebrow"></p>
+    <h2 id="level-title" tabindex="-1"></h2>
+    <p id="level-instructions"></p>
+    <p id="progress" class="progress" role="status"></p>
+    <div id="challenge-area"></div>
+    <p id="feedback" class="feedback" role="status"></p>
+    <p id="fraction-hint" role="status" hidden></p>
+    <div class="game-actions">
+      <button id="show-hint" class="secondary-button" type="button">Show hint</button>
+      <button id="next-level" class="primary-button" type="button" hidden>Next level</button>
+    </div>
+  </div>
+  <div id="quest-complete" class="quest-complete" hidden>
+    <p class="trail-home" aria-hidden="true">🐢 🌉 🌿</p>
+    <p class="eyebrow">Bridge crossed!</p>
+    <h2 id="quest-heading" tabindex="-1">Show your parent!</h2>
+    <p>You helped Tilly find fraction places, compare sizes, and order the stepping stones. You are a fraction explorer!</p>
+    <button id="play-again" class="primary-button" type="button">Play again</button>
+  </div>
+</section>
+<script src="{{ get_url(path='fraction-bridge.js', cachebust=true) }}" type="module"></script>
+{% endblock content %}
