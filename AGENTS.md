@@ -40,6 +40,7 @@ the "Keep dragging" feedback message) can break them. Update tests together with
 ## Conventions
 
 - Keep it dependency-free: vanilla JS, one shared `static/style.css`, no build step.
+- Describe games and level progression by skills, without age recommendations in UI or documentation.
 - Keep testable game logic in helper modules; keep DOM code in the game's UI module (`alphabetical-order.js`, `proofreading.js`, `number-trail.js`, or `acorn-adventure.js`).
 - Accessibility matters: don't rely on colour alone (pair it with text), keep `aria-label`s accurate, support keyboard moves and touch, and keep dark-mode styles in the `prefers-color-scheme` blocks.
 - Build links with `get_url`, `page.permalink` or `config.base_url`; Pages overrides `base_url`, so never hard-code the host.

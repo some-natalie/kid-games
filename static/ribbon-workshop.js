@@ -265,7 +265,7 @@ if (!isQuizMode(window.location.search)) {
     find("next-level").hidden = true;
     showWarning(saveProgress(storage, index));
     drawMap();
-    find("level-count").textContent = `Level ${index + 1} of ${LEVELS.length} · Ages ${level.age}`;
+    find("level-count").textContent = `Level ${index + 1} of ${LEVELS.length}`;
     find("level-title").textContent = level.title;
     find("level-instructions").textContent = level.instructions;
     find("fraction-target").textContent = taskDescription(level);

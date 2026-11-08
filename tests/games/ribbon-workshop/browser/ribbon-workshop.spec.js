@@ -36,11 +36,12 @@ test("the worked example explains equal parts and keyboard play supports folds a
   await expect(page.locator("#tutorial")).toContainText("1/2");
   await expect(page.locator(".ribbon-progression li")).toHaveCount(4);
   await expect(page.locator("#tutorial")).toContainText("no timer");
+  await expect(page.locator("#tutorial")).not.toContainText(/\bages?\b/i);
   await audit(page);
 
   await page.getByRole("button", { name: "Start making ribbons" }).press("Enter");
   await expect(page.locator("#level-title")).toBeFocused();
-  await expect(page.locator("#level-count")).toHaveText("Level 1 of 9 · Ages 6–7");
+  await expect(page.locator("#level-count")).toHaveText("Level 1 of 9");
   await page.getByRole("button", { name: "Select one more part on ribbon 1" }).press("Space");
   await expect(page.locator(".ribbon-quantity")).toContainText("1/2");
   await page.getByRole("button", { name: "Check the ribbons" }).press("Enter");

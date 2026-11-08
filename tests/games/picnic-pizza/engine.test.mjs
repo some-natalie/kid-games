@@ -6,11 +6,11 @@ import {
 } from "../../../static/picnic-pizza-engine.js";
 import { gradeQuiz } from "../../../static/quiz-engine.js";
 
-test("the seven age-progressive levels cover every fraction activity", () => {
+test("the seven levels cover every fraction activity without age recommendations", () => {
   assert.equal(LEVELS.length, 7);
   assert.deepEqual(LEVELS.map((level) => level.activity),
     ["equal", "name", "build", "build", "compare", "equivalent", "complete"]);
-  assert.deepEqual(LEVELS.map((level) => level.ages), ["6–7", "6–7", "6–7", "8–9", "8–9", "8–9", "8–9"]);
+  assert.ok(LEVELS.every((level) => !("age" in level) && !("ages" in level)));
   assert.equal(PUZZLES_PER_LEVEL, 4);
 });
 
