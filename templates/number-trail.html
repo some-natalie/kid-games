@@ -39,7 +39,11 @@
     <h2 id="level-title" tabindex="-1"></h2>
     <p id="level-instructions"></p>
     <p id="progress" class="progress" role="status"></p>
-    <ol id="trail-path" class="trail-path" aria-label="Stepping stones crossed"></ol>
+    <div class="trail-crossing">
+      <span class="trail-bank" aria-hidden="true">🌿</span>
+      <ol id="trail-path" class="trail-path" aria-label="Stepping stones crossed"></ol>
+      <span class="trail-bank trail-bank-far" aria-hidden="true">🥕</span>
+    </div>
     <details class="how-to-play">
       <summary>How to play</summary>
       <p id="trail-instructions">Choose the number that belongs in the question mark. Plus means add; minus means take away. Sometimes the missing number comes before the equals sign. Tap a stone, or use Tab and Enter or Space. A wrong answer gives a hint and you can try again. A correct answer opens the next step.</p>
