@@ -8,12 +8,17 @@
 </section>
 <section aria-label="Games" class="game-grid">
   {% for game in section.pages %}
+  {% if not game.extra.informational | default(value=false) %}
   <a class="game-tile" href="{{ game.permalink }}">
     <span class="game-icon" aria-hidden="true">{{ game.extra.icon }}</span>
     <h2>{{ game.title }}</h2>
     <p>{{ game.description }}</p>
     <span class="badge">{% if game.extra.playable %}Play now{% else %}Coming soon{% endif %}</span>
   </a>
+  {% endif %}
   {% endfor %}
 </section>
+<nav class="grown-ups-link" aria-label="Information for grown-ups">
+  <a href="{{ get_url(path='for-grown-ups/') }}">For grown-ups</a>
+</nav>
 {% endblock content %}

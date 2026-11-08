@@ -266,6 +266,26 @@ footer { padding-block: 1.5rem; text-align: center; }
 .acorn-term { display: inline-block; padding: 0.2rem 0.35rem; border: 2px solid transparent; border-radius: 0.4rem; }
 .acorn-term.current { border-color: var(--accent); background: var(--badge); font-weight: 800; text-decoration: underline; }
 .acorn-term.done { font-weight: 700; }
+.quiz-notice { padding: 0.75rem; border: 2px solid var(--accent); border-radius: 0.65rem; color: var(--text); background: var(--badge); }
+.quiz-mode #tutorial, .quiz-mode .alphabet-rail { display: none; }
+.quiz-navigation { margin-top: 1rem; }
+.quiz-words li { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem; }
+.quiz-words li > span { flex: 1 1 8rem; }
+.quiz-mode select, .quiz-mode input[type="number"] { max-width: 100%; min-height: 2.75rem; padding: 0.5rem; font: inherit; background: var(--surface); color: var(--text); border: 2px solid var(--accent); border-radius: 0.5rem; }
+.quiz-mode label { display: block; margin-block: 1rem; }
+.quiz-review li { margin-bottom: 1rem; }
+.quiz-score { font-weight: 800; font-size: 1.5rem; color: var(--accent); }
+.quiz-mode summary { min-height: 2.75rem; padding-block: 0.4rem; cursor: pointer; }
+.quiz-mode summary:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+.quiz-mode .answer-stones [aria-pressed="true"] { background: var(--badge); border-width: 4px; }
+.grown-ups { max-width: 48rem; margin-inline: auto; }
+.grown-ups-link { margin-top: 1.5rem; text-align: center; }
+.grown-ups-link a, .grown-ups label, .grown-ups summary { display: inline-block; min-height: 2.75rem; padding-block: 0.5rem; }
+.grown-ups label, .grown-ups summary { cursor: pointer; }
+.grown-ups input { width: 1.25rem; height: 1.25rem; accent-color: var(--accent); }
+.grown-ups input:focus-visible, .grown-ups summary:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+.grown-ups-play { display: inline-block; text-decoration: none; }
+.license-text { white-space: pre-wrap; overflow-wrap: anywhere; font: inherit; }
 @media (prefers-color-scheme: dark) {
   .trail-bank { background: linear-gradient(160deg, #567741, #395c2c 55%, #496a36); }
   .trail-bank-far { border-color: #789a55; }

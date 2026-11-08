@@ -8,6 +8,7 @@
   <title>{% block title %}{{ config.title }}{% endblock title %}</title>
   <link rel="stylesheet" href="{{ get_url(path='style.css', cachebust=true) }}">
   <script src="{{ get_url(path='site-font.js', cachebust=true) }}" defer></script>
+  <script src="{{ get_url(path='site-quiz.js', cachebust=true) }}" type="module"></script>
 </head>
 <body class="{% block body_class %}{% endblock body_class %}">
   <a class="skip-link" href="#main">Skip to content</a>

@@ -6,6 +6,32 @@ the site's alphabetical-order game, Proofreading Detectives is its
 proofreading game, Number Trail is its woodland math adventure for ages 6–9,
 and Acorn Adventure introduces cumulative, multistep arithmetic.
 
+## Quiz mode
+
+Add `?quiz=1` to the home page or any game URL to opt into quiz mode.
+The landing page's **For grown-ups** link opens a page with a quiz-mode toggle,
+the public GitHub repository, and MIT licensing and third-party attribution
+information. The toggle changes the URL setting, not a saved browser preference.
+Internal navigation keeps the flag; omit it (or use `?quiz=0`) for normal play.
+Quiz mode removes worked examples, reference hints, and immediate grading.
+**Next question**, **Previous question**, and **Review answers** let players
+change any answer as often as they like before **Submit quiz**.
+The “Show your parent!” screen then gives a rounded percent correct and
+expandable **Answer details**, including incorrect responses and corrections.
+
+Each completely correct question earns one point: an entire word order or
+proofreading passage, one Number Trail puzzle, or one Acorn Adventure stop.
+Unanswered questions count as incorrect. Proofreading requires marking every
+mistake without marking correct text. Acorn Adventure uses a numeric input
+instead of answer choices and carries the player's entered totals, so later
+stops cannot reveal whether an earlier answer was right. Each stop is scored
+against the original journey; revising a total does not automatically rewrite
+later answers. Alphabetical quiz words use the selected theme and have keyboard-
+and touch-friendly Up/Down controls.
+
+Quiz answers live only in memory: leaving or reloading discards them, and
+ordinary saved game progress is neither loaded nor changed.
+
 ## Community and license
 
 Original project code and content are licensed under [MIT](LICENSE).
@@ -19,7 +45,8 @@ Report vulnerabilities privately as described in [Security](SECURITY.md).
 
 ## Local development
 
-Install [Zola 0.23.6](https://www.getzola.org/documentation/getting-started/installation/),
+Install the latest [Zola release](https://www.getzola.org/documentation/getting-started/installation/)
+and the latest Node.js LTS release supported by Playwright,
 then run these commands from the repository root:
 
 ```sh

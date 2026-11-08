@@ -1,6 +1,9 @@
 import { LEVELS, STEPS_PER_LEVEL, buildRound, equationText, spokenEquation, hintText } from "./number-trail-engine.js";
 import { createLevelProgress } from "./level-progress.js";
 import { celebrate, stopCelebration } from "./alphabet-celebration.js";
+import { isQuizMode } from "./quiz-engine.js";
+
+if (!isQuizMode(window.location.search)) {
 
 const { loadProgress, saveProgress, clearProgress } =
   createLevelProgress("kid-games.number-trail.progress", "Number Trail");
@@ -181,4 +184,5 @@ showWarning(saved.warning);
 if (saved.level !== undefined) {
   find("start-game").textContent = `Continue level ${saved.level + 1}`;
   find("new-quest").hidden = false;
+}
 }

@@ -2,8 +2,10 @@ import { celebrate, DEFAULT_CELEBRATIONS, readCelebrations, stopCelebration } fr
 import { buildRound, correctionParts, describeFix, gradeRound, MISTAKE_TYPES, pickVariant, tokenKey } from "./proofreading-engine.js";
 import { CELEBRATION_MESSAGES, LEVELS } from "./proofreading-levels.js";
 import { clearProgress, loadProgress, saveProgress } from "./proofreading-progress.js";
+import { isQuizMode } from "./quiz-engine.js";
 
 (() => {
+  if (isQuizMode(window.location.search)) return;
   const tutorial = document.querySelector("#tutorial");
   const playArea = document.querySelector("#play-area");
   const questComplete = document.querySelector("#quest-complete");
