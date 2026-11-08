@@ -259,8 +259,8 @@ footer { padding-block: 1.5rem; text-align: center; }
 .trail-stone.correct:disabled { opacity: 1; background: var(--badge); color: var(--accent); border-width: 4px; }
 .trail-home { font-size: clamp(2rem, 10vw, 4rem); }
 .acorn-example, .acorn-log { text-align: left; }
+.acorn-example-nuts { display: flex; flex-wrap: wrap; gap: 0.2rem; margin-top: 0.25rem; }
 .acorn-basket { padding: 0.75rem; border: 2px solid var(--border); border-radius: 1rem; background: var(--badge); text-align: center; }
-.acorn-basket > span { font-size: 2.5rem; }
 .acorn-basket p { margin: 0; color: var(--text); font-weight: 800; }
 .acorn-expression { display: flex; flex-wrap: wrap; align-items: center; gap: 0.25rem; font-size: 1.35rem; color: var(--text); }
 .acorn-term { display: inline-block; padding: 0.2rem 0.35rem; border: 2px solid transparent; border-radius: 0.4rem; }

@@ -31,6 +31,12 @@ test("home tile, worked example, keyboard steps, and retries preserve the runnin
   await page.getByRole("link", { name: /Acorn Adventure/ }).click();
   await expect(page.locator("#tutorial")).toContainText("5 + 19 − 4 + 7 = 27");
   await expect(page.locator("#tutorial")).toContainText("equal priority");
+  for (const [index, total] of [24, 20, 27].entries()) {
+    const basket = page.locator(".acorn-example li").nth(index);
+    await expect(basket.locator(".acorn-example-nuts > span")).toHaveCount(total);
+    await expect(basket.locator("p")).toContainText(`Your basket: ${total} nuts`);
+    await expect(basket.locator(".acorn-example-nuts")).toHaveAttribute("aria-hidden", "true");
+  }
   await page.locator("#start-game").press("Enter");
   await expect(page.locator("#level-title")).toBeFocused();
   await expect(page.locator(".acorn-term.current")).toHaveCount(1);
@@ -38,6 +44,8 @@ test("home tile, worked example, keyboard steps, and retries preserve the runnin
   await expect(page.locator("#hint")).toBeVisible();
   const total = await solve(page, true);
   await expect(page.locator("#basket-total")).toContainText(`${total} `);
+  await expect(page.locator(".acorn-basket p")).toHaveText(`🐿️ Your basket: ${total} ${total === 1 ? "nut" : "nuts"} 🌰`);
+  await expect(page.locator("#play-area .acorn-example-nuts")).toHaveCount(0);
   await expect(page.locator("#journey-log li")).toHaveCount(1);
   await page.locator("#next-step").press("Enter");
   await expect(page.locator("#step-heading")).toBeFocused();

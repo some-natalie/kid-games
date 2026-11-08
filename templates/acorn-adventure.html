@@ -23,9 +23,15 @@
       <h3>Try following this journey</h3>
       <p><strong>5 + 19 − 4 + 7 = 27</strong></p>
       <ol class="acorn-example">
-        <li>Start with 5 nuts. Find 19 more: <strong>5 + 19 = 24</strong>.</li>
-        <li>Carry 24 forward. Share 4: <strong>24 − 4 = 20</strong>.</li>
-        <li>Carry 20 forward. Gather 7: <strong>20 + 7 = 27</strong>.</li>
+        <li>Start with 5 nuts. Find 19 more: <strong>5 + 19 = 24</strong>.
+          <p>Your basket: 24 nuts <span class="acorn-example-nuts" aria-hidden="true">{% for nut in range(end=24) %}<span>🌰</span>{% endfor %}</span></p>
+        </li>
+        <li>Carry 24 forward. Share 4: <strong>24 − 4 = 20</strong>.
+          <p>Your basket: 20 nuts <span class="acorn-example-nuts" aria-hidden="true">{% for nut in range(end=20) %}<span>🌰</span>{% endfor %}</span></p>
+        </li>
+        <li>Carry 20 forward. Gather 7: <strong>20 + 7 = 27</strong>.
+          <p>Your basket: 27 nuts <span class="acorn-example-nuts" aria-hidden="true">{% for nut in range(end=27) %}<span>🌰</span>{% endfor %}</span></p>
+        </li>
       </ol>
     </div>
     <p><strong>Addition and subtraction have equal priority.</strong> When a chain has only these operations, work from left to right. Do not do all the additions first.</p>
@@ -42,8 +48,7 @@
     <p>Only addition and subtraction here: work from left to right.</p>
     <p id="progress" class="progress" role="status"></p>
     <div class="acorn-basket">
-      <span aria-hidden="true">🐿️ 🌰</span>
-      <p id="basket-total"></p>
+      <p><span aria-hidden="true">🐿️</span> <span id="basket-total"></span> <span aria-hidden="true">🌰</span></p>
     </div>
     <h3>Your whole journey</h3>
     <p id="expression" class="acorn-expression" aria-label="Full expression"></p>
