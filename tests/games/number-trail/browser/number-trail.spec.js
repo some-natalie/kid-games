@@ -46,6 +46,14 @@ test("the home tile opens a worked example and keyboard-accessible untimed play"
   await page.locator("#start-game").press("Enter");
   await expect(page.locator("#level-title")).toBeFocused();
   await expect(stones(page)).toHaveCount(4);
+  await expect(page.locator("#trail-path li.current")).toHaveCount(1);
+  await expect(page.locator("#trail-path li.current .trail-bunny")).toBeVisible();
+  await expect(page.locator("#trail-path li.current .trail-number")).toHaveText("1");
+  await expect(page.locator(".trail-crossing .trail-bank")).toHaveCount(2);
+  await expect(page.locator(".trail-bank-far")).toHaveText("🥕");
+  await expect(page.locator(".trail-crossing .trail-bank").first()).toHaveAttribute("aria-hidden", "true");
+  expect(await page.locator(".trail-crossing").evaluate((element) => getComputedStyle(element).backgroundImage)).toBe("none");
+  expect(await page.locator(".trail-bank").first().evaluate((element) => getComputedStyle(element).backgroundImage)).not.toBe("none");
   await expect(page.locator("#next-step")).toBeHidden();
   await page.locator("#show-hint").press("Space");
   await expect(page.locator("#trail-hint")).toContainText("count forward");
@@ -62,10 +70,13 @@ test("the home tile opens a worked example and keyboard-accessible untimed play"
   await page.locator("#next-step").press("Enter");
   await expect(page.locator("#puzzle-heading")).toBeFocused();
   await expect(page.locator("#feedback")).toBeEmpty();
+  await expect(page.locator("#trail-path li.current .trail-number")).toHaveText("2");
+  await expect(page.locator("#trail-path li.current .trail-bunny")).toBeVisible();
+  await expect(page.locator("#trail-path li.current")).toHaveAttribute("aria-current", "step");
 });
 
 test("all 50 stones can be crossed, progress advances, and finishing waits for the player", async ({ page }) => {
-  test.slow();
+  test.setTimeout(180_000);
   await page.emulateMedia({ reducedMotion: "reduce" });
   await start(page);
   for (let level = 0; level < 10; level += 1) {

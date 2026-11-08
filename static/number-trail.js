@@ -44,14 +44,19 @@ function drawPath() {
   find("trail-path").replaceChildren(...Array.from({ length: STEPS_PER_LEVEL }, (_, index) => {
     const item = document.createElement("li");
     const done = index < crossed;
+    const current = index === stepIndex;
     const bunny = document.createElement("span");
     bunny.textContent = "\u{1f430} ";
     bunny.setAttribute("aria-hidden", "true");
-    if (index === stepIndex) item.append(bunny);
-    item.append(`${done ? "\u2713 " : ""}${index + 1}`);
+    bunny.className = "trail-bunny";
+    if (current) item.append(bunny);
+    const number = document.createElement("span");
+    number.className = "trail-number";
+    number.textContent = `${done ? "\u2713 " : ""}${index + 1}`;
+    item.append(number);
     item.setAttribute("aria-label", `Stone ${index + 1}: ${done ? "crossed" : "not crossed yet"}`);
-    item.className = done ? "crossed" : "";
-    if (index === stepIndex) item.setAttribute("aria-current", "step");
+    item.className = [done && "crossed", current && "current"].filter(Boolean).join(" ");
+    if (current) item.setAttribute("aria-current", "step");
     return item;
   }));
 }

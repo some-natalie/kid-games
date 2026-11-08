@@ -243,15 +243,27 @@ footer { padding-block: 1.5rem; text-align: center; }
 .quest-complete .dino-leg, .quest-complete .dino-notes,
 .quest-complete .victory-character, .quest-complete .detective { animation-iteration-count: 2; }
 .trail-example { padding: 0.5rem 1rem; border-radius: 1rem; background: var(--badge); }
-.trail-path { display: flex; flex-wrap: wrap; gap: 0.5rem; list-style: none; padding: 0; }
-.trail-path li { min-width: 2.75rem; padding: 0.4rem; text-align: center; border: 2px solid var(--border); border-radius: 1rem; }
-.trail-path li.crossed { border-color: var(--accent); color: var(--accent); font-weight: 700; }
+.trail-crossing { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: stretch; overflow: hidden; border-radius: 1rem; }
+.trail-bank { display: grid; place-items: center; min-width: 1.75rem; padding: 0.25rem; background: linear-gradient(160deg, #a4ca76, #6d9849 55%, #91b85d); font-size: clamp(1.15rem, 4vw, 1.6rem); }
+.trail-bank:first-child { border-radius: 1rem 0 0 1rem; }
+.trail-bank-far { border-left: 2px dashed #527636; border-radius: 0 1rem 1rem 0; }
+.trail-path { position: relative; isolation: isolate; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: clamp(0.15rem, 2vw, 0.9rem); list-style: none; padding: 1.8rem 0.25rem 0.75rem; overflow: hidden; background: linear-gradient(165deg, #bce7f3, #91d3e6 52%, #bce7f3); }
+.trail-path li { position: relative; display: grid; place-items: center; min-width: 0; aspect-ratio: 1.1; padding: 0.25rem; border: 1px solid #87939b; border-radius: 42% 52% 43% 48% / 47% 38% 56% 45%; background: linear-gradient(145deg, #f8fafb 0%, #cbd2d6 45%, #a9b3b9 100%); box-shadow: inset 2px 3px 5px #fff9, inset -4px -6px 8px #56636b40, 0 5px 5px #38556250; color: #29333a; text-align: center; }
+.trail-number { position: relative; z-index: 1; font-weight: 800; }
+.trail-bunny { position: absolute; z-index: 2; top: -1.05rem; left: 50%; transform: translateX(-50%); font-size: clamp(1.2rem, 4vw, 1.6rem); line-height: 1; filter: drop-shadow(0 1px 1px #0005); }
+.trail-path li.current { outline: 3px solid var(--accent); outline-offset: -3px; }
+.trail-path li.crossed { background: linear-gradient(145deg, #e1ece4 0%, #b7c9bc 48%, #91aa98 100%); }
 .trail-equation { font-size: clamp(1.5rem, 5vw, 2.5rem); text-align: center; }
 .answer-stones { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 7rem), 1fr)); gap: 0.75rem; }
 .trail-stone { min-height: 3.5rem; min-width: 2.75rem; padding: 0.5rem; border-radius: 1.5rem; font-size: 1.5rem; touch-action: manipulation; }
 .trail-stone.correct:disabled { opacity: 1; background: var(--badge); color: var(--accent); border-width: 4px; }
 .trail-home { font-size: clamp(2rem, 10vw, 4rem); }
 @media (prefers-color-scheme: dark) {
+  .trail-bank { background: linear-gradient(160deg, #567741, #395c2c 55%, #496a36); }
+  .trail-bank-far { border-color: #789a55; }
+  .trail-path { background: linear-gradient(165deg, #174b60, #236781 52%, #174b60); }
+  .trail-path li { border-color: #697982; background: linear-gradient(145deg, #59666d 0%, #3c484e 48%, #303b40 100%); color: #f5f7f8; box-shadow: inset 2px 3px 5px #ffffff24, inset -4px -6px 8px #0006, 0 5px 5px #0006; }
+  .trail-path li.crossed { background: linear-gradient(145deg, #506858 0%, #34493b 48%, #293c30 100%); }
   .proof-token[data-result="found"], .example-token[data-result="found"] { background: #1f3b28; color: #c9f2b8; border-color: #4cc26d; }
   .proof-token.proof-removed { background: #450a0a; color: #fecaca; border-color: #f87171; }
   .proof-deletion { background: #450a0a; color: #fecaca; }
