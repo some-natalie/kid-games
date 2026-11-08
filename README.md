@@ -5,6 +5,17 @@ light/dark styling based on the device preference. Alphabetical Adventure is
 the site's alphabetical-order game, and Proofreading Detectives is its
 proofreading game.
 
+## Community and license
+
+Original project code and content are licensed under [MIT](LICENSE).
+Bundled OpenDyslexic fonts and WordNet-derived data retain their separate
+licenses; see [Third-party notices](THIRD_PARTY_NOTICES.md).
+
+Contributions are welcome! Start with [Contributing](CONTRIBUTING.md), meet the
+[contributors](CONTRIBUTORS.md), and follow our
+[Code of Conduct](CODE_OF_CONDUCT.md).
+Report vulnerabilities privately as described in [Security](SECURITY.md).
+
 ## Local development
 
 Install [Zola 0.23.6](https://www.getzola.org/documentation/getting-started/installation/),
