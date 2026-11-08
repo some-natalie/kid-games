@@ -1,8 +1,9 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import {
-  LEVELS, buildQuizQuestions, compareFractions, equivalentFractions, evaluatePlacement,
-  fractionAtTick, fractionName, isOrdered, orderFractions, parseFraction, positionChoices, positionOf,
+  LEVELS, bridgeSummary, buildQuizQuestions, compareFractions, equivalentFractions, evaluatePlacement,
+  fractionAtTick, fractionName, isOrdered, orderFractions, parseFraction, positionChoices, positionLabel,
+  positionOf, stepTick, tickFromRatio,
 } from "../../../static/fraction-bridge-engine.js";
 
 test("the scaffold moves from visible halves and quarters to reduced-guide challenges", () => {
@@ -60,4 +61,50 @@ test("fraction parsing rejects malformed values and quiz prompts include all ski
     "fraction-placement", "fraction-placement", "fraction-placement",
     "fraction-equivalent", "fraction-compare", "fraction-order",
   ]);
+});
+
+test("taps and drags snap to the nearest valid tick and stay on the bridge", () => {
+  assert.equal(tickFromRatio(0, 8), 0);
+  assert.equal(tickFromRatio(0.6, 8), 5);
+  assert.equal(tickFromRatio(0.5625, 8), 5);
+  assert.equal(tickFromRatio(0.55, 8), 4);
+  assert.equal(tickFromRatio(0.74, 2), 1);
+  assert.equal(tickFromRatio(-0.4, 4), 0);
+  assert.equal(tickFromRatio(1.7, 4), 4);
+  assert.throws(() => tickFromRatio(Number.NaN, 4), TypeError);
+  assert.throws(() => tickFromRatio(0.5, 0), RangeError);
+});
+
+test("keyboard steps move one interval and clamp at the endpoints", () => {
+  assert.equal(stepTick(0, "ArrowRight", 4), 1);
+  assert.equal(stepTick(1, "ArrowUp", 4), 2);
+  assert.equal(stepTick(2, "ArrowLeft", 4), 1);
+  assert.equal(stepTick(0, "ArrowDown", 4), 0);
+  assert.equal(stepTick(4, "ArrowRight", 4), 4);
+  assert.equal(stepTick(2, "Home", 4), 0);
+  assert.equal(stepTick(2, "End", 4), 4);
+  assert.equal(stepTick(2, "Tab", 4), undefined);
+});
+
+test("bridge labels and shading describe the chosen part and the unshaded rest", () => {
+  assert.equal(positionLabel(1, 2), "1/2 (one half)");
+  assert.equal(positionLabel(0, 8), "0 (zero)");
+  assert.equal(positionLabel(8, 8), "1 (one)");
+  assert.deepEqual(bridgeSummary(6, 8), {
+    shaded: "3/4 (three fourths)",
+    unshaded: "1/4 (one fourth)",
+    text: "Shaded part from 0: 3/4 (three fourths). Unshaded part: 1/4 (one fourth).",
+  });
+  assert.equal(bridgeSummary(0, 4).unshaded, "1 (one)");
+  assert.equal(bridgeSummary(4, 4).shaded, "1 (one)");
+  assert.throws(() => bridgeSummary(5, 4), RangeError);
+});
+
+test("quiz placement questions carry the bridge size and every tick label", () => {
+  const placements = buildQuizQuestions().filter(({ kind }) => kind === "fraction-placement");
+  assert.deepEqual(placements.map(({ intervals, expected }) => [intervals, expected]), [[8, 4], [8, 4], [6, 2]]);
+  for (const question of placements) {
+    assert.equal(question.choices.length, question.intervals + 1);
+    assert.deepEqual(question.choices.map(({ value }) => value), Array.from({ length: question.intervals + 1 }, (_, tick) => tick));
+  }
 });
