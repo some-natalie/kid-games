@@ -123,6 +123,32 @@ test("list validation, wrong final orders, revisions, and clearing empty groups 
   await expect(page.locator("#feedback")).toHaveClass(/success/);
 });
 
+test("success feedback keeps full contrast at the first animation frame in light and dark modes", async ({ page }) => {
+  test.slow();
+  for (const colorScheme of ["light", "dark"]) {
+    await page.emulateMedia({ colorScheme, reducedMotion: "no-preference" });
+    await openSample(page);
+    await activate(page.getByRole("button", { name: "Send Word tray to final ABC list", exact: true }));
+    await sortList(page, "final");
+    await activate(page.getByRole("button", { name: "Check order", exact: true }));
+    const animations = await page.locator("#feedback").evaluate((feedback) => {
+      const animations = feedback.getAnimations();
+      for (const animation of animations) {
+        animation.pause();
+        animation.currentTime = 0;
+      }
+      return animations.length;
+    });
+    expect(animations).toBe(1);
+    await expect(page.locator("#feedback")).toHaveCSS("opacity", "1");
+    await audit(page);
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await expect(page.locator("#feedback")).toHaveCSS("animation-name", "none");
+    await expect(page.locator("#feedback")).toHaveCSS("opacity", "1");
+    await audit(page);
+  }
+});
+
 test("all seven deeper-letter rounds complete, and the finale clears only group progress", async ({ page }) => {
   test.slow();
   await openSample(page);

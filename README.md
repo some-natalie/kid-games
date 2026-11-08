@@ -103,6 +103,7 @@ underline in normal play. Use Up/Down buttons or arrow keys, Home, and End to
 arrange its words. Send each smaller list to the end of the **Final ABC list**
 in your chosen order, then **Check order**. You can move words back into
 working lists, remove empty lists, undo changes, and retry without a timer.
+Success text stays fully opaque throughout its pop animation to preserve contrast.
 The curated rounds deliberately include comparisons at each level's target
 depth, including words that end at a shared prefix.
 
