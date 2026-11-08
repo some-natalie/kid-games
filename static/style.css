@@ -258,6 +258,14 @@ footer { padding-block: 1.5rem; text-align: center; }
 .trail-stone { min-height: 3.5rem; min-width: 2.75rem; padding: 0.5rem; border-radius: 1.5rem; font-size: 1.5rem; touch-action: manipulation; }
 .trail-stone.correct:disabled { opacity: 1; background: var(--badge); color: var(--accent); border-width: 4px; }
 .trail-home { font-size: clamp(2rem, 10vw, 4rem); }
+.acorn-example, .acorn-log { text-align: left; }
+.acorn-basket { padding: 0.75rem; border: 2px solid var(--border); border-radius: 1rem; background: var(--badge); text-align: center; }
+.acorn-basket > span { font-size: 2.5rem; }
+.acorn-basket p { margin: 0; color: var(--text); font-weight: 800; }
+.acorn-expression { display: flex; flex-wrap: wrap; align-items: center; gap: 0.25rem; font-size: 1.35rem; color: var(--text); }
+.acorn-term { display: inline-block; padding: 0.2rem 0.35rem; border: 2px solid transparent; border-radius: 0.4rem; }
+.acorn-term.current { border-color: var(--accent); background: var(--badge); font-weight: 800; text-decoration: underline; }
+.acorn-term.done { font-weight: 700; }
 @media (prefers-color-scheme: dark) {
   .trail-bank { background: linear-gradient(160deg, #567741, #395c2c 55%, #496a36); }
   .trail-bank-far { border-color: #789a55; }

@@ -3,7 +3,8 @@
 A small Zola site for kid-games.dev, with responsive game tiles and automatic
 light/dark styling based on the device preference. Alphabetical Adventure is
 the site's alphabetical-order game, Proofreading Detectives is its
-proofreading game, and Number Trail is its woodland math adventure for ages 6–9.
+proofreading game, Number Trail is its woodland math adventure for ages 6–9,
+and Acorn Adventure introduces cumulative, multistep arithmetic.
 
 ## Community and license
 
@@ -298,6 +299,43 @@ individual stones within a level are not saved. **Start a new trail** resets
 progress; **Finish trail** clears it. Storage errors show a warning without
 blocking play. Proofreading and Number Trail share `static/level-progress.js`
 for versioned level storage, retaining separate keys.
+
+## Acorn Adventure
+
+Help Squirrel gather and share nuts for the winter pantry. Each level is one
+cumulative journey: solve a stop, carry the new basket total forward, then
+continue. The full expression stays visible with the current operation
+underlined and outlined; a completed-step log preserves earlier equations.
+Hazelnut emoji stand in for the woodland nuts.
+
+Addition and subtraction have equal priority: chains containing only these
+operations are evaluated **left to right**, not by doing addition first.
+A worked `5 + 19 − 4 + 7 = 27` example demonstrates each running total.
+This game prepares players for multistep arithmetic; it does not introduce
+multiplication, division, parentheses, or their precedence rules.
+
+| Levels | Stops per journey | Largest running total |
+|---|---|---|
+| 1–2 | 2 | 10 |
+| 3–4 | 2 | 20 |
+| 5 | 3 | 20 |
+| 6 | 3 | 30 |
+| 7 | 3 | 50 |
+| 8 | 4 | 50 |
+| 9–10 | 4 | 100 |
+
+Tap an answer or use Tab and Enter/Space. Strategy hints and unlimited retries
+leave earlier steps intact, and there is no timer. Correct answers wait for
+**Next stop**, **Next level**, or **Finish adventure** before proceeding.
+The final journey remains readable until the player explicitly finishes.
+
+`static/acorn-adventure-engine.js` generates bounded, whole-number journeys
+without negative totals; `static/acorn-adventure.js` handles the UI. The shared
+level-progress helper saves the unlocked level separately under
+`kid-games.acorn-adventure.progress` as `{"version":1,"level":3}`.
+Returning begins that level with a new journey; individual stops are not saved.
+Starting a new adventure or finishing clears that save without touching other
+games. Storage failures display a warning and do not block play.
 
 ## Accessibility
 

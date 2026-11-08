@@ -13,7 +13,7 @@ for (const colorScheme of ["light", "dark"]) {
   test(`pages and active games pass automated WCAG checks in ${colorScheme} mode`, async ({ page }) => {
     test.slow();
     await page.emulateMedia({ colorScheme, reducedMotion: "reduce" });
-    for (const path of ["/", "/alphabetical-order/", "/proofreading/", "/number-trail/"]) {
+    for (const path of ["/", "/alphabetical-order/", "/proofreading/", "/number-trail/", "/acorn-adventure/"]) {
       await page.goto(path);
       await expect(page.getByRole("checkbox", { name: "Use OpenDyslexic font" })).toBeVisible();
       await audit(page);
@@ -77,7 +77,7 @@ test("alphabet hints and the completed quest pass automated accessibility checks
 });
 
 test("skip links move keyboard focus into content on every page", async ({ page }) => {
-  for (const path of ["/", "/alphabetical-order/", "/proofreading/", "/number-trail/"]) {
+  for (const path of ["/", "/alphabetical-order/", "/proofreading/", "/number-trail/", "/acorn-adventure/"]) {
     await page.goto(path);
     await page.keyboard.press("Tab");
     await expect(page.getByRole("link", { name: "Skip to content" })).toBeFocused();
@@ -90,7 +90,7 @@ test("pages and games reflow at 320px with enlarged text and custom text spacing
   test.slow();
   await page.setViewportSize({ width: 320, height: 568 });
   await page.addInitScript(() => localStorage.setItem("kid-games.font", "opendyslexic"));
-  for (const path of ["/", "/alphabetical-order/", "/proofreading/", "/number-trail/"]) {
+  for (const path of ["/", "/alphabetical-order/", "/proofreading/", "/number-trail/", "/acorn-adventure/"]) {
     await page.goto(path);
     await page.evaluate(() => document.fonts.ready);
     await page.addStyleTag({ content: `
