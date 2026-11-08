@@ -113,7 +113,9 @@ button:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
 .game-instructions { margin-top: 0; }
 .progress { font-weight: 700; }
 .answer-list { display: grid; gap: 0.4rem; padding-left: 2rem; }
-.answer-list li { padding: 0.15rem; border-top: 8px solid transparent; border-bottom: 8px solid transparent; }
+.answer-list li { position: relative; padding: 0.15rem 6.4rem 0.15rem 0.15rem; border-top: 8px solid transparent; border-bottom: 8px solid transparent; }
+.word-move-controls { position: absolute; right: 0.15rem; top: 50%; transform: translateY(-50%); display: flex; gap: 0.25rem; }
+.move-word { min-width: 2.75rem; min-height: 2.75rem; padding: 0.25rem; border: 2px solid var(--accent); border-radius: 0.65rem; background: var(--surface); color: var(--accent); font: inherit; font-size: 1.5rem; font-weight: 700; cursor: pointer; touch-action: manipulation; }
 .answer-list li::marker { font-size: 1.2rem; font-weight: 700; color: var(--accent); }
 .feedback { min-height: 1.6rem; font-weight: 700; font-size: 1.15rem; }
 .feedback.success { color: var(--accent); font-size: 1.4rem; animation: pop-in 0.45s ease-out; }

@@ -9,17 +9,24 @@ export function moveWord(words, from, to) {
   return result;
 }
 
+export function nearestPosition(centers, y) {
+  if (!centers.length || !Number.isFinite(y) || centers.some((center) => !Number.isFinite(center))) {
+    throw new RangeError("Drop positions need finite row centers and a pointer position.");
+  }
+  return centers.reduce((nearest, center, index) =>
+    Math.abs(center - y) < Math.abs(centers[nearest] - y) ? index : nearest, 0);
+}
+
 export function attachSorter(list, onMove) {
   let drag;
   let frame;
 
   function destination(y) {
-    const others = [...list.children].filter((item) => item !== drag.item);
-    const index = others.findIndex((item) => {
+    const centers = [...list.children].map((item) => {
       const rect = item.getBoundingClientRect();
-      return y < rect.top + rect.height / 2;
+      return rect.top + rect.height / 2;
     });
-    return index < 0 ? others.length : index;
+    return nearestPosition(centers, y + drag.offsetY);
   }
 
   function preview() {
@@ -28,6 +35,7 @@ export function attachSorter(list, onMove) {
     );
     const others = [...list.children].filter((item) => item !== drag.item);
     const target = destination(drag.y);
+    if (target === drag.from) return;
     if (target < others.length) others[target].classList.add("drop-before");
     else others.at(-1)?.classList.add("drop-after");
   }
@@ -60,9 +68,14 @@ export function attachSorter(list, onMove) {
     const button = event.target.closest(".word-button");
     if (!button || button.disabled || drag || !event.isPrimary || event.button !== 0) return;
     event.preventDefault();
-    const item = button.parentElement;
+    const item = button.closest("li");
+    const rect = item.getBoundingClientRect();
+    const buttonRect = button.getBoundingClientRect();
     drag = { button, item, pointerId: event.pointerId, x: event.clientX, y: event.clientY,
-      startX: event.clientX, startY: event.clientY, from: [...list.children].indexOf(item), active: false };
+      startX: event.clientX, startY: event.clientY, from: [...list.children].indexOf(item), active: false,
+      offsetY: rect.top + rect.height / 2 - event.clientY,
+      ghostOffsetX: buttonRect.left + buttonRect.width / 2 - event.clientX,
+      ghostOffsetY: buttonRect.top + buttonRect.height / 2 - event.clientY };
     button.setPointerCapture(event.pointerId);
     button.focus({ preventScroll: true });
     frame = requestAnimationFrame(animate);
@@ -84,8 +97,8 @@ export function attachSorter(list, onMove) {
     }
     if (drag.active) {
       event.preventDefault();
-      drag.ghost.style.left = `${drag.x}px`;
-      drag.ghost.style.top = `${drag.y}px`;
+      drag.ghost.style.left = `${drag.x + drag.ghostOffsetX}px`;
+      drag.ghost.style.top = `${drag.y + drag.ghostOffsetY}px`;
       preview();
     }
   });
@@ -93,8 +106,9 @@ export function attachSorter(list, onMove) {
     if (!drag || event.pointerId !== drag.pointerId) return;
     const { from, active } = drag;
     const rect = list.getBoundingClientRect();
-    const inside = event.clientX >= rect.left && event.clientX <= rect.right &&
-      event.clientY >= rect.top && event.clientY <= rect.bottom;
+    const tolerance = 48;
+    const inside = event.clientX >= rect.left - tolerance && event.clientX <= rect.right + tolerance &&
+      event.clientY >= rect.top - tolerance && event.clientY <= rect.bottom + tolerance;
     const to = destination(event.clientY);
     cancel();
     if (active && inside && from !== to) onMove(from, to);
@@ -106,6 +120,13 @@ export function attachSorter(list, onMove) {
     list.addEventListener(type, (event) => event.preventDefault());
   }
   window.addEventListener("blur", cancel);
+  list.addEventListener("click", (event) => {
+    const button = event.target.closest(".move-word");
+    if (!button || button.disabled || drag) return;
+    const from = [...list.children].indexOf(button.closest("li"));
+    const to = from + (button.dataset.direction === "up" ? -1 : 1);
+    onMove(from, to, button.dataset.direction);
+  });
   list.addEventListener("keydown", (event) => {
     if (event.key === "Escape") {
       cancel();
@@ -113,7 +134,7 @@ export function attachSorter(list, onMove) {
     }
     const button = event.target.closest(".word-button");
     if (!button || button.disabled || drag) return;
-    const from = [...list.children].indexOf(button.parentElement);
+    const from = [...list.children].indexOf(button.closest("li"));
     const positions = { ArrowUp: Math.max(0, from - 1), ArrowDown: Math.min(list.children.length - 1, from + 1),
       Home: 0, End: list.children.length - 1 };
     if (Object.hasOwn(positions, event.key)) {

@@ -37,12 +37,12 @@ import { pickVictory } from "./alphabet-victory.js";
   let history = [];
   let completed = false;
   let hints = null;
-  const cancelDrag = attachSorter(answerList, (from, to) => {
+  const cancelDrag = attachSorter(answerList, (from, to, direction) => {
     history.push([...words]);
     words = moveWord(words, from, to);
     hints = null;
     feedback.textContent = "";
-    render(to);
+    render(to, direction);
     persist();
     progress.textContent = `${words[to]} moved to position ${to + 1} of ${words.length}.`;
   });
@@ -156,7 +156,7 @@ import { pickVictory } from "./alphabet-victory.js";
     else startLevel(saved?.level ?? 0);
   }
 
-  function render(focusIndex) {
+  function render(focusIndex, direction) {
     answerList.replaceChildren();
     words.forEach((word, index) => {
       const item = document.createElement("li");
@@ -168,7 +168,7 @@ import { pickVictory } from "./alphabet-victory.js";
       handle.textContent = "↕";
       handle.setAttribute("aria-hidden", "true");
       button.append(handle, document.createTextNode(word));
-      button.setAttribute("aria-label", `${word}, position ${index + 1} of ${words.length}. Drag or use arrow keys to move.`);
+      button.setAttribute("aria-label", `${word}, position ${index + 1} of ${words.length}. Drag, use the move buttons, or use arrow keys to move.`);
       button.disabled = completed;
       if (hints) {
         const hint = hints[index];
@@ -180,6 +180,19 @@ import { pickVictory } from "./alphabet-victory.js";
         button.setAttribute("aria-label", `${button.getAttribute("aria-label")} ${hint.label}.`);
       }
       item.append(button);
+      const controls = document.createElement("span");
+      controls.className = "word-move-controls";
+      for (const [direction, symbol, atEdge] of [["up", "↑", index === 0], ["down", "↓", index === words.length - 1]]) {
+        const move = document.createElement("button");
+        move.type = "button";
+        move.className = "move-word";
+        move.dataset.direction = direction;
+        move.textContent = symbol;
+        move.setAttribute("aria-label", `Move ${word} ${direction} one position`);
+        move.disabled = completed || atEdge;
+        controls.append(move);
+      }
+      item.append(controls);
       answerList.append(item);
     });
     progress.textContent = `${words.length} words to put in ABC order`;
@@ -187,7 +200,11 @@ import { pickVictory } from "./alphabet-victory.js";
     checkButton.disabled = completed;
     answerList.classList.toggle("solved", completed);
     renderLevelMap();
-    if (focusIndex !== undefined) answerList.children[focusIndex].querySelector("button").focus();
+    if (focusIndex !== undefined) {
+      const item = answerList.children[focusIndex];
+      const control = direction && item.querySelector(`[data-direction="${direction}"]`);
+      (control && !control.disabled ? control : item.querySelector(".word-button")).focus();
+    }
   }
 
   function finishQuest() {
