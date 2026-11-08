@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block title %}{{ page.title }} · {{ config.title }}{% endblock title %}
+{% block description %}{{ page.description }}{% endblock description %}
+
+{% block content %}
+<section class="intro">
+  <a class="back-link" href="{{ get_url(path='/') }}">← All games</a>
+  <span class="game-icon" aria-hidden="true">{{ page.extra.icon }}</span>
+  <h1>{{ page.title }}</h1>
+  <p>{{ page.description }}</p>
+</section>
+<section class="alphabet-game acorn-game" aria-label="{{ page.title }}">
+  <div class="theme-picker">
+    <a class="back-link play-only" href="{{ get_url(path='/') }}">← All games</a>
+    <p id="preference-status" role="status">Your level is saved only in this browser.</p>
+  </div>
+  <div id="tutorial" class="tutorial">
+    <p class="eyebrow">Gather, share, and keep counting</p>
+    <h2>Help Squirrel fill the winter pantry</h2>
+    <p>Start with some nuts. At each forest stop, collect more or share with a friend. Your answer becomes the starting number for the next stop!</p>
+    <div class="trail-example">
+      <h3>Try following this journey</h3>
+      <p><strong>5 + 19 − 4 + 7 = 27</strong></p>
+      <ol class="acorn-example">
+        <li>Start with 5 nuts. Find 19 more: <strong>5 + 19 = 24</strong>.</li>
+        <li>Carry 24 forward. Share 4: <strong>24 − 4 = 20</strong>.</li>
+        <li>Carry 20 forward. Gather 7: <strong>20 + 7 = 27</strong>.</li>
+      </ol>
+    </div>
+    <p><strong>Addition and subtraction have equal priority.</strong> When a chain has only these operations, work from left to right. Do not do all the additions first.</p>
+    <p>Explore 10 levels, from two stops within 10 to four stops within 100. There is no timer, and you can try again without losing earlier answers.</p>
+    <div class="game-actions centered">
+      <button id="start-game" class="primary-button" type="button">Let’s gather!</button>
+      <button id="new-quest" class="secondary-button" type="button" hidden>Start a new adventure</button>
+    </div>
+  </div>
+  <div id="play-area" hidden>
+    <ol id="level-map" class="level-map" aria-label="Adventure levels"></ol>
+    <p id="level-count" class="eyebrow"></p>
+    <h2 id="level-title" tabindex="-1"></h2>
+    <p>Only addition and subtraction here: work from left to right.</p>
+    <p id="progress" class="progress" role="status"></p>
+    <div class="acorn-basket">
+      <span aria-hidden="true">🐿️ 🌰</span>
+      <p id="basket-total"></p>
+    </div>
+    <h3>Your whole journey</h3>
+    <p id="expression" class="acorn-expression" aria-label="Full expression"></p>
+    <ol id="journey-log" class="acorn-log" aria-label="Completed steps"></ol>
+    <h3 id="step-heading" tabindex="-1"></h3>
+    <p id="step-story"></p>
+    <p id="step-equation" class="trail-equation"></p>
+    <div id="answers" class="answer-stones" role="group" aria-labelledby="step-heading" aria-describedby="step-story"></div>
+    <p id="feedback" class="feedback" role="status"></p>
+    <p id="hint" role="status" hidden></p>
+    <div class="game-actions">
+      <button id="show-hint" class="secondary-button" type="button">Show hint</button>
+      <button id="next-step" class="primary-button" type="button" hidden>Next stop</button>
+    </div>
+  </div>
+  <div id="quest-complete" class="quest-complete" hidden>
+    <p class="trail-home" aria-hidden="true">🐿️ 🌰 🌳</p>
+    <p class="eyebrow">The pantry is ready!</p>
+    <h2 id="quest-heading" tabindex="-1">Show your parent!</h2>
+    <p>You carried your totals through all 10 journeys. You are a multistep math champion!</p>
+    <button id="play-again" class="primary-button" type="button">Play again</button>
+  </div>
+</section>
+<script src="{{ get_url(path='acorn-adventure.js', cachebust=true) }}" type="module"></script>
+{% endblock content %}
