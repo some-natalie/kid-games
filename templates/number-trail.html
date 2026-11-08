@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block title %}{{ page.title }} · {{ config.title }}{% endblock title %}
+{% block description %}{{ page.description }}{% endblock description %}
+
+{% block content %}
+<section class="intro">
+  <a class="back-link" href="{{ get_url(path='/') }}">← All games</a>
+  <span class="game-icon" aria-hidden="true">{{ page.extra.icon }}</span>
+  <h1>{{ page.title }}</h1>
+  <p>{{ page.description }}</p>
+</section>
+
+<section class="alphabet-game number-trail" aria-label="{{ page.title }}">
+  <div class="theme-picker">
+    <a class="back-link play-only" href="{{ get_url(path='/') }}">← All games</a>
+    <p id="preference-status" role="status">Your level is saved only in this browser.</p>
+  </div>
+  <div id="tutorial" class="tutorial">
+    <p class="eyebrow">A woodland math adventure</p>
+    <h2>Help Bunny get home</h2>
+    <p>Each puzzle has a missing number. Choose the stepping stone that makes it true.</p>
+    <div class="trail-example">
+      <h3>For example: 2 + 3 = ?</h3>
+      <p>Two hops, then three more hops, make five. Choose <strong>5</strong>!</p>
+      <p aria-hidden="true">🐾 🐾 + 🐾 🐾 🐾 = 5</p>
+    </div>
+    <p>Cross five stones in each of 10 levels. Start with numbers within 10, then explore numbers within 20 and 100.</p>
+    <p>There is no timer. Use your fingers or paper, ask for a hint, and try again as often as you like.</p>
+    <div class="game-actions centered">
+      <button id="start-game" class="primary-button" type="button">Let’s play!</button>
+      <button id="new-quest" class="secondary-button" type="button" hidden>Start a new trail</button>
+    </div>
+  </div>
+
+  <div id="play-area" hidden>
+    <ol id="level-map" class="level-map" aria-label="Trail levels"></ol>
+    <p id="level-count" class="eyebrow"></p>
+    <h2 id="level-title" tabindex="-1"></h2>
+    <p id="level-instructions"></p>
+    <p id="progress" class="progress" role="status"></p>
+    <ol id="trail-path" class="trail-path" aria-label="Stepping stones crossed"></ol>
+    <details class="how-to-play">
+      <summary>How to play</summary>
+      <p id="trail-instructions">Choose the number that belongs in the question mark. Plus means add; minus means take away. Sometimes the missing number comes before the equals sign. Tap a stone, or use Tab and Enter or Space. A wrong answer gives a hint and you can try again. A correct answer opens the next step.</p>
+    </details>
+    <h3 id="puzzle-heading" class="trail-equation" tabindex="-1"></h3>
+    <div id="answer-stones" class="answer-stones" role="group" aria-labelledby="puzzle-heading" aria-describedby="trail-instructions"></div>
+    <p id="feedback" class="feedback" role="status"></p>
+    <p id="trail-hint" role="status" hidden></p>
+    <div class="game-actions">
+      <button id="show-hint" class="secondary-button" type="button">Show hint</button>
+      <button id="next-step" class="primary-button" type="button" hidden>Next step</button>
+    </div>
+  </div>
+
+  <div id="quest-complete" class="quest-complete" hidden>
+    <p class="trail-home" aria-hidden="true">🐰 🏡 🌳</p>
+    <p class="eyebrow">Bunny is home!</p>
+    <h2 id="quest-heading" tabindex="-1">Show your parent!</h2>
+    <p>You crossed all 50 stepping stones. You are a Number Trail champion!</p>
+    <button id="play-again" class="primary-button" type="button">Play again</button>
+  </div>
+</section>
+<script src="{{ get_url(path='number-trail.js', cachebust=true) }}" type="module"></script>
+{% endblock content %}
