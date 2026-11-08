@@ -44,7 +44,7 @@ test("home page lists the game and links to it", async ({ page }) => {
 test("the optional example teaches whole-word marking and shows the changed letter", async ({ page }) => {
   await page.goto("/proofreading/");
   const example = page.locator("#example-text");
-  await expect(example.getByRole("button")).toHaveText(["my", "cat", "naps", "."]);
+  await expect(example.getByRole("button")).toHaveText(["my", "cat", "naps."]);
   await page.locator("#check-example").click();
   await expect(page.locator("#example-status")).toContainText("Tap the whole word “my” only");
   const word = example.locator(".example-token").first();
@@ -87,6 +87,19 @@ test("checking with nothing marked asks the player to mark something", async ({ 
   await expect(page.locator("#feedback")).toContainText("Tap the words");
 });
 
+test("correct punctuation is part of the whole word target", async ({ page }) => {
+  await startAtLevel(page, 0);
+  const lastWord = page.locator("#proof-text .proof-token").last();
+  await expect(lastWord).toHaveText("sun.");
+  await expect(lastWord).toHaveAttribute("data-kind", "word");
+  await expect(page.locator("#proof-text .proof-punctuation")).toHaveCount(0);
+  const bounds = await lastWord.boundingBox();
+  await page.mouse.click(bounds.x + bounds.width - 3, bounds.y + bounds.height / 2);
+  await expect(lastWord).toHaveAttribute("aria-pressed", "true");
+  await page.locator("#check-marks").click();
+  await expect(lastWord).toHaveAttribute("data-result", "false");
+});
+
 test("word targets have no horizontal padding or minimum width while punctuation stays finger-sized", async ({ page }) => {
   await page.goto("/proofreading/");
   const exampleWord = page.locator("#example-text .example-token").first();
@@ -106,8 +119,9 @@ test("word targets have no horizontal padding or minimum width while punctuation
   expect(dimensions.height).toBeGreaterThanOrEqual(44);
   const punctuation = page.locator('#proof-text .proof-token[data-kind="mark"]').first();
   const bounds = await punctuation.boundingBox();
-  expect(bounds.width).toBeGreaterThanOrEqual(44);
+  expect(bounds.width).toBeLessThan(44);
   expect(bounds.height).toBeGreaterThanOrEqual(44);
+  expect(await punctuation.evaluate((el) => parseFloat(getComputedStyle(el, "::before").width))).toBeGreaterThanOrEqual(44);
   await word.click();
   await expect(word).toHaveAttribute("aria-pressed", "true");
 });
@@ -242,16 +256,21 @@ test("mirrored characters are drawn flipped and extra spaces show as gaps", asyn
   expect((await gap.boundingBox()).width).toBeLessThan(gapStyle.width / 2);
 });
 
-test("punctuation has a separate 44px tap target and stays crossed out when removed", async ({ page, isMobile }) => {
+test("punctuation is naturally spaced with a wider tap zone above it and stays crossed out when removed", async ({ page, isMobile }) => {
   await page.emulateMedia({ colorScheme: "dark" });
   await startAtLevel(page, 1);
   const [first] = positions(1, true);
   const comma = token(page, ...first);
   const bounds = await comma.boundingBox();
-  expect(bounds.width).toBeGreaterThanOrEqual(44);
+  expect(bounds.width).toBeLessThan(44);
   expect(bounds.height).toBeGreaterThanOrEqual(44);
-  const x = bounds.x + bounds.width - 3;
-  const y = bounds.y + bounds.height / 2;
+  const previous = await page.locator('#proof-text .proof-token').filter({ hasText: /^like$/ }).boundingBox();
+  expect(bounds.x - (previous.x + previous.width)).toBeLessThanOrEqual(0);
+  expect(bounds.y).toBeCloseTo(previous.y, 0);
+  const hitWidth = await comma.evaluate((el) => parseFloat(getComputedStyle(el, "::before").width));
+  expect(hitWidth).toBeGreaterThanOrEqual(44);
+  const x = bounds.x + bounds.width / 2 + hitWidth / 2 - 3;
+  const y = bounds.y - 4;
   if (isMobile) await page.touchscreen.tap(x, y);
   else await page.mouse.click(x, y);
   await expect(comma).toHaveAttribute("aria-pressed", "true");
@@ -271,11 +290,11 @@ test("a deleted spelling letter remains red and crossed out inside the whole cor
   await startAtLevel(page, 4);
   const [, spelling] = positions(4, true, 2);
   const word = token(page, ...spelling);
-  await expect(word).toHaveText("zebrass");
+  await expect(word).toHaveText("zebrass.");
   await word.click();
   await page.locator("#check-marks").click();
   await expect(word.locator("del.proof-deletion")).toHaveText("s");
-  await expect(word).toHaveAccessibleName("zebras, corrected. “zebrass” should be “zebras”.");
+  await expect(word).toHaveAccessibleName("zebras., corrected. “zebrass.” should be “zebras.”.");
   await expect(page.locator("#progress")).toContainText("1 fixed");
 });
 
@@ -304,7 +323,7 @@ test("missing spacing after a comma is marked separately from either whole word"
   await expect(comma).toHaveText(",");
   await expect(comma).toHaveAttribute("data-kind", "mark");
   await expect(page.locator(".proof-token").filter({ hasText: /^apples$/ })).toHaveCount(1);
-  await expect(page.locator(".proof-token").filter({ hasText: /^pears$/ })).toHaveCount(1);
+  await expect(page.locator(".proof-token").filter({ hasText: /^pears,$/ })).toHaveCount(1);
   await comma.click();
   await page.locator("#check-marks").click();
   await expect(comma.locator(".proof-change")).toHaveText(" ");

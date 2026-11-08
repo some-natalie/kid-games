@@ -92,7 +92,21 @@ export function parseSentence(source) {
     last = match.index + match[0].length;
   }
   addPlain(source.slice(last));
-  return { tokens, mistakes: tokens.filter((token) => token.kind === "mistake").length };
+  const targets = [];
+  for (const token of tokens) {
+    const previous = targets.at(-1);
+    if (token.kind === "punct" && /^[,.;:!?%)\]"}]$/.test(token.text) &&
+        (previous?.kind === "word" || previous?.kind === "mistake" && /\w/.test(previous.text))) {
+      previous.text += token.text;
+      if (previous.kind === "mistake") {
+        previous.right += token.text;
+        previous.parts.push({ text: token.text, mirrored: false });
+      }
+    } else {
+      targets.push(token);
+    }
+  }
+  return { tokens: targets, mistakes: targets.filter((token) => token.kind === "mistake").length };
 }
 
 export function correctionParts(token) {
