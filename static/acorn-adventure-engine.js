@@ -1,3 +1,5 @@
+import { answerChoices } from "./math-choices.js";
+
 export const LEVELS = Object.freeze([
   { title: "Little collections", steps: 2, max: 10, operations: ["+", "+"] },
   { title: "Share with a friend", steps: 2, max: 10, operations: ["+", "-"] },
@@ -36,14 +38,7 @@ export function buildJourney(levelIndex, random = Math.random) {
     const amount = 1 + pickIndex(limit, random);
     const before = total;
     total = operation === "+" ? total + amount : total - amount;
-    const others = Array.from({ length: level.max + 1 }, (_, value) => value)
-      .filter((value) => value !== total)
-      .sort((a, b) => Math.abs(a - total) - Math.abs(b - total));
-    const choices = [total, ...others.slice(0, 3)];
-    for (let position = choices.length - 1; position > 0; position -= 1) {
-      const swap = pickIndex(position + 1, random);
-      [choices[position], choices[swap]] = [choices[swap], choices[position]];
-    }
+    const choices = answerChoices(before, amount, operation, { max: level.max, earlierTotal: start }, random);
     return { operation, amount, before, total, choices };
   });
   return { start, steps, total };

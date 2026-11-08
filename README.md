@@ -292,6 +292,13 @@ Each level draws five distinct randomized puzzles; answers are whole numbers
 between 0 and the level's limit, with no negative subtraction results. The math
 and distractor generation live in `static/number-trail-engine.js`, separate from
 the DOM code in `static/number-trail.js`.
+Both math games use `static/math-choices.js` for mistake-based answer choices:
+forgotten carries, incorrect borrowing, the wrong operation, ignored operands
+or place values, and (in Acorn Adventure) using the original basket instead of
+the carried total. Duplicate, correct, negative, and out-of-range decoys are
+excluded. Small problems use counting mistakes when other errors produce too
+few distinct options; choices are shuffled, not a run of neighboring numbers.
+Number Trail's missing operands use the corresponding inverse calculation.
 
 The current unlocked level is saved under `kid-games.number-trail.progress`
 as `{"version":1,"level":3}`. Returning starts that level with new puzzles;

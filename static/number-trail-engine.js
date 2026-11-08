@@ -1,3 +1,5 @@
+import { answerChoices } from "./math-choices.js";
+
 export const STEPS_PER_LEVEL = 5;
 export const LEVELS = Object.freeze([
   { title: "Meadow gate", operations: ["+"], max: 10, unit: 1, missing: false },
@@ -50,10 +52,18 @@ export function buildRound(levelIndex, random = Math.random) {
     const missing = level.missing
       ? (Math.floor(index / level.operations.length) % 2 === 0 ? "left" : "right") : "result";
     const answer = problem[missing];
-    const distractors = Array.from({ length: level.max / level.unit + 1 }, (_, value) => value * level.unit)
-      .filter((value) => value !== answer)
-      .sort((a, b) => Math.abs(a - answer) - Math.abs(b - answer));
-    const choices = shuffle([answer, ...distractors.slice(0, 3)], random);
+    // Missing operands become an inverse-operation problem with the same answer.
+    let { left, right } = problem;
+    let choiceOperation = operation;
+    if (missing === "left") {
+      left = problem.result;
+      choiceOperation = operation === "-" ? "+" : "-";
+    } else if (missing === "right") {
+      right = operation === "-" ? problem.result : problem.left;
+      left = operation === "-" ? problem.left : problem.result;
+      choiceOperation = "-";
+    }
+    const choices = answerChoices(left, right, choiceOperation, { max: level.max, unit: level.unit }, random);
     return { ...problem, missing, answer, choices };
   });
 }
