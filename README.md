@@ -307,6 +307,9 @@ cumulative journey: solve a stop, carry the new basket total forward, then
 continue. The full expression stays visible with the current operation
 underlined and outlined; a completed-step log preserves earlier equations.
 Hazelnut emoji stand in for the woodland nuts.
+The worked example shows one nut emoji per nut in each resulting basket.
+During gameplay, a compact squirrel-and-nut line displays the numeric total
+instead of repeating nut emojis.
 
 Addition and subtraction have equal priority: chains containing only these
 operations are evaluated **left to right**, not by doing addition first.
