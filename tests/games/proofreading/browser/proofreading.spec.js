@@ -87,6 +87,31 @@ test("checking with nothing marked asks the player to mark something", async ({ 
   await expect(page.locator("#feedback")).toContainText("Tap the words");
 });
 
+test("word targets have no horizontal padding or minimum width while punctuation stays finger-sized", async ({ page }) => {
+  await page.goto("/proofreading/");
+  const exampleWord = page.locator("#example-text .example-token").first();
+  expect(await exampleWord.evaluate((el) => getComputedStyle(el).paddingInlineStart)).toBe("0px");
+  await startAtLevel(page, 4);
+  const word = page.locator('#proof-text .proof-token[data-kind="word"]').first();
+  await expect(word).toHaveText("I");
+  const dimensions = await word.evaluate((el) => {
+    const style = getComputedStyle(el);
+    return { width: el.getBoundingClientRect().width, height: el.getBoundingClientRect().height,
+      minWidth: style.minWidth, left: style.paddingLeft, right: style.paddingRight };
+  });
+  expect(dimensions.minWidth).toBe("0px");
+  expect(dimensions.left).toBe("0px");
+  expect(dimensions.right).toBe("0px");
+  expect(dimensions.width).toBeLessThan(44);
+  expect(dimensions.height).toBeGreaterThanOrEqual(44);
+  const punctuation = page.locator('#proof-text .proof-token[data-kind="mark"]').first();
+  const bounds = await punctuation.boundingBox();
+  expect(bounds.width).toBeGreaterThanOrEqual(44);
+  expect(bounds.height).toBeGreaterThanOrEqual(44);
+  await word.click();
+  await expect(word).toHaveAttribute("aria-pressed", "true");
+});
+
 test("tapping any letter in birds marks the whole word and only the corrected B is emphasized", async ({ page }) => {
   await page.addInitScript(() => { Math.random = () => 3 / 11; });
   await startAtLevel(page, 0);

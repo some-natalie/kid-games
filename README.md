@@ -209,7 +209,8 @@ whole word if any letter looks wrong, or a punctuation mark or wide gap, then
 press **Check**. An optional interactive example demonstrates marking “my” and
 checking its capital-letter correction before starting the case.
 All word errors, including capitalization and flipped letters, target the whole
-word; punctuation has its own touch targets at least 44 pixels wide and tall.
+word. Word targets fit their text without extra horizontal padding; punctuation
+has its own touch targets at least 44 pixels wide and tall.
 Extra spacing is shown as a larger blank gap, without dots. Correct marks are fixed
 in place after checking, even before the whole round is solved. Those fixes
 stay in place when changing or clearing the remaining marks.
