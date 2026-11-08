@@ -64,7 +64,7 @@ function groupedBy(items, key) {
   return groups;
 }
 
-// Each cluster is two words sharing `depth - 1` letters and differing at letter `depth`.
+// Each cluster shares `depth - 1` letters; the next letter (or an allowed word ending) decides.
 // Words outside a cluster have unique first letters, so each level tests only its intended depth.
 export const QUEST_LEVELS = [
   { count: 4, clusters: [], title: "ABC warm-up", hint: "Look at the first letter of each word." },
@@ -79,8 +79,8 @@ export const QUEST_LEVELS = [
   { count: 12, dinosaurs: true, title: "Dinosaur challenge", hint: "Dinosaur names can be long! Compare letters from the beginning until you find a difference." },
 ];
 
-function pickCluster(words, depth) {
-  const prefixes = [...groupedBy(words.filter((word) => word.length >= depth),
+function pickCluster(words, depth, allowWordEnd = false) {
+  const prefixes = [...groupedBy(words.filter((word) => word.length >= depth - Number(allowWordEnd)),
     (word) => word.slice(0, depth - 1).toLowerCase()).values()]
     .map((group) => [...groupedBy(group, (word) => word.slice(0, depth).toLowerCase()).values()])
     .filter((groups) => groups.length >= 2);
@@ -98,9 +98,9 @@ export function selectLevelWords(bank, level) {
   const available = new Map(shuffled(firstLetters));
   const selected = [];
   for (const depth of [...level.clusters].sort((first, second) => second - first)) {
-    const letter = [...available.keys()].find((key) => pickCluster(available.get(key), depth));
+    const letter = [...available.keys()].find((key) => pickCluster(available.get(key), depth, level.allowWordEnd));
     if (!letter) throw new Error(`Not enough words share ${depth - 1} letters.`);
-    selected.push(...pickCluster(available.get(letter), depth));
+    selected.push(...pickCluster(available.get(letter), depth, level.allowWordEnd));
     available.delete(letter);
   }
   for (const group of available.values()) {

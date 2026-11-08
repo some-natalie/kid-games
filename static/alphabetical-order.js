@@ -7,7 +7,7 @@ import { pickVictory } from "./alphabet-victory.js";
 import { isQuizMode } from "./quiz-engine.js";
 
 (() => {
-  if (isQuizMode(window.location.search)) return;
+  if (isQuizMode(window.location.search) || new URLSearchParams(window.location.search).get("sort") === "groups") return;
   const levels = QUEST_LEVELS;
   const tutorial = document.querySelector("#tutorial");
   const playArea = document.querySelector("#play-area");

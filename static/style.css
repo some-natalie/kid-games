@@ -85,6 +85,22 @@ p { color: var(--muted); }
 .theme-picker select { max-width: 100%; min-height: 2.75rem; padding: 0.5rem; border: 2px solid var(--accent); border-radius: 0.65rem; background: var(--surface); color: var(--text); font: inherit; }
 .theme-picker select:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
 .theme-picker p { font-size: 0.9rem; }
+.alphabet-modes { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.5rem 1rem; margin-block: 1rem; }
+.alphabet-modes a { min-height: 2.75rem; padding: 0.5rem; }
+.group-tools { display: flex; flex-wrap: wrap; align-items: end; gap: 0.75rem; margin-block: 1rem; }
+.group-workspace label { display: block; font-weight: 700; max-width: 100%; }
+.group-workspace input, .group-workspace select { display: block; min-height: 2.75rem; max-width: 100%; width: 100%; padding: 0.5rem; border: 2px solid var(--accent); border-radius: 0.65rem; background: var(--surface); color: var(--text); font: inherit; }
+.group-workspace input:focus-visible, .group-workspace select:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+.group-boards { display: grid; gap: 1rem; }
+.group-board { min-width: 0; padding: 0.75rem; border: 2px solid var(--border); border-radius: 0.65rem; }
+.group-board h3 { margin-top: 0; }
+.group-board > button { margin: 0.5rem 0.5rem 0 0; }
+.group-words { padding-left: 1.5rem; }
+.group-words li { display: flex; flex-wrap: wrap; gap: 0.35rem; margin-block: 0.5rem; }
+.group-words [data-word] { flex: 1 1 100%; text-align: left; overflow-wrap: anywhere; }
+.group-words [aria-pressed="true"] { border-style: dashed; background: var(--badge); }
+.comparison-letter { text-decoration: underline; text-decoration-thickness: 0.15em; }
+.group-board[data-list="final"] { border-color: var(--accent); }
 .tutorial { text-align: center; }
 .tutorial h2, .level-heading h2 { margin-top: 0.25rem; }
 .alphabet-strip { display: grid; grid-template-columns: repeat(auto-fit, minmax(2rem, 1fr)); gap: 0.35rem; margin: 1.5rem 0; }
