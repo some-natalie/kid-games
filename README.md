@@ -254,6 +254,10 @@ Progress autosaves under
 after level 10. Celebrations reuse `static/celebrations.json` effects with the
 game's own cheers.
 
+Final corrections stay available until the player chooses **Finish case**.
+Decorative victory animations stop within five seconds and respect reduced
+motion. See [Accessibility](#accessibility) for review coverage and limitations.
+
 Levels live in `static/proofreading-levels.js`. Write the text normally and
 wrap each mistake as `{wrong>right#type}`, for example
 `{their>there#homonym}` or `{,>#comma}` (the fix is to remove it). Types are
@@ -262,6 +266,21 @@ wrap each mistake as `{wrong>right#type}`, for example
 (`{  > #spacing}`), and a `^` to mirror the next character (`{^3>3#flipped}`).
 Keep topics friendly and kid-appropriate; `tests/games/proofreading/` checks the
 level shape and that every mistake type is used.
+
+## Accessibility
+
+The site targets WCAG 2.2 AA. Automated axe checks run with the browser suite,
+alongside keyboard, touch, reflow, and reduced-motion regression tests. Games
+provide non-dragging controls, text feedback in addition to color, and an
+optional OpenDyslexic font. The skip link moves focus into the main content.
+
+Automated checks are not certification of conformance. The November 2026 review
+covers the built site and tested game states, not every device or browser
+configuration. Screen-reader testing with NVDA/Firefox and VoiceOver/Safari,
+and usability testing with disabled players, are still needed before claiming
+full WCAG conformance. Proofreading intentionally contains incorrect and
+mirrored text; its accessible descriptions need particular attention in that
+testing.
 
 ## Browser tests
 

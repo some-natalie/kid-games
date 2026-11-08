@@ -11,7 +11,7 @@
   <p>{{ page.description }}</p>
 </section>
 
-<section class="alphabet-game proofreading-game" aria-labelledby="game-heading">
+<section class="alphabet-game proofreading-game" aria-label="{{ page.title }}">
   <div class="theme-picker">
     <a class="back-link play-only" href="{{ config.base_url }}/">← All games</a>
     <p id="preference-status" role="status" aria-live="polite">Your level is saved only in this browser.</p>
@@ -69,6 +69,7 @@
       <button id="check-marks" class="primary-button" type="button">Check</button>
       <button id="clear-marks" class="secondary-button" type="button">Clear marks</button>
       <button id="next-level" class="primary-button" type="button" hidden>Next level</button>
+      <button id="finish-case" class="primary-button" type="button" hidden>Finish case</button>
     </div>
   </div>
 

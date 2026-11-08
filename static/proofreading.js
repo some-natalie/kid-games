@@ -15,6 +15,7 @@ import { clearProgress, loadProgress, saveProgress } from "./proofreading-progre
   const checkButton = document.querySelector("#check-marks");
   const clearButton = document.querySelector("#clear-marks");
   const nextButton = document.querySelector("#next-level");
+  const finishButton = document.querySelector("#finish-case");
   const startButton = document.querySelector("#start-game");
   const newQuestButton = document.querySelector("#new-quest");
   const playAgainButton = document.querySelector("#play-again");
@@ -222,6 +223,7 @@ import { clearProgress, loadProgress, saveProgress } from "./proofreading-progre
     questComplete.hidden = true;
     playArea.hidden = false;
     nextButton.hidden = true;
+    finishButton.hidden = true;
     fixes.hidden = true;
     document.querySelector("#level-count").textContent = `Level ${index + 1} of ${LEVELS.length}`;
     document.querySelector("#level-title").textContent = LEVELS[index].title;
@@ -291,7 +293,8 @@ import { clearProgress, loadProgress, saveProgress } from "./proofreading-progre
       results = new Map(grade.found.map((key) => [key, "found"]));
       paint();
       if (levelIndex === LEVELS.length - 1) {
-        setTimeout(finishQuest, 4000);
+        finishButton.hidden = false;
+        finishButton.focus();
         return;
       }
       persist(levelIndex + 1);
@@ -352,6 +355,7 @@ import { clearProgress, loadProgress, saveProgress } from "./proofreading-progre
     paint();
   });
   nextButton.addEventListener("click", () => startLevel(levelIndex + 1));
+  finishButton.addEventListener("click", finishQuest);
   startButton.addEventListener("click", () => startLevel(loadProgress(getStorage, LEVELS.length).level ?? 0));
   const restart = () => {
     const warning = clearProgress(getStorage);
