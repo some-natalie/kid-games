@@ -3,9 +3,9 @@
 A small Zola site for kid-games.dev, with responsive game tiles and automatic
 light/dark styling based on the device preference. Alphabetical Adventure is
 the site's alphabetical-order game, Proofreading Detectives is its
-proofreading game, Number Trail is its woodland math adventure for ages 6–9,
+proofreading game, Number Trail is its woodland math adventure,
 Acorn Adventure introduces cumulative, multistep arithmetic, and Picnic Pizza
-introduces equal shares and visual fractions for ages 6–9, while Ribbon
+introduces equal shares and visual fractions, while Ribbon
 Workshop explores fractions with equal-length ribbons, and Fraction Bridge
 helps children find, compare, and order fractions on a number line.
 
@@ -136,7 +136,7 @@ confetti and sparkles.
 
 ## Fraction Bridge
 
-Fraction Bridge is an untimed eight-level number-line game for ages 6–9. It starts
+Fraction Bridge is an untimed eight-level number-line game. It starts
 with guided halves and quarters, introduces thirds, sixths, and eighths, and then
 practices equivalent positions, ordering, and comparison. Fraction placement and
 comparison use exact rational arithmetic; each puzzle keeps one fixed unit length
@@ -266,7 +266,7 @@ npm run test:python
 
 ## Proofreading Detectives
 
-A 10-level proofreading game for kids under 12 (`content/proofreading/`,
+A 10-level proofreading game for kids (`content/proofreading/`,
 `templates/proofreading.html`, `static/proofreading*.js`). Players tap every
 whole word if any letter looks wrong, or a punctuation mark or wide gap, then
 press **Check**. An optional interactive example demonstrates marking “my” and
@@ -400,8 +400,8 @@ games. Storage failures display a warning and do not block play.
 Fold equal-length rectangular ribbons into halves, thirds, quarters, sixths,
 and eighths. The worked example shows how two of four equal parts have the same
 length as one half. Its nine untimed levels progress from selecting halves and
-quarters for ages 6–7, through thirds and equivalent lengths for ages 7–8, to
-eighths, comparisons, and completing a whole for ages 8–9.
+quarters, through thirds and equivalent lengths, to eighths, comparisons, and
+completing a whole.
 
 | Levels | Fraction skill |
 |---|---|
@@ -430,11 +430,11 @@ fraction questions, with grading and answer details held until submission.
 Prepare a fair picnic by sharing pizzas and rectangular foods into equal-area
 pieces. The worked example introduces one half (1/2), the numerator (selected
 pieces), and the denominator (all equal pieces). Seven untimed levels progress
-from equal and unequal shares, naming and building halves and quarters (ages
-6–7), to thirds, sixths, and eighths, comparing same-size wholes, matching
-equivalent coverage, and completing a whole by looking for its missing pieces
-(ages 8–9). Unequal-area cuts are explicitly identified as not being equal
-shares. Formal fraction arithmetic and number-line placement are not included.
+from equal and unequal shares, naming and building halves and quarters,
+to thirds, sixths, and eighths, comparing same-size wholes, matching
+equivalent coverage, and completing a whole by looking for its missing pieces.
+Unequal-area cuts are explicitly identified as not being equal shares.
+Formal fraction arithmetic and number-line placement are not included.
 
 Tap piece controls or use the keyboard; hints and unlimited retries never cost
 points. Circles and rectangles show the quantity, with synchronized fraction

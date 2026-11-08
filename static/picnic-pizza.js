@@ -303,7 +303,7 @@ if (!isQuizMode(window.location.search)) {
     finale.hidden = true;
     playArea.hidden = false;
     drawMap();
-    find("level-count").textContent = `Level ${index + 1} of ${LEVELS.length} · ages ${LEVELS[index].ages}`;
+    find("level-count").textContent = `Level ${index + 1} of ${LEVELS.length}`;
     find("level-title").textContent = LEVELS[index].title;
     const instructions = {
       equal: "Look closely at the area of each piece. Equal shares must be the same size.",

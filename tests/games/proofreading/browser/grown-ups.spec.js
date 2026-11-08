@@ -4,6 +4,25 @@ import { readFileSync } from "node:fs";
 
 const license = readFileSync(new URL("../../../../LICENSE", import.meta.url), "utf8");
 
+for (const mode of ["", "?quiz=1"]) {
+  test(`all screens omit age recommendations in ${mode ? "quiz" : "normal"} mode`, async ({ page }) => {
+    test.slow();
+    const ageRecommendation = /\bages?\s*:?\s*\d|\b(?:under|over)\s+\d+\s*(?:years?|years?\s+old)?\b|\b\d+(?:\s*[–-]\s*\d+)?\s*[- ]year[- ]olds?\b/i;
+    await page.goto(`/${mode}`);
+    const gamePaths = await page.locator(".game-tile").evaluateAll((tiles) =>
+      tiles.map((tile) => new URL(tile.href).pathname));
+    for (const path of ["/", "/for-grown-ups/", ...gamePaths]) {
+      await page.goto(`${path}${mode}`);
+      await expect(page.locator("body")).not.toContainText(ageRecommendation);
+      if (gamePaths.includes(path)) {
+        if (mode) await page.getByRole("button", { name: "Start quiz", exact: true }).click();
+        else await page.locator("#start-game").click();
+        await expect(page.locator("body")).not.toContainText(ageRecommendation);
+      }
+    }
+  });
+}
+
 test("landing page links to grown-up settings without listing them as a game", async ({ page }) => {
   await page.goto("/");
   await expect(page.locator(".game-tile")).toHaveCount(7);

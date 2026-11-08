@@ -1,13 +1,13 @@
 export const PUZZLES_PER_LEVEL = 4;
 
 export const LEVELS = Object.freeze([
-  { title: "Fair picnic shares", ages: "6–7", activity: "equal" },
-  { title: "Name the serving", ages: "6–7", activity: "name" },
-  { title: "Build halves and quarters", ages: "6–7", activity: "build" },
-  { title: "Try thirds, sixths, and eighths", ages: "8–9", activity: "build" },
-  { title: "Compare same-size servings", ages: "8–9", activity: "compare" },
-  { title: "Match the same coverage", ages: "8–9", activity: "equivalent" },
-  { title: "Finish the whole picnic", ages: "8–9", activity: "complete" },
+  { title: "Fair picnic shares", activity: "equal" },
+  { title: "Name the serving", activity: "name" },
+  { title: "Build halves and quarters", activity: "build" },
+  { title: "Try thirds, sixths, and eighths", activity: "build" },
+  { title: "Compare same-size servings", activity: "compare" },
+  { title: "Match the same coverage", activity: "equivalent" },
+  { title: "Finish the whole picnic", activity: "complete" },
 ].map((level) => Object.freeze(level)));
 
 function assertFraction(numerator, denominator) {

@@ -5,11 +5,9 @@ import {
   fractionLabel, fractionsEquivalent, makeQuizQuestion, partitionRibbon,
 } from "../../../static/ribbon-workshop-engine.js";
 
-test("the nine levels progress through age-appropriate fraction skills", () => {
+test("the nine levels progress through fraction skills without age recommendations", () => {
   assert.equal(LEVELS.length, 9);
-  assert.deepEqual(LEVELS.map((level) => level.age), [
-    "6–7", "6–7", "6–7", "7–8", "7–8", "8–9", "8–9", "8–9", "8–9",
-  ]);
+  assert.ok(LEVELS.every((level) => !("age" in level) && !("ages" in level)));
   assert.deepEqual(LEVELS.map((level) => level.type), [
     "select", "select", "select", "select", "equivalent", "equivalent", "equivalent", "compare", "complete",
   ]);

@@ -64,7 +64,7 @@ async function audit(page) {
   expect(results.violations).toEqual([]);
 }
 
-test("the home tile opens a worked example with the age progression and no timer", async ({ page }) => {
+test("the home tile opens a worked example with skill progression and no timer", async ({ page }) => {
   await page.goto("/");
   await page.getByRole("link", { name: /Picnic Pizza/ }).click();
   await expect(page).toHaveURL(/\/picnic-pizza\/$/);
@@ -73,9 +73,10 @@ test("the home tile opens a worked example with the age progression and no timer
   await expect(page.locator("#tutorial")).toContainText("numerator");
   await expect(page.locator("#tutorial")).toContainText("thirds, sixths, and eighths");
   await expect(page.locator("#tutorial")).toContainText("There is no timer");
+  await expect(page.locator("#tutorial")).not.toContainText(/\bages?\b/i);
   await page.locator("#start-game").press("Enter");
   await expect(page.locator("#level-title")).toBeFocused();
-  await expect(page.locator("#level-count")).toContainText("ages 6–7");
+  await expect(page.locator("#level-count")).toHaveText("Level 1 of 7");
   await expect(page.locator("#puzzle-visuals svg path")).toHaveCount(2);
   await audit(page);
 });
