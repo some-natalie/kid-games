@@ -299,6 +299,24 @@ footer { padding-block: 1.5rem; text-align: center; }
   .sentence-note { color: #ffd8bf; }
 }
 @media (prefers-reduced-motion: reduce) { .detective { animation: none; } }
+.fraction-example-line { color: var(--text); font-size: 1.2rem; font-weight: 800; letter-spacing: 0.12em; }
+.fraction-line-wrap { display: grid; grid-template-columns: 2rem minmax(0, 1fr) 2rem; align-items: center; gap: 0.25rem; margin-block: 0.75rem 1.25rem; color: var(--text); font-weight: 800; text-align: center; }
+.fraction-line { display: block; width: 100%; height: 3.5rem; overflow: visible; }
+.fraction-line-base, .fraction-line-tick { stroke: var(--accent); stroke-width: 5; vector-effect: non-scaling-stroke; }
+.fraction-line-tick { stroke-width: 4; }
+.fraction-position-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 8.5rem), 1fr)); gap: 0.55rem; margin-block: 0.75rem 1rem; }
+.fraction-position { min-height: 3.25rem; padding: 0.4rem; overflow-wrap: anywhere; touch-action: manipulation; }
+.fraction-order-list { display: grid; gap: 0.55rem; padding: 0; list-style: none; }
+.fraction-order-list li { display: flex; flex-wrap: wrap; align-items: center; gap: 0.45rem; min-width: 0; padding: 0.35rem; border: 1px solid var(--border); border-radius: 0.65rem; }
+.fraction-order-list li > span { flex: 1 1 7rem; font-weight: 700; }
+.fraction-move { min-width: 2.75rem; min-height: 2.75rem; padding-inline: 0.6rem; }
+.fraction-bridge #challenge-area h3 { margin-bottom: 0.35rem; }
+.fraction-bridge #challenge-area > .primary-button { margin-top: 0.75rem; }
+.fraction-bridge .quiz-fraction-order { margin-block: 1rem; }
+@media (max-width: 30rem) {
+  .fraction-position-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .fraction-position { padding-inline: 0.2rem; }
+}
 
 .picnic-level-guide { text-align: left; }
 .picnic-pizza-game { max-width: 52rem; }
@@ -342,6 +360,7 @@ footer { padding-block: 1.5rem; text-align: center; }
   .fraction-preview .fraction-whole.rectangle { width: min(30vw, 5.5rem); }
 }
 @media (prefers-reduced-motion: reduce) {
+  .fraction-bridge .fraction-line { scroll-behavior: auto; }
   .picnic-pizza-game *, .picnic-pizza-game *::before, .picnic-pizza-game *::after {
     animation: none !important;
     scroll-behavior: auto !important;

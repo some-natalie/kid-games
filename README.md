@@ -4,8 +4,9 @@ A small Zola site for kid-games.dev, with responsive game tiles and automatic
 light/dark styling based on the device preference. Alphabetical Adventure is
 the site's alphabetical-order game, Proofreading Detectives is its
 proofreading game, Number Trail is its woodland math adventure for ages 6–9,
-Acorn Adventure introduces cumulative, multistep arithmetic, and Picnic Pizza
-introduces equal shares and visual fractions for ages 6–9.
+Acorn Adventure introduces cumulative, multistep arithmetic, Picnic Pizza
+introduces equal shares and visual fractions for ages 6–9, and Fraction Bridge
+helps children find, compare, and order fractions on a number line.
 
 ## Quiz mode
 
@@ -21,8 +22,8 @@ The “Show your parent!” screen then gives a rounded percent correct and
 expandable **Answer details**, including incorrect responses and corrections.
 
 Each completely correct question earns one point: an entire word order or
-proofreading passage, one Number Trail puzzle, one Acorn Adventure stop, or one
-Picnic Pizza fraction question.
+proofreading passage, one Number Trail puzzle, one Acorn Adventure stop, one
+Picnic Pizza fraction question, or one Fraction Bridge challenge.
 Unanswered questions count as incorrect. Proofreading requires marking every
 mistake without marking correct text. Acorn Adventure uses a numeric input
 instead of answer choices and carries the player's entered totals, so later
@@ -128,6 +129,19 @@ Add an effect with this structure:
 `colors`, or both; colors alone make confetti pieces, and colors tint text
 symbols such as `★`. If the file is missing or invalid, the game uses built-in
 confetti and sparkles.
+
+## Fraction Bridge
+
+Fraction Bridge is an untimed eight-level number-line game for ages 6–9. It starts
+with guided halves and quarters, introduces thirds, sixths, and eighths, and then
+practices equivalent positions, ordering, and comparison. Fraction placement and
+comparison use exact rational arithmetic; each puzzle keeps one fixed unit length
+and only offers mathematically valid tick positions. The denominator counts equal
+intervals, while the number line includes both endpoint tick marks. Players can
+choose positions with keyboard- and touch-accessible buttons, use hints to restore
+partition guides, and retry without losing points. Normal progress is saved in
+this browser under `kid-games.fraction-bridge.progress`; quiz answers remain in
+memory and do not load or change that progress.
 
 ## Themes and browser preferences
 
