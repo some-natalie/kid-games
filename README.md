@@ -313,7 +313,8 @@ instead of repeating nut emojis.
 
 Addition and subtraction have equal priority: chains containing only these
 operations are evaluated **left to right**, not by doing addition first.
-A worked `5 + 19 − 4 + 7 = 27` example demonstrates each running total.
+A worked `5 + 4 − 3 + 6 = 12` example demonstrates each running total,
+keeping the tutorial basket at no more than 12 nuts.
 This game prepares players for multistep arithmetic; it does not introduce
 multiplication, division, parentheses, or their precedence rules.
 
