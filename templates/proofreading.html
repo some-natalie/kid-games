@@ -20,7 +20,14 @@
     <p class="eyebrow">Be a mistake detective</p>
     <h2 id="game-heading">What is proofreading?</h2>
     <p>Proofreading means reading carefully to catch mistakes before you share your writing.</p>
-    <p>Tap every word, letter, or punctuation mark that looks wrong. Then choose <strong>Check</strong> to see how you did.</p>
+    <p>Tap the whole word if any of its letters look wrong. Tap punctuation marks or wide gaps separately. Then choose <strong>Check</strong> to see how you did.</p>
+    <section class="proof-example" aria-labelledby="example-heading">
+      <h3 id="example-heading">Try a quick example</h3>
+      <p>Every sentence starts with a capital letter. Tap the whole word <strong>my</strong> below, then choose <strong>Check example</strong>.</p>
+      <p id="example-text" class="proof-text" role="group" aria-label="Practice text to proofread" aria-describedby="example-status"></p>
+      <button id="check-example" class="secondary-button" type="button">Check example</button>
+      <p id="example-status" role="status" aria-live="polite">Tap “my” to mark it. Tap it again to unmark it.</p>
+    </section>
     <p>Here are the kinds of mistakes to hunt for:</p>
     <ul class="mistake-kinds">
       <li><strong>Capital letters</strong> that are missing or in the wrong place</li>
@@ -49,7 +56,7 @@
     <p id="progress" class="progress" aria-live="polite"></p>
     <details class="how-to-play">
       <summary>How to play</summary>
-      <p id="proof-instructions" class="game-instructions">Tap the exact letter for a capital-letter or flipped-letter mistake. Tap the whole word for spelling or sound-alike mistakes, or tap a punctuation mark or wide gap that looks wrong. Tap again to unmark it. Then choose Check. Correct marks are fixed right in the text and stay fixed while you find the rest. Clear marks removes only marks that have not been fixed. With a keyboard, use the Left and Right arrow keys to move between items, and Space or Enter to mark one.</p>
+      <p id="proof-instructions" class="game-instructions">Tap the whole word if any letter looks wrong, or tap a punctuation mark or wide gap. Tap again to unmark it. Then choose Check. Fixed letters are bold and underlined. Removed marks stay red and crossed out; they still count as fixed. Correct marks stay fixed while you find the rest. Clear marks removes only marks that have not been fixed. With a keyboard, use the Left and Right arrow keys to move between items, and Space or Enter to mark one.</p>
     </details>
     <h3>Find the mistakes</h3>
     <p id="proof-text" class="proof-text" role="group" aria-label="Text to proofread" aria-describedby="proof-instructions"></p>

@@ -41,6 +41,30 @@ test("home page lists the game and links to it", async ({ page }) => {
   await expect(page.getByRole("heading", { name: "What is proofreading?" })).toBeVisible();
 });
 
+test("the optional example teaches whole-word marking and shows the changed letter", async ({ page }) => {
+  await page.goto("/proofreading/");
+  const example = page.locator("#example-text");
+  await expect(example.getByRole("button")).toHaveText(["my", "cat", "naps", "."]);
+  await page.locator("#check-example").click();
+  await expect(page.locator("#example-status")).toContainText("Tap the whole word “my” only");
+  const word = example.locator(".example-token").first();
+  await expect(word).toHaveAccessibleName("my");
+  await word.focus();
+  await word.press("Space");
+  await expect(word).toHaveAttribute("aria-pressed", "true");
+  await word.press("Space");
+  await expect(word).toHaveAttribute("aria-pressed", "false");
+  await word.click();
+  await page.locator("#check-example").click();
+  await expect(word).toHaveText("My");
+  await expect(word.locator(".proof-change")).toHaveText("M");
+  await expect(page.locator("#example-status")).toContainText("You are ready to play");
+  await expect(page.locator("#start-game")).toBeFocused();
+  expect(await page.evaluate((key) => localStorage.getItem(key), progressKey)).toBeNull();
+  await page.locator("#start-game").click();
+  await expect(page.locator("#progress")).toContainText("0 marked · 0 fixed");
+});
+
 test("level 1 can be solved and advances", async ({ page }) => {
   await startAtLevel(page, 0);
   await expect(page.locator("#progress")).toContainText("1 mistake to find");
@@ -48,8 +72,9 @@ test("level 1 can be solved and advances", async ({ page }) => {
   await page.locator("#check-marks").click();
   await expect(page.locator("#feedback")).toContainText("You found all 1 mistake!");
   await expect(page.locator("#fix-list li")).toHaveCount(1);
-  await expect(page.locator("#fix-list")).toContainText("“m” should be “M”");
-  await expect(page.locator(".proof-token").first()).toHaveText("M");
+  await expect(page.locator("#fix-list")).toContainText("“my” should be “My”");
+  await expect(page.locator(".proof-token").first()).toHaveText("My");
+  await expect(page.locator(".proof-token").first().locator(".proof-change")).toHaveText("M");
   await expect(page.locator("#proof-text")).toContainText("My cat likes to nap in the sun.");
   await page.locator("#next-level").click();
   await expect(page.locator("#level-count")).toHaveText("Level 2 of 10");
@@ -62,22 +87,24 @@ test("checking with nothing marked asks the player to mark something", async ({ 
   await expect(page.locator("#feedback")).toContainText("Tap the words");
 });
 
-test("only the b in birds is marked and changes to B after checking", async ({ page }) => {
+test("tapping any letter in birds marks the whole word and only the corrected B is emphasized", async ({ page }) => {
   await page.addInitScript(() => { Math.random = () => 3 / 11; });
   await startAtLevel(page, 0);
-  const letters = page.locator(".proof-chunk").first().locator(".proof-token");
-  await expect(letters).toHaveText(["b", "i", "r", "d", "s"]);
-  await letters.nth(1).click();
+  const word = page.locator(".proof-chunk").first().locator(".proof-token");
+  await expect(word).toHaveCount(1);
+  await expect(word).toHaveText("birds");
+  const bounds = await word.boundingBox();
+  await page.mouse.click(bounds.x + bounds.width - 8, bounds.y + bounds.height / 2);
+  await expect(word).toHaveAttribute("aria-pressed", "true");
   await page.locator("#check-marks").click();
-  await expect(letters.nth(1)).toHaveAttribute("data-result", "false");
-  await expect(letters.first()).toHaveText("b");
-  await page.locator("#clear-marks").click();
-  await letters.first().click();
-  await expect(letters.first()).toHaveAttribute("aria-pressed", "true");
-  await expect(letters.nth(1)).toHaveAttribute("aria-pressed", "false");
-  await page.locator("#check-marks").click();
-  await expect(letters.first()).toHaveText("B");
-  await expect(letters.first()).toHaveAccessibleName("B, corrected");
+  await expect(word).toHaveText("Birds");
+  await expect(word).toHaveAccessibleName("Birds, corrected. “birds” should be “Birds”.");
+  await expect(word.locator(".proof-change")).toHaveText("B");
+  const style = await word.locator(".proof-change").evaluate((el) => ({
+    underline: getComputedStyle(el).textDecorationLine, weight: getComputedStyle(el).fontWeight,
+  }));
+  expect(style.underline).toBe("underline");
+  expect(Number(style.weight)).toBeGreaterThanOrEqual(700);
   await expect(page.locator("#proof-text")).toHaveText("Birds sing in the morning. ");
 });
 
@@ -87,13 +114,13 @@ test("partial corrections survive clearing marks and keyboard navigation skips t
   await token(page, ...first).click();
   await token(page, ...mirrored).click();
   await page.locator("#check-marks").click();
-  await expect(token(page, ...first)).toHaveText("W");
+  await expect(token(page, ...first)).toHaveText("We");
   await expect(token(page, ...mirrored)).toHaveText("7");
   await expect(page.locator(".mirrored")).toHaveCount(0);
   await expect(page.locator("#fix-list li")).toHaveCount(2);
   await token(page, ...homonym).click();
   await page.locator("#clear-marks").click();
-  await expect(token(page, ...first)).toHaveText("W");
+  await expect(token(page, ...first)).toHaveText("We");
   await expect(token(page, ...first)).toBeDisabled();
   await expect(token(page, ...homonym)).toHaveAttribute("aria-pressed", "false");
   await expect(page.locator("#progress")).toContainText("2 marked");
@@ -118,6 +145,15 @@ test("wrong answers show what was right, what was fine, and what is still hiding
   await expect(page.locator("#feedback")).toContainText("1 marked spot marked ✗ is already correct");
   await expect(page.locator("#feedback")).toContainText("1 mistake still hiding");
   await expect(token(page, ...first)).toHaveAttribute("data-result", "found");
+  await expect(token(page, ...first)).toBeVisible();
+  await expect(token(page, ...first).locator("del")).toHaveText(",");
+  await expect(token(page, ...first)).toHaveAccessibleName("comma, removed, fixed");
+  const removedStyle = await token(page, ...first).locator("del").evaluate((el) => ({
+    decoration: getComputedStyle(el).textDecorationLine, color: getComputedStyle(el).color,
+  }));
+  expect(removedStyle.decoration).toBe("line-through");
+  expect(removedStyle.color).toBe("rgb(153, 27, 27)");
+  await expect(page.locator("#progress")).toContainText("1 fixed");
   await expect(token(page, ...fine)).toHaveAttribute("data-result", "false");
   await expect(token(page, ...second)).not.toHaveAttribute("data-result", /.*/);
   await expect(page.locator("#next-level")).toBeHidden();
@@ -128,6 +164,8 @@ test("wrong answers show what was right, what was fine, and what is still hiding
   await token(page, ...second).click();
   await page.locator("#check-marks").click();
   await expect(page.locator("#feedback")).toContainText("You found all 2 mistakes!");
+  await expect(page.locator("#proof-text .proof-removed")).toHaveCount(2);
+  await expect(page.locator("#progress")).toContainText("2 fixed");
 });
 
 test("marks can be cleared and tokens toggle", async ({ page }) => {
@@ -164,6 +202,88 @@ test("mirrored characters are drawn flipped and extra spaces show as gaps", asyn
   await page.locator("#start-game").click();
   await expect(page.locator(".proof-gap")).toHaveCount(1);
   await expect(page.locator(".proof-gap")).toHaveAccessibleName("wide space between words");
+  const gap = page.locator(`[data-token="${await page.locator(".proof-gap").getAttribute("data-token")}"]`);
+  await expect(gap).toHaveText(" ");
+  const gapStyle = await gap.evaluate((el) => ({
+    width: el.getBoundingClientRect().width, border: getComputedStyle(el).borderBottomStyle,
+  }));
+  expect(gapStyle.width).toBeGreaterThanOrEqual(63);
+  expect(gapStyle.border).not.toBe("dotted");
+  await gap.click();
+  await page.locator("#check-marks").click();
+  await expect(gap).not.toHaveClass(/proof-gap/);
+  await expect(gap).toHaveAccessibleName("single space, corrected. Use one space here, not two.");
+  await expect(gap.locator(".proof-change")).toHaveText(" ");
+  expect((await gap.boundingBox()).width).toBeLessThan(gapStyle.width / 2);
+});
+
+test("punctuation has a separate 44px tap target and stays crossed out when removed", async ({ page, isMobile }) => {
+  await page.emulateMedia({ colorScheme: "dark" });
+  await startAtLevel(page, 1);
+  const [first] = positions(1, true);
+  const comma = token(page, ...first);
+  const bounds = await comma.boundingBox();
+  expect(bounds.width).toBeGreaterThanOrEqual(44);
+  expect(bounds.height).toBeGreaterThanOrEqual(44);
+  const x = bounds.x + bounds.width - 3;
+  const y = bounds.y + bounds.height / 2;
+  if (isMobile) await page.touchscreen.tap(x, y);
+  else await page.mouse.click(x, y);
+  await expect(comma).toHaveAttribute("aria-pressed", "true");
+  await expect(page.locator(".proof-token[aria-pressed=true]")).toHaveCount(1);
+  await page.locator("#check-marks").click();
+  await expect(comma.locator("del")).toHaveText(",");
+  expect(await comma.evaluate((el) => getComputedStyle(el).color)).toBe("rgb(254, 202, 202)");
+  await token(page, ...positions(1, true)[1]).click();
+  await page.locator("#clear-marks").click();
+  await expect(comma).toBeVisible();
+  await expect(comma).toBeDisabled();
+  await expect(page.locator("#progress")).toContainText("1 fixed");
+});
+
+test("a deleted spelling letter remains red and crossed out inside the whole corrected word", async ({ page }) => {
+  await page.addInitScript(() => { Math.random = () => 2 / 11; });
+  await startAtLevel(page, 4);
+  const [, spelling] = positions(4, true, 2);
+  const word = token(page, ...spelling);
+  await expect(word).toHaveText("zebrass");
+  await word.click();
+  await page.locator("#check-marks").click();
+  await expect(word.locator("del.proof-deletion")).toHaveText("s");
+  await expect(word).toHaveAccessibleName("zebras, corrected. “zebrass” should be “zebras”.");
+  await expect(page.locator("#progress")).toContainText("1 fixed");
+});
+
+test("whole-word targets and enlarged punctuation fit small screens with OpenDyslexic", async ({ page }) => {
+  test.slow();
+  await page.addInitScript(() => localStorage.setItem("kid-games.font", "opendyslexic"));
+  await page.setViewportSize({ width: 320, height: 568 });
+  await page.goto("/proofreading/");
+  await page.evaluate(() => document.fonts.ready);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(320);
+  for (const level of [0, 2, 4, 5, 9]) {
+    await startAtLevel(page, level);
+    await page.evaluate(() => document.fonts.ready);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(320);
+    await markMistakes(page, level);
+    await page.locator("#check-marks").click();
+    await expect(page.locator("#feedback")).toContainText("You found all");
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(320);
+  }
+});
+
+test("missing spacing after a comma is marked separately from either whole word", async ({ page }) => {
+  await startAtLevel(page, 4);
+  const [first] = positions(4, true);
+  const comma = token(page, ...first);
+  await expect(comma).toHaveText(",");
+  await expect(comma).toHaveAttribute("data-kind", "mark");
+  await expect(page.locator(".proof-token").filter({ hasText: /^apples$/ })).toHaveCount(1);
+  await expect(page.locator(".proof-token").filter({ hasText: /^pears$/ })).toHaveCount(1);
+  await comma.click();
+  await page.locator("#check-marks").click();
+  await expect(comma.locator(".proof-change")).toHaveText(" ");
+  await expect(page.locator("#fix-list")).toContainText("Add one space after the comma");
 });
 
 test("final level is a five-sentence paragraph and finishing it ends the case", async ({ page }) => {
@@ -187,8 +307,12 @@ test("every level can be solved by marking exactly its mistakes", async ({ page 
     await page.locator("#check-marks").click();
     await expect(page.locator("#feedback")).toContainText("You found all");
     await expect(page.locator("#next-level")).toBeVisible();
-    const clean = LEVELS[level].variants[0].map((source) => correctedText(buildRound({ sentences: [source] }).sentences[0])).join(" ");
-    await expect(page.locator("#proof-text")).toHaveText(`${clean} `);
+    const clean = buildRound({ sentences: LEVELS[level].variants[0] }).sentences.map(correctedText).join(" ");
+    expect(await page.locator("#proof-text").evaluate((el) => {
+      const copy = el.cloneNode(true);
+      for (const removed of copy.querySelectorAll("del")) removed.remove();
+      return copy.textContent;
+    })).toBe(`${clean} `);
   }
 });
 

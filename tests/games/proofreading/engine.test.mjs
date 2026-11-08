@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import {
-  buildRound, correctedText, describeFix, gradeRound, MISTAKE_TYPES, parseSentence, pickVariant, tokenKey,
+  buildRound, correctedText, correctionParts, describeFix, gradeRound, MISTAKE_TYPES, parseSentence, pickVariant, tokenKey,
 } from "../../../static/proofreading-engine.js";
 import { LEVELS } from "../../../static/proofreading-levels.js";
 
@@ -9,32 +9,57 @@ test("parseSentence splits words, punctuation, spaces, and mistakes", () => {
   const { tokens, mistakes } = parseSentence("{my>My#capitalization} cat, hi.");
   assert.equal(mistakes, 1);
   assert.deepEqual(tokens.map((token) => token.kind),
-    ["mistake", "word", "space", "word", "word", "word", "punct", "space", "word", "word", "punct"]);
-  assert.equal(tokens[0].text, "m");
-  assert.equal(tokens[0].right, "M");
+    ["mistake", "space", "word", "punct", "space", "word", "punct"]);
+  assert.equal(tokens[0].text, "my");
+  assert.equal(tokens[0].right, "My");
   assert.equal(correctedText({ tokens }), "My cat, hi.");
 });
 
-test("parseSentence makes correct letters and apostrophes individually selectable", () => {
-  const { tokens } = parseSentence("They're here.");
-  assert.equal(tokens.slice(0, 7).map((token) => token.text).join(""), "They're");
-  assert.ok(tokens.slice(0, 7).every((token) => token.text.length === 1));
+test("deletions remain available for red strikethrough while extra spaces highlight the single replacement space", () => {
+  const deletion = parseSentence("{zebrass>zebras#spelling}").tokens[0];
+  assert.deepEqual(correctionParts(deletion), { before: "zebras", changed: "", after: "", removed: "s" });
+  const gap = parseSentence("{  > #spacing}").tokens[0];
+  assert.deepEqual(correctionParts(gap), { before: "", changed: " ", after: "", removed: "" });
 });
 
-test("letter mistakes isolate only the changed characters without losing the word", () => {
-  for (const [source, wrong, right, clean] of [
-    ["{birds>Birds#capitalization}", "b", "B", "Birds"],
-    ["{SunDay>Sunday#capitalization}", "D", "d", "Sunday"],
-    ["{dig>big#flipped}", "d", "b", "big"],
-    ["{a^bc>abc#flipped}", "b", "b", "abc"],
+test("parseSentence keeps correct words and their apostrophes as one target", () => {
+  const { tokens } = parseSentence("They're here.");
+  assert.deepEqual(tokens.map((token) => token.text), ["They're", " ", "here", "."]);
+});
+
+test("word mistakes keep the whole target and highlight only the correction", () => {
+  for (const [source, wrong, right, changed] of [
+    ["{birds>Birds#capitalization}", "birds", "Birds", "B"],
+    ["{SunDay>Sunday#capitalization}", "SunDay", "Sunday", "d"],
+    ["{dig>big#flipped}", "dig", "big", "b"],
+    ["{a^bc>abc#flipped}", "abc", "abc", "b"],
+    ["{freind>friend#spelling}", "freind", "friend", "ie"],
+    ["{artclass>art class#spacing}", "artclass", "art class", " "],
   ]) {
     const sentence = parseSentence(source);
     const [mistake] = sentence.tokens.filter((token) => token.kind === "mistake");
     assert.equal(sentence.mistakes, 1);
     assert.equal(mistake.text, wrong);
     assert.equal(mistake.right, right);
-    assert.equal(correctedText(sentence), clean);
+    assert.equal(sentence.tokens.length, 1);
+    assert.equal(correctedText(sentence), right);
+    const parts = correctionParts(mistake);
+    assert.equal(parts.changed, changed);
+    assert.equal(parts.before + parts.changed + parts.after, right);
   }
+});
+
+test("missing space after punctuation targets the punctuation, not the surrounding words", () => {
+  for (const mark of [",", ".", "!", "?"]) {
+    const sentence = parseSentence(`{apples${mark}pears>apples${mark} pears#space-after}`);
+    assert.deepEqual(sentence.tokens.map((token) => token.text), ["apples", mark, "pears"]);
+    const mistake = sentence.tokens[1];
+    assert.equal(mistake.right, `${mark} `);
+    assert.equal(correctionParts(mistake).changed, " ");
+    assert.equal(sentence.mistakes, 1);
+    assert.equal(correctedText(sentence), `apples${mark} pears`);
+  }
+  assert.throws(() => parseSentence("{apples>pears#space-after}"), /must add one space/);
 });
 
 test("spelling and sound-alike mistakes remain selectable as words", () => {
@@ -123,13 +148,14 @@ test("every kind of mistake appears in the game", () => {
   assert.deepEqual([...used].sort(), Object.keys(MISTAKE_TYPES).sort());
 });
 
-test("every capitalization or flipped-character mistake targets a single character", () => {
+test("every capitalization or flipped-character mistake keeps the full authored word or number", () => {
   for (const round of rounds.flat()) {
     for (const sentence of round.sentences) {
       for (const token of sentence.tokens) {
         if (token.type === "capitalization" || token.type === "flipped") {
-          assert.equal(token.text.length, 1, token.text);
-          assert.equal(token.right.length, 1, token.right);
+          assert.match(token.text, /^[A-Za-z0-9]+$/);
+          assert.equal(token.text.length, token.right.length);
+          assert.equal(correctionParts(token).changed.length, 1, token.text);
         }
       }
     }

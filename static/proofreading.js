@@ -1,5 +1,5 @@
 import { celebrate, DEFAULT_CELEBRATIONS, readCelebrations, stopCelebration } from "./alphabet-celebration.js";
-import { buildRound, describeFix, gradeRound, MISTAKE_TYPES, pickVariant, tokenKey } from "./proofreading-engine.js";
+import { buildRound, correctionParts, describeFix, gradeRound, MISTAKE_TYPES, pickVariant, tokenKey } from "./proofreading-engine.js";
 import { CELEBRATION_MESSAGES, LEVELS } from "./proofreading-levels.js";
 import { clearProgress, loadProgress, saveProgress } from "./proofreading-progress.js";
 
@@ -86,7 +86,6 @@ import { clearProgress, loadProgress, saveProgress } from "./proofreading-progre
     button.className = "proof-token";
     button.dataset.token = tokenKey(sentenceIndex, tokenIndex);
     button.dataset.kind = token.kind === "word" || token.kind === "mistake" && /\w/.test(token.text) ? "word" : "mark";
-    if (button.dataset.kind === "word" && token.text.length === 1) button.dataset.kind = "letter";
     button.setAttribute("aria-pressed", "false");
     button.tabIndex = -1;
     fillToken(button, token);
@@ -96,9 +95,28 @@ import { clearProgress, loadProgress, saveProgress } from "./proofreading-progre
   function fillToken(button, token, fixed = false) {
     button.replaceChildren();
     button.classList.toggle("proof-gap", !fixed && token.kind === "mistake" && token.text.trim() === "");
+    button.classList.toggle("proof-fixed-gap", fixed && token.text.trim() === "" && token.right.trim() === "");
+    button.classList.toggle("proof-removed", fixed && token.right === "");
     if (fixed) {
-      button.textContent = token.right;
-      button.hidden = token.right === "";
+      if (token.right === "") {
+        const removed = document.createElement("del");
+        removed.textContent = token.text;
+        button.append(removed);
+      } else {
+        const { before, changed, after, removed } = correctionParts(token);
+        const change = document.createElement("strong");
+        change.className = "proof-change";
+        change.textContent = changed;
+        button.append(before);
+        if (removed) {
+          const deletion = document.createElement("del");
+          deletion.className = "proof-deletion";
+          deletion.textContent = removed;
+          button.append(deletion);
+        }
+        if (changed) button.append(change);
+        button.append(after);
+      }
     } else if (token.kind === "mistake" && token.text.trim() === "") {
       button.textContent = " ";
     } else if (token.parts) {
@@ -162,10 +180,9 @@ import { clearProgress, loadProgress, saveProgress } from "./proofreading-progre
       else delete button.dataset.result;
       const status = result === "false" ? ", not a mistake" :
         isMarked ? ", marked" : "";
-      button.setAttribute("aria-label", fixed ? `${token.right || punctuationNames[token.text] || token.text}, corrected` :
-        labelFor(token) + status);
+      button.setAttribute("aria-label", fixed ? fixedLabel(token) : labelFor(token) + status);
     }
-    progress.textContent = `${plural(round.total, "mistake")} to find · ${marked.size} marked`;
+    progress.textContent = `${plural(round.total, "mistake")} to find · ${marked.size} marked · ${corrected.size} fixed`;
     checkButton.disabled = completed;
     clearButton.disabled = completed || marked.size === corrected.size;
     const available = buttons.filter((button) => !button.disabled && !button.hidden);
@@ -173,6 +190,12 @@ import { clearProgress, loadProgress, saveProgress } from "./proofreading-progre
       for (const button of buttons) button.tabIndex = button === available[0] ? 0 : -1;
     }
     renderLevelMap();
+  }
+
+  function fixedLabel(token) {
+    if (token.right === "") return `${punctuationNames[token.text] || token.text}, removed, fixed`;
+    const text = token.right.trim() || "single space";
+    return `${punctuationNames[text] || text}, corrected. ${describeFix(token)}`;
   }
 
   function clearResults() {
@@ -252,7 +275,7 @@ import { clearProgress, loadProgress, saveProgress } from "./proofreading-progre
   function checkMarks() {
     if (marked.size === 0) {
       feedback.classList.remove("success");
-      feedback.textContent = "Tap the words, letters, or punctuation that look wrong first. Then choose Check.";
+      feedback.textContent = "Tap the words, punctuation marks, or wide gaps that look wrong first. Then choose Check.";
       return;
     }
     const grade = gradeRound(round, marked);
@@ -336,6 +359,52 @@ import { clearProgress, loadProgress, saveProgress } from "./proofreading-progre
   newQuestButton.addEventListener("click", restart);
   playAgainButton.addEventListener("click", restart);
 
+  function setupExample() {
+    const example = buildRound({ sentences: ["{my>My#capitalization} cat naps."] });
+    const text = document.querySelector("#example-text");
+    const status = document.querySelector("#example-status");
+    const exampleMarks = new Set();
+    const exampleButtons = [];
+    example.sentences[0].tokens.forEach((token, index) => {
+      if (token.kind === "space") {
+        text.append(document.createTextNode(token.text));
+        return;
+      }
+      const button = buildToken(token, 0, index);
+      button.classList.replace("proof-token", "example-token");
+      delete button.dataset.token;
+      button.tabIndex = 0;
+      button.setAttribute("aria-label", labelFor(token));
+      button.addEventListener("click", () => {
+        const key = tokenKey(0, index);
+        if (exampleMarks.has(key)) exampleMarks.delete(key);
+        else exampleMarks.add(key);
+        button.setAttribute("aria-pressed", String(exampleMarks.has(key)));
+        status.textContent = "Now choose Check example. Tap a marked item again to unmark it.";
+      });
+      exampleButtons.push({ button, token, key: tokenKey(0, index) });
+      text.append(button);
+    });
+    document.querySelector("#check-example").addEventListener("click", () => {
+      if (!gradeRound(example, exampleMarks).complete) {
+        status.textContent = "Tap the whole word “my” only. It needs a capital M because it starts the sentence. Then check again.";
+        return;
+      }
+      for (const { button, token, key } of exampleButtons) {
+        button.disabled = true;
+        if (exampleMarks.has(key)) {
+          fillToken(button, token, true);
+          button.dataset.result = "found";
+          button.setAttribute("aria-label", fixedLabel(token));
+        }
+      }
+      status.textContent = "You fixed it! The bold, underlined M shows the change from “my” to “My”. You are ready to play!";
+      document.querySelector("#check-example").disabled = true;
+      startButton.focus();
+    });
+  }
+
+  setupExample();
   loadCelebrations();
   updateStart();
 })();
