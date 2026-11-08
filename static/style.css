@@ -372,6 +372,15 @@ footer { padding-block: 1.5rem; text-align: center; }
   .bridge-line[data-rows="2"] .bridge-labels { height: auto; }
   .bridge-label, .bridge-label[data-row="1"] { top: auto; bottom: calc(var(--at) * 100%); left: 0; display: flex; flex-wrap: wrap; gap: 0 0.35em; max-width: 100%; text-align: start; transform: translateY(50%); }
 }
+.celebrating .bridge-turtle { animation: tilly-hop 0.5s ease-in-out 3; }
+.celebrating .bridge-label.selected::before, .celebrating .bridge-label.selected::after { position: absolute; top: -0.6em; font-size: 1.1em; content: "✨"; animation: bridge-twinkle 0.8s ease-in-out infinite alternate; }
+.celebrating .bridge-label.selected::before { left: -0.9em; }
+.celebrating .bridge-label.selected::after { right: -0.9em; animation-delay: -0.4s; }
+.celebrating .bridge-shade { background-size: 0.919rem 0.919rem; animation: bridge-shimmer 0.9s linear 3; }
+.celebrating .bridge-plank { box-shadow: 0 0 0 0.25rem var(--badge), 0 0 1rem var(--accent); }
+@keyframes tilly-hop { 0%, 100% { translate: 0 0; } 40% { translate: 0 -0.9rem; } 60% { translate: 0 -0.9rem; } }
+@keyframes bridge-twinkle { from { scale: 0.7; rotate: -15deg; } to { scale: 1.2; rotate: 15deg; } }
+@keyframes bridge-shimmer { to { background-position: 0.919rem 0; } }
 .bridge-summary { min-height: 1.5em; margin-block: 0.25rem 0; color: var(--muted); font-size: 0.85rem; font-weight: 700; }
 .bridge-help { margin-block: 0 0.25rem; color: var(--muted); font-size: 0.85rem; }
 .bridge-target { display: inline-grid; justify-items: center; gap: 0.1rem; margin-block: 0.25rem 0.5rem; padding: 0.5rem 1.25rem; border: 3px solid var(--accent); border-radius: 1rem; background: var(--badge); color: var(--text); line-height: 1.15; }
@@ -436,6 +445,7 @@ footer { padding-block: 1.5rem; text-align: center; }
 }
 @media (prefers-reduced-motion: reduce) {
   .bridge-turtle, .bridge-shade { transition: none; }
+  .celebrating .bridge-turtle, .celebrating .bridge-shade, .celebrating .bridge-label.selected::before, .celebrating .bridge-label.selected::after { animation: none; }
   .picnic-pizza-game *, .picnic-pizza-game *::before, .picnic-pizza-game *::after {
     animation: none !important;
     scroll-behavior: auto !important;

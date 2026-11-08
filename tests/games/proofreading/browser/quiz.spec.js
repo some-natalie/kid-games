@@ -70,6 +70,7 @@ test("number quiz withholds grading, permits revisions, and scores the final res
   await page.getByRole("button", { name: "Submit quiz" }).click();
   await expect(page.locator("#quest-heading")).toBeFocused();
   await expect(page.locator(".quiz-score")).toHaveText("98% correct (49 of 50 questions)");
+  await expect(page.locator(".celebration")).toHaveCount(0);
   await page.getByText("Answer details", { exact: true }).click();
   await expect(page.locator("#quest-complete details")).toContainText(`Your answer: ${wrong}`);
   await expect(page.locator("#quest-complete details")).toContainText("Correct equation:");
@@ -111,6 +112,7 @@ test("Acorn quiz accepts a correct full journey and keeps grading hidden until s
   await expect(page.locator(".quiz-score")).toHaveCount(0);
   await page.getByRole("button", { name: "Submit quiz" }).click();
   await expect(page.locator(".quiz-score")).toHaveText(`100% correct (${steps.length} of ${steps.length} questions)`);
+  await expect(page.locator(".celebration")).toHaveCount(0);
   await audit(page);
 });
 
@@ -132,6 +134,7 @@ test("proofreading quiz never fixes marks early and reports missed mistakes and 
   await page.getByRole("button", { name: "Review answers", exact: true }).click();
   await page.getByRole("button", { name: "Submit quiz" }).click();
   await expect(page.locator(".quiz-score")).toHaveText("0% correct (0 of 10 questions)");
+  await expect(page.locator(".celebration")).toHaveCount(0);
   await page.getByText("Answer details", { exact: true }).click();
   await expect(page.locator("#quest-complete details")).toContainText(`Mistakes missed: ${expected.length}. Correct items marked by mistake: 1.`);
   await audit(page);
@@ -164,6 +167,7 @@ test("alphabet quiz retains edited orders, removes reference hints, and grades w
   }).length;
   await page.getByRole("button", { name: "Submit quiz" }).click();
   await expect(page.locator(".quiz-score")).toHaveText(`${correctCount * 10}% correct (${correctCount} of 10 questions)`);
+  await expect(page.locator(".celebration")).toHaveCount(0);
   await page.getByText("Answer details", { exact: true }).click();
   await expect(page.locator("#quest-complete details li").first()).toContainText("Correct");
   await expect(page.locator("#quest-complete details")).toContainText("Correct order:");

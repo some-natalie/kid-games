@@ -1,5 +1,8 @@
 import { test, expect } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
+import { GAME_CELEBRATIONS } from "../../../../static/game-celebrations.js";
+
+const BRIDGE_CELEBRATIONS = GAME_CELEBRATIONS["fraction-bridge"];
 
 const progressKey = "kid-games.fraction-bridge.progress";
 const start = async (page, level = 0) => {
@@ -17,6 +20,8 @@ const audit = async (page) => {
   expect(results.violations).toEqual([]);
 };
 
+const escape = (text) => text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+const cheered = (text) => new RegExp(`^(${BRIDGE_CELEBRATIONS.messages.map(escape).join("|")}) ${escape(text)}$`);
 const bridgePoint = async (page, ratio) => {
   const plank = page.locator(".bridge-plank");
   await plank.scrollIntoViewIfNeeded();
@@ -73,7 +78,7 @@ test("the worked example explains intervals and tapping the bridge moves Tilly a
   await expect(slider).toHaveAttribute("aria-valuetext", "1 (one)");
   await expectTillyAt(page, 1);
   await tapBridge(page, 0.4);
-  await expect(page.locator("#feedback")).toHaveText("Yes! 1/2 (one half) belongs here.");
+  await expect(page.locator("#feedback")).toHaveText(cheered("1/2 (one half) belongs here."));
   await expectTillyAt(page, 0.5);
   await expect(page.locator(".bridge-label.selected")).toHaveText("1/2one half");
   await expect(page.locator(".bridge-summary [aria-hidden]")).toHaveText("Shaded: 1/2 · Unshaded: 1/2");
@@ -104,7 +109,7 @@ test("dragging snaps Tilly to the nearest tick and only checks when released", a
   await expect(page.locator("#feedback")).toHaveText("");
   await expectTillyAt(page, 5 / 8);
   await page.mouse.up();
-  await expect(page.locator("#feedback")).toHaveText("Yes! 5/8 (five eighths) belongs here.");
+  await expect(page.locator("#feedback")).toHaveText(cheered("5/8 (five eighths) belongs here."));
 });
 
 test("keyboard arrows move Tilly, Enter checks, and a button checks the current spot", async ({ page }) => {
@@ -123,7 +128,7 @@ test("keyboard arrows move Tilly, Enter checks, and a button checks the current 
   await expect(slider).toHaveAttribute("aria-valuenow", "3");
   await expect(page.locator("#feedback")).toHaveText("");
   await page.getByRole("button", { name: "Check Tilly’s spot" }).click();
-  await expect(page.locator("#feedback")).toHaveText("Yes! 3/4 (three fourths) belongs here.");
+  await expect(page.locator("#feedback")).toHaveText(cheered("3/4 (three fourths) belongs here."));
   await expect(page.getByRole("button", { name: "Check Tilly’s spot" })).toBeDisabled();
   await expect(page.locator("#next-level")).toBeFocused();
 });
@@ -133,7 +138,7 @@ test("touch taps move Tilly on the bridge", async ({ page, hasTouch }) => {
   await start(page, 2);
   const point = await bridgePoint(page, 2 / 6);
   await page.touchscreen.tap(point.x, point.y);
-  await expect(page.locator("#feedback")).toHaveText("Yes! 1/3 (one third) belongs here.");
+  await expect(page.locator("#feedback")).toHaveText(cheered("1/3 (one third) belongs here."));
   await expectTillyAt(page, 1 / 3);
 });
 
@@ -143,7 +148,7 @@ test("equivalent fractions share one point and ordering uses keyboard controls",
   await expect(page.locator(".bridge-target")).toHaveText("Walk Tilly to1/2 = 2/4one half = two fourths");
   await expect(page.locator(".bridge-label")).toHaveCount(9);
   await tapBridge(page, 0.5);
-  await expect(page.locator("#feedback")).toHaveText("Yes! 1/2 (one half) and 2/4 (two fourths) share this spot.");
+  await expect(page.locator("#feedback")).toHaveText(cheered("1/2 (one half) and 2/4 (two fourths) share this spot."));
   await page.locator("#next-level").click();
   await expect(page.locator("#level-title")).toHaveText("Order the stepping stones");
   await page.getByRole("button", { name: "Move 2/3 down" }).press("Enter");
@@ -195,7 +200,9 @@ test("quiz bridge taps and keyboard revisions withhold feedback until exact resu
   await expect(page.locator(".bridge-summary")).toContainText(
     "Tilly is at 1/4 (one fourth). Shaded part from 0: 1/4 (one fourth). Unshaded part: 3/4 (three fourths).");
   await expectTillyAt(page, 0.25);
-  await expect(page.locator(".fraction-bridge")).not.toContainText(/right spot|belongs|Yes!|Correct|Incorrect/);
+  await expect(page.locator(".fraction-bridge")).not.toContainText(/right spot|belongs|Correct|Incorrect/);
+  await expect(page.locator(".celebration")).toHaveCount(0);
+  await expect(page.locator(".bridge-line.celebrating")).toHaveCount(0);
   const slider = page.getByRole("slider");
   await slider.press("ArrowRight");
   await slider.press("ArrowRight");
@@ -266,7 +273,7 @@ test("the bridge reflows to a vertical line at phone width with OpenDyslexic and
   await slider.press("ArrowUp");
   await expect(slider).toHaveAttribute("aria-valuetext", "1/8 (one eighth)");
   await tapBridge(page, 5 / 8);
-  await expect(page.locator("#feedback")).toHaveText("Yes! 5/8 (five eighths) belongs here.");
+  await expect(page.locator("#feedback")).toHaveText(cheered("5/8 (five eighths) belongs here."));
   await expectTillyAt(page, 5 / 8);
   expect(await page.locator(".bridge-turtle").evaluate((turtle) => getComputedStyle(turtle).transitionDuration)).toBe("0s");
 });
@@ -310,3 +317,60 @@ for (const [width, forward, back] of [[1024, "right", "left"], [320, "up", "down
     expect(await turtleFacing(page)).toBe(back);
   });
 }
+
+const effects = new Map(BRIDGE_CELEBRATIONS.effects.map((effect) => [effect.id, effect]));
+
+test("right answers set off a themed celebration, Tilly hops, and wrong answers do not", async ({ page }) => {
+  await start(page, 3);
+  await tapBridge(page, 0.25);
+  await expect(page.locator("#feedback")).toHaveText("1/4 (one fourth) is not the right spot yet. Try again.");
+  await expect(page.locator(".celebration")).toHaveCount(0);
+  await expect(page.locator(".bridge-line.celebrating")).toHaveCount(0);
+  await tapBridge(page, 5 / 8);
+  await expect(page.locator("#feedback")).toHaveText(cheered("5/8 (five eighths) belongs here."));
+  await expect(page.locator("#feedback")).toHaveClass(/success/);
+  const layer = page.locator(".celebration");
+  await expect(layer).toHaveCount(1);
+  await expect(layer).toHaveAttribute("aria-hidden", "true");
+  const { effect, motion, pieces } = await layer.evaluate((element) => ({ ...element.dataset, pieces: element.children.length }));
+  expect(effects.get(effect)?.motion).toBe(motion);
+  expect(pieces).toBe(effects.get(effect).count);
+  await expect(page.locator(".bridge-line")).toHaveClass(/celebrating/);
+  expect(await page.locator(".bridge-turtle").evaluate((turtle) => getComputedStyle(turtle).animationName)).toBe("tilly-hop");
+  expect(await page.locator(".bridge-label.selected").evaluate((label) => getComputedStyle(label, "::after").content)).toBe('"✨"');
+  await page.locator("#next-level").click();
+  await expect(page.locator(".celebration")).toHaveCount(0);
+  await expect(page.locator(".bridge-line.celebrating")).toHaveCount(0);
+  await expect(page.locator("#feedback")).not.toHaveClass(/success/);
+});
+
+test("ordering, comparing, and finishing the bridge celebrate too", async ({ page }) => {
+  await start(page, 5);
+  await page.getByRole("button", { name: "Move 2/3 down" }).click();
+  await page.getByRole("button", { name: "Check order" }).click();
+  await expect(page.locator("#feedback")).toHaveText(cheered("1/4 (one fourth), 2/3 (two thirds), 5/6 (five sixths) are in order."));
+  await expect(page.locator(".celebration")).toHaveCount(1);
+  await page.locator("#next-level").click();
+  await page.getByRole("button", { name: "5/8 (five eighths)" }).click();
+  await expect(page.locator("#feedback")).toHaveText(cheered("5/8 (five eighths) is greater because it is farther from 0."));
+  await expect(page.locator(".celebration")).toHaveCount(1);
+  await page.locator("#next-level").click();
+  await tapBridge(page, 0.75);
+  await page.locator("#next-level").click();
+  await expect(page.locator("#quest-heading")).toBeFocused();
+  await expect(page.locator(".celebration")).toHaveCount(1);
+});
+
+test("with reduced motion the rewards stay still", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await start(page, 0);
+  await tapBridge(page, 0.5);
+  await expect(page.locator(".celebration")).toHaveCount(1);
+  expect(await page.locator(".celebration").evaluate((element) => element.getAnimations({ subtree: true }).length)).toBe(0);
+  await expect(page.locator(".celebration .still")).toHaveCount(5);
+  for (const selector of [".bridge-turtle", ".bridge-shade"]) {
+    expect(await page.locator(selector).evaluate((element) => getComputedStyle(element).animationName)).toBe("none");
+  }
+  expect(await page.locator(".bridge-label.selected").evaluate((label) => getComputedStyle(label, "::after").animationName)).toBe("none");
+  await audit(page);
+});

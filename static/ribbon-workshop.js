@@ -1,3 +1,5 @@
+import { celebrate, stopCelebration } from "./alphabet-celebration.js";
+import { GAME_CELEBRATIONS } from "./game-celebrations.js";
 import { createLevelProgress } from "./level-progress.js";
 import { isQuizMode } from "./quiz-engine.js";
 import {
@@ -212,14 +214,14 @@ if (!isQuizMode(window.location.search)) {
   }
 
   function successMessage(level) {
-    if (level.type === "select") return `That's it! ${fractionLabel(level.target)} is selected as equal ribbon parts.`;
+    if (level.type === "select") return `${fractionLabel(level.target)} is selected as equal ribbon parts.`;
     if (level.type === "equivalent") {
-      return `That's it! ${fractionLabel(level.target)} has the same length on both ribbons.`;
+      return `${fractionLabel(level.target)} has the same length on both ribbons.`;
     }
     if (level.type === "compare") {
-      return `That's it! ${fractionLabel(level.target)} is longer than ${fractionLabel(level.other)}.`;
+      return `${fractionLabel(level.target)} is longer than ${fractionLabel(level.other)}.`;
     }
-    return `That's it! ${fractionLabel(level.target)} plus the missing parts completes one whole.`;
+    return `${fractionLabel(level.target)} plus the missing parts completes one whole.`;
   }
 
   function check() {
@@ -227,7 +229,8 @@ if (!isQuizMode(window.location.search)) {
     if (checkExercise(levelIndex, selections)) {
       solved = true;
       feedback.className = "feedback success";
-      feedback.textContent = successMessage(LEVELS[levelIndex]);
+      const { message: cheer } = celebrate(GAME_CELEBRATIONS["ribbon-workshop"]);
+      feedback.textContent = `${cheer} ${successMessage(LEVELS[levelIndex])}`;
       hint.hidden = true;
       find("check-ribbons").hidden = true;
       const next = find("next-level");
@@ -247,6 +250,7 @@ if (!isQuizMode(window.location.search)) {
     levelIndex = index;
     solved = false;
     overlayShown = false;
+    stopCelebration();
     const level = LEVELS[index];
     selections = level.ribbons.map(({ denominator }, ribbonIndex) => ({
       denominator,
@@ -295,6 +299,7 @@ if (!isQuizMode(window.location.search)) {
       playArea.hidden = true;
       finale.hidden = false;
       find("quest-heading").focus();
+      celebrate(GAME_CELEBRATIONS["ribbon-workshop"]);
     }
   });
   overlayToggle.addEventListener("click", () => {

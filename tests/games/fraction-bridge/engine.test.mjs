@@ -5,6 +5,10 @@ import {
   fractionAtTick, fractionName, isOrdered, orderFractions, parseFraction, positionChoices, positionLabel,
   positionOf, stepTick, tickFromRatio,
 } from "../../../static/fraction-bridge-engine.js";
+import { GAME_CELEBRATIONS } from "../../../static/game-celebrations.js";
+import { MOTIONS } from "../../../static/alphabet-celebration.js";
+
+const BRIDGE_CELEBRATIONS = GAME_CELEBRATIONS["fraction-bridge"];
 
 test("the scaffold moves from visible halves and quarters to reduced-guide challenges", () => {
   assert.equal(LEVELS.length, 8);
@@ -111,4 +115,14 @@ test("quiz placement questions carry the bridge size and every tick label", () =
     assert.equal(question.choices.length, question.intervals + 1);
     assert.deepEqual(question.choices.map(({ value }) => value), Array.from({ length: question.intervals + 1 }, (_, tick) => tick));
   }
+});
+
+test("bridge celebrations are themed, valid, and use every motion", () => {
+  assert.ok(BRIDGE_CELEBRATIONS.messages.length >= 5);
+  assert.ok(BRIDGE_CELEBRATIONS.messages.includes("Tilly made it!"));
+  assert.deepEqual(new Set(BRIDGE_CELEBRATIONS.effects.map(({ motion }) => motion)), new Set(MOTIONS));
+  for (const id of ["sparkles", "pond-bubbles", "falling-leaves", "turtle-friends", "lily-blossoms", "fraction-stars", "frog-hops", "fish-splash", "duck-parade", "river-rainbows"]) {
+    assert.ok(BRIDGE_CELEBRATIONS.effects.some((effect) => effect.id === id), id);
+  }
+  assert.ok(Object.isFrozen(BRIDGE_CELEBRATIONS));
 });
