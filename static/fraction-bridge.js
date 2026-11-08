@@ -1,7 +1,7 @@
 import {
-  LEVELS, compareFractions, evaluatePlacement, fractionAtTick, fractionName, isOrdered, positionLabel,
+  LEVELS, compareFractions, evaluatePlacement, fractionName, isOrdered, positionLabel,
 } from "./fraction-bridge-engine.js";
-import { createBridgeLine } from "./fraction-bridge-line.js";
+import { createBridgeLine, createTargetCard } from "./fraction-bridge-line.js";
 import { createLevelProgress } from "./level-progress.js";
 import { isQuizMode } from "./quiz-engine.js";
 
@@ -58,30 +58,24 @@ if (!isQuizMode(window.location.search)) {
     if (solved) return;
     const label = positionLabel(tick, level.intervals);
     if (!evaluatePlacement(level.fractions, tick, level.intervals)) {
-      feedback.textContent = `${label} is not the right spot yet. Move Tilly and try again, or ask for a hint.`;
+      feedback.textContent = `${label} is not the right spot yet. Try again.`;
       return;
     }
     const target = level.fractions.map((fraction) => `${fraction} (${fractionName(fraction)})`).join(" and ");
-    const location = fractionAtTick(tick, level.intervals);
-    finishLevel(`Yes! ${target} ${level.fractions.length > 1 ? "share" : "belongs at"} ${location} (${fractionName(location)}). The shaded part shows ${label} of the bridge.`);
+    finishLevel(`Yes! ${target} ${level.fractions.length > 1 ? "share this spot" : "belongs here"}.`);
   }
 
   function showAnswerControls(level) {
-    const title = document.createElement("h3");
-    title.id = "fraction-position-heading";
-    title.textContent = "Tap or drag on the bridge to move Tilly";
-    const help = document.createElement("p");
-    help.className = "bridge-help";
-    help.textContent = "Let go to check the spot. With a keyboard, use the arrow keys, then press Enter or Space.";
     bridge = createBridgeLine({
+      keyboardHelp: "Use the arrow keys to move Tilly, then press Enter or Space to check her spot.",
       intervals: level.intervals,
       guides: level.guide,
       onMove: () => { feedback.textContent = ""; },
       onChoose: (tick) => check(level, tick),
     });
-    const checkButton = button("Check Tilly’s spot", "primary-button");
+    const checkButton = button("Check Tilly’s spot");
     checkButton.addEventListener("click", () => check(level, bridge.tick));
-    challengeArea.append(title, help, bridge.element, checkButton);
+    challengeArea.append(createTargetCard(level.fractions), bridge.element, checkButton);
   }
 
   function showOrdering(level) {
@@ -198,7 +192,7 @@ if (!isQuizMode(window.location.search)) {
     find("level-count").textContent = `Level ${levelIndex + 1} of ${LEVELS.length}`;
     find("level-title").textContent = level.title;
     find("level-instructions").textContent = level.instructions;
-    find("progress").textContent = `Level ${levelIndex + 1} of ${LEVELS.length}. No timer and no points are lost for trying again.`;
+    find("progress").textContent = `Level ${levelIndex + 1} of ${LEVELS.length}.`;
     if (level.mode === "place" || level.mode === "equivalent") showAnswerControls(level);
     if (level.mode === "order") showOrdering(level);
     if (level.mode === "compare") showComparison(level);

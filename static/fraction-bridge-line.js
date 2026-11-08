@@ -18,10 +18,21 @@ function tickText(tick, intervals) {
   return [fraction, fractionName(fraction)];
 }
 
+export function createTargetCard(fractions) {
+  const card = node("p", "bridge-target");
+  card.append(
+    node("span", "bridge-target-label", "Walk Tilly to"),
+    node("span", "bridge-target-fraction", fractions.join(" = ")),
+    node("span", "bridge-target-name", fractions.map(fractionName).join(" = ")),
+  );
+  return card;
+}
+
 // Interactive number line: tap or drag snaps Tilly to a valid tick, arrows step
 // between ticks, and the part from 0 to Tilly is shaded with a stripe pattern.
 export function createBridgeLine({
   intervals, guides = true, interactive = true, selected, onMove, onChoose,
+  keyboardHelp = "Use the arrow keys to move Tilly.",
 }) {
   const id = `fraction-bridge-${bridgeCount += 1}`;
   const wrapper = node("div", "bridge-line");
@@ -42,7 +53,13 @@ export function createBridgeLine({
   track.append(span);
   const summary = node("p", "bridge-summary");
   summary.id = `${id}-summary`;
-  wrapper.append(track, summary);
+  const summaryShort = node("span");
+  summaryShort.setAttribute("aria-hidden", "true");
+  const summaryFull = node("span", "visually-hidden");
+  summary.append(summaryShort, summaryFull);
+  const keys = node("p", "visually-hidden", keyboardHelp);
+  keys.id = `${id}-keys`;
+  wrapper.append(track, summary, keys);
 
   let tick = selected ?? 0;
   let chosen = selected !== undefined;
@@ -56,7 +73,7 @@ export function createBridgeLine({
     track.setAttribute("aria-label", "Tilly's spot on the fraction bridge, from 0 to 1");
     track.setAttribute("aria-valuemin", "0");
     track.setAttribute("aria-valuemax", String(intervals));
-    track.setAttribute("aria-describedby", summary.id);
+    track.setAttribute("aria-describedby", `${summary.id} ${keys.id}`);
   } else {
     track.setAttribute("aria-hidden", "true");
     summary.hidden = true;
@@ -88,8 +105,10 @@ export function createBridgeLine({
     turtle.style.setProperty("--at", String(at));
     for (const item of labels.children) item.classList.toggle("selected", chosen && Number(item.dataset.tick) === tick);
     const where = positionLabel(tick, intervals);
-    summary.textContent = chosen
-      ? `Tilly is at ${where}. ${bridgeSummary(tick, intervals).text}`
+    const parts = bridgeSummary(tick, intervals);
+    summaryShort.textContent = chosen ? parts.short : "";
+    summaryFull.textContent = chosen
+      ? `Tilly is at ${where}. ${parts.text}`
       : "Tilly is waiting at 0. Tap or drag on the bridge to choose a spot.";
     if (interactive) {
       track.setAttribute("aria-valuenow", String(tick));
