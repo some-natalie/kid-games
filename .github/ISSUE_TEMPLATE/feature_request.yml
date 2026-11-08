@@ -1,0 +1,20 @@
+name: Feature request
+description: Suggest a game, accessibility improvement, or other change.
+body:
+  - type: markdown
+    attributes:
+      value: Please search existing issues first and keep examples free of personal information.
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem would this solve?
+      description: Explain who would benefit and why.
+    validations:
+      required: true
+  - type: textarea
+    id: suggestion
+    attributes:
+      label: Suggested change
+      description: Describe the behavior you would like and any alternatives.
+    validations:
+      required: true

@@ -1,0 +1,33 @@
+name: Bug report
+description: Report something that is not working as expected.
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Please search existing issues first. Do not include identifying information
+        about children or testers. For vulnerabilities, follow SECURITY.md instead
+        of posting details here.
+  - type: textarea
+    id: problem
+    attributes:
+      label: What happened?
+      description: Include what you expected to happen.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: Include the game and level, if relevant.
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Browser and device
+      placeholder: Safari on iPad, Chrome on Windows, etc.
+  - type: textarea
+    id: details
+    attributes:
+      label: Additional details
+      description: Optional screenshots or error messages, with private information removed.
