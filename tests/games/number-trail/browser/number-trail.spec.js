@@ -52,6 +52,8 @@ test("the home tile opens a worked example and keyboard-accessible untimed play"
   await expect(page.locator(".trail-crossing .trail-bank")).toHaveCount(2);
   await expect(page.locator(".trail-bank-far")).toHaveText("🥕");
   await expect(page.locator(".trail-crossing .trail-bank").first()).toHaveAttribute("aria-hidden", "true");
+  expect(await page.locator(".trail-crossing").evaluate((element) => getComputedStyle(element).backgroundImage)).toBe("none");
+  expect(await page.locator(".trail-bank").first().evaluate((element) => getComputedStyle(element).backgroundImage)).not.toBe("none");
   await expect(page.locator("#next-step")).toBeHidden();
   await page.locator("#show-hint").press("Space");
   await expect(page.locator("#trail-hint")).toContainText("count forward");
