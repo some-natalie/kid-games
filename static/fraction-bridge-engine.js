@@ -76,6 +76,31 @@ export function positionChoices(intervals) {
   });
 }
 
+export function tickFromRatio(ratio, intervals) {
+  if (!Number.isInteger(intervals) || intervals < 1) throw new RangeError("Intervals must be a positive whole number.");
+  if (!Number.isFinite(ratio)) throw new TypeError("A bridge position must be a finite number.");
+  return Math.round(Math.min(1, Math.max(0, ratio)) * intervals);
+}
+
+export function stepTick(tick, key, intervals) {
+  const moves = { ArrowRight: 1, ArrowUp: 1, ArrowLeft: -1, ArrowDown: -1 };
+  if (key === "Home") return 0;
+  if (key === "End") return intervals;
+  if (!(key in moves)) return undefined;
+  return Math.min(intervals, Math.max(0, tick + moves[key]));
+}
+
+export function positionLabel(tick, intervals) {
+  return positionChoices(intervals)[tick].label;
+}
+
+export function bridgeSummary(tick, intervals) {
+  fractionAtTick(tick, intervals);
+  const shaded = positionLabel(tick, intervals);
+  const unshaded = positionLabel(intervals - tick, intervals);
+  return { shaded, unshaded, text: `Shaded part from 0: ${shaded}. Unshaded part: ${unshaded}.` };
+}
+
 export function evaluatePlacement(fractions, tick, intervals) {
   if (!Array.isArray(fractions) || fractions.length === 0) throw new TypeError("At least one fraction is required.");
   const positions = fractions.map((fraction) => positionOf(fraction, intervals));
@@ -99,6 +124,7 @@ export function buildQuizQuestions() {
     kind: "fraction-placement",
     title,
     prompt: `Where does ${fraction} (${fractionName(fraction)}) belong between 0 and 1?`,
+    intervals,
     choices: positionChoices(intervals).map(({ tick, label }) => ({ value: tick, label })),
     expected: positionOf(fraction, intervals),
     correction: `${fraction} (${fractionName(fraction)}) belongs at ${fractionAtTick(positionOf(fraction, intervals), intervals)}.`,

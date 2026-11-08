@@ -175,9 +175,18 @@ with guided halves and quarters, introduces thirds, sixths, and eighths, and the
 practices equivalent positions, ordering, and comparison. Fraction placement and
 comparison use exact rational arithmetic; each puzzle keeps one fixed unit length
 and only offers mathematically valid tick positions. The denominator counts equal
-intervals, while the number line includes both endpoint tick marks. Players can
-choose positions with keyboard- and touch-accessible buttons, use hints to restore
-partition guides, and retry without losing points. Normal progress is saved in
+intervals, while the number line includes both endpoint tick marks. Each tick on
+the bridge is labelled with its fraction and name (for example, “1/2 one half”).
+Players tap the bridge, or tap and drag, to move Tilly the turtle; she snaps to the
+nearest valid tick, and letting go checks the spot. The part from 0 to Tilly is
+shaded with stripes, and a text summary names both the shaded and unshaded parts.
+With a keyboard, the bridge is a slider: arrow keys, Home, and End move Tilly, and
+Enter, Space, or **Check Tilly’s spot** checks the answer. On narrow screens the
+bridge turns vertical, with 0 at the bottom and 1 at the top, so every label stays
+readable. Players can use hints to restore partition guides and their labels, and
+retry without losing points. The comparison level shows a non-interactive bridge.
+In quiz mode, moving Tilly only records the answer; there is no check and no
+correctness feedback until the quiz is submitted. Normal progress is saved in
 this browser under `kid-games.fraction-bridge.progress`; quiz answers remain in
 memory and do not load or change that progress.
 

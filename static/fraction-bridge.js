@@ -1,7 +1,7 @@
 import {
-  LEVELS, compareFractions, evaluatePlacement, fractionAtTick, fractionName, isOrdered,
-  orderFractions, positionChoices,
+  LEVELS, compareFractions, evaluatePlacement, fractionAtTick, fractionName, isOrdered, positionLabel,
 } from "./fraction-bridge-engine.js";
+import { createBridgeLine } from "./fraction-bridge-line.js";
 import { createLevelProgress } from "./level-progress.js";
 import { isQuizMode } from "./quiz-engine.js";
 
@@ -24,6 +24,7 @@ if (!isQuizMode(window.location.search)) {
   let solved = false;
   let hintShown = false;
   let currentOrder = [];
+  let bridge;
 
   function showWarning(message) {
     if (!message) return;
@@ -53,71 +54,34 @@ if (!isQuizMode(window.location.search)) {
     }));
   }
 
-  function drawLine(level) {
-    const svg = challengeArea.querySelector(".fraction-line");
-    if (!svg) return;
-    const showGuides = level.guide || hintShown;
-    const namespace = "http://www.w3.org/2000/svg";
-    const line = document.createElementNS(namespace, "line");
-    line.setAttribute("x1", "40");
-    line.setAttribute("x2", "960");
-    line.setAttribute("y1", "56");
-    line.setAttribute("y2", "56");
-    line.setAttribute("class", "fraction-line-base");
-    const marks = [0, ...(showGuides ? Array.from({ length: level.intervals - 1 }, (_, index) => index + 1) : []), level.intervals];
-    svg.replaceChildren(line, ...marks.map((tick) => {
-      const mark = document.createElementNS(namespace, "line");
-      const position = 40 + tick / level.intervals * 920;
-      mark.setAttribute("x1", String(position));
-      mark.setAttribute("x2", String(position));
-      mark.setAttribute("y1", tick === 0 || tick === level.intervals ? "38" : "45");
-      mark.setAttribute("y2", "68");
-      mark.setAttribute("class", "fraction-line-tick");
-      return mark;
-    }));
-  }
-
-  function makeLine(level) {
-    const wrapper = document.createElement("div");
-    wrapper.className = "fraction-line-wrap";
-    const start = document.createElement("span");
-    start.textContent = "0";
-    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-    svg.classList.add("fraction-line");
-    svg.setAttribute("viewBox", "0 0 1000 100");
-    svg.setAttribute("preserveAspectRatio", "none");
-    svg.setAttribute("aria-hidden", "true");
-    const end = document.createElement("span");
-    end.textContent = "1";
-    wrapper.append(start, svg, end);
-    return wrapper;
+  function check(level, tick) {
+    if (solved) return;
+    const label = positionLabel(tick, level.intervals);
+    if (!evaluatePlacement(level.fractions, tick, level.intervals)) {
+      feedback.textContent = `${label} is not the right spot yet. Move Tilly and try again, or ask for a hint.`;
+      return;
+    }
+    const target = level.fractions.map((fraction) => `${fraction} (${fractionName(fraction)})`).join(" and ");
+    const location = fractionAtTick(tick, level.intervals);
+    finishLevel(`Yes! ${target} ${level.fractions.length > 1 ? "share" : "belongs at"} ${location} (${fractionName(location)}). The shaded part shows ${label} of the bridge.`);
   }
 
   function showAnswerControls(level) {
     const title = document.createElement("h3");
     title.id = "fraction-position-heading";
-    title.textContent = "Choose a position on the number line";
-    const group = document.createElement("div");
-    group.className = "fraction-position-grid";
-    group.setAttribute("role", "group");
-    group.setAttribute("aria-labelledby", title.id);
-    positionChoices(level.intervals).forEach(({ tick, label }) => {
-      const choice = button(label, "secondary-button fraction-position");
-      choice.setAttribute("aria-label", `Position ${label} on the number line`);
-      choice.addEventListener("click", () => {
-        if (solved) return;
-        if (!evaluatePlacement(level.fractions, tick, level.intervals)) {
-          feedback.textContent = `${label} is not the right position yet. Try again, or ask for a hint.`;
-          return;
-        }
-        const target = level.fractions.map((fraction) => `${fraction} (${fractionName(fraction)})`).join(" and ");
-        const location = fractionAtTick(tick, level.intervals);
-        finishLevel(`Yes! ${target} ${level.fractions.length > 1 ? "share" : "belongs at"} ${location} (${fractionName(location)}).`);
-      });
-      group.append(choice);
+    title.textContent = "Tap or drag on the bridge to move Tilly";
+    const help = document.createElement("p");
+    help.className = "bridge-help";
+    help.textContent = "Let go to check the spot. With a keyboard, use the arrow keys, then press Enter or Space.";
+    bridge = createBridgeLine({
+      intervals: level.intervals,
+      guides: level.guide,
+      onMove: () => { feedback.textContent = ""; },
+      onChoose: (tick) => check(level, tick),
     });
-    challengeArea.append(makeLine(level), title, group);
-    drawLine(level);
+    const checkButton = button("Check Tilly’s spot", "primary-button");
+    checkButton.addEventListener("click", () => check(level, bridge.tick));
+    challengeArea.append(title, help, bridge.element, checkButton);
   }
 
   function showOrdering(level) {
@@ -186,8 +150,8 @@ if (!isQuizMode(window.location.search)) {
       });
       group.append(choice);
     });
-    challengeArea.append(title, makeLine(level), group);
-    drawLine(level);
+    bridge = createBridgeLine({ intervals: level.intervals, guides: false, interactive: false });
+    challengeArea.append(title, bridge.element, group);
   }
 
   function showHint(level) {
@@ -201,13 +165,14 @@ if (!isQuizMode(window.location.search)) {
           ? "The whole bridge stays the same length. The fraction farther from 0 is greater."
           : `The denominator in ${level.fractions.join(" and ")} tells how many equal intervals make 1 whole. Count intervals from 0; the denominator is not the number of tick marks. The numerator tells how many intervals to count.`;
     }
-    drawLine(level);
+    bridge?.setGuides(level.guide || hintShown);
   }
 
   function finishLevel(message) {
     solved = true;
     feedback.textContent = message;
     challengeArea.querySelectorAll("button").forEach((choice) => { choice.disabled = true; });
+    bridge?.disable();
     hint.hidden = true;
     hintButton.hidden = true;
     nextButton.textContent = levelIndex === LEVELS.length - 1 ? "Finish bridge" : "Next level";
@@ -221,6 +186,7 @@ if (!isQuizMode(window.location.search)) {
     solved = false;
     hintShown = false;
     currentOrder = [];
+    bridge = undefined;
     feedback.textContent = "";
     hint.textContent = "";
     hint.hidden = true;

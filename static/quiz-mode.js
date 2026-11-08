@@ -6,6 +6,7 @@ import { LEVELS as NUMBER_LEVELS, buildRound as numberRound, equationText } from
 import { LEVELS as ACORN_LEVELS, buildJourney } from "./acorn-adventure-engine.js";
 import { LEVELS as RIBBON_LEVELS, makeQuizQuestion as ribbonQuizQuestion } from "./ribbon-workshop-engine.js";
 import { buildQuizQuestions as fractionQuestions, fractionName } from "./fraction-bridge-engine.js";
+import { createBridgeLine } from "./fraction-bridge-line.js";
 import { quizQuestions as pizzaQuestions } from "./picnic-pizza-engine.js";
 import { createWorkspace, finalWords, groupQuizQuestions } from "./alphabet-groups-engine.js";
 import { mountWorkspace } from "./alphabet-groups-workspace.js";
@@ -343,20 +344,30 @@ function setupQuiz(game) {
       renderFractionOrder(question);
       return;
     }
+    if (question.kind === "fraction-placement") {
+      area.append(element("p", "Tap or drag on the bridge to move Tilly. With a keyboard, use the arrow keys.", "bridge-help"));
+      const bridge = createBridgeLine({
+        intervals: question.intervals,
+        selected: responses[current],
+        onMove: (tick) => {
+          responses[current] = tick;
+          status.textContent = "Answer selected. You can change it before submitting.";
+        },
+      });
+      area.append(bridge.element);
+      return;
+    }
     const choices = element("div", undefined, "answer-stones fraction-position-grid");
     choices.setAttribute("role", "group");
     choices.setAttribute("aria-labelledby", "quiz-question-heading");
-    question.choices.forEach((option, index) => {
-      const objectChoice = typeof option === "object";
-      const value = objectChoice ? option.value : index;
-      const label = objectChoice ? option.label : `${option} (${fractionName(option)})`;
+    question.choices.forEach((option, value) => {
+      const label = `${option} (${fractionName(option)})`;
       const choice = button(label, () => {
         responses[current] = value;
         for (const item of choices.children) item.setAttribute("aria-pressed", String(item === choice));
         status.textContent = "Answer selected. You can change it before submitting.";
       });
       choice.classList.add("fraction-position");
-      choice.setAttribute("aria-label", objectChoice ? `Position ${label} on the number line` : label);
       choice.setAttribute("aria-pressed", String(responses[current] === value));
       choices.append(choice);
     });
