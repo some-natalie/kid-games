@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block title %}{{ page.title }} · {{ config.title }}{% endblock title %}
+{% block description %}{{ page.description }}{% endblock description %}
+
+{% block content %}
+<section class="intro">
+  <a class="back-link" href="{{ get_url(path='/') }}">← All games</a>
+  <span class="game-icon" aria-hidden="true">{{ page.extra.icon }}</span>
+  <h1>{{ page.title }}</h1>
+  <p>{{ page.description }}</p>
+</section>
+<section class="alphabet-game picnic-pizza-game" aria-label="{{ page.title }}">
+  <div class="theme-picker">
+    <a class="back-link play-only" href="{{ get_url(path='/') }}">← All games</a>
+    <p id="preference-status" role="status">Your level is saved only in this browser.</p>
+  </div>
+  <div id="tutorial" class="tutorial">
+    <p class="eyebrow">An untimed sharing adventure</p>
+    <h2>Pack a fair picnic</h2>
+    <p>Share pizzas, rectangular sandwiches, and fruit bars into equal pieces. Tap pieces to serve them, or choose an answer with a tap, Enter, or Space.</p>
+    <div class="trail-example">
+      <h3>Worked example: sharing a pizza</h3>
+      <p>Cut one pizza into <strong>2 equal pieces</strong>. One piece is <strong>one half (1/2)</strong>.</p>
+      <p>The <strong>denominator</strong>, the bottom number 2, tells how many equal pieces make the whole. The <strong>numerator</strong>, the top number 1, tells how many pieces we selected.</p>
+    </div>
+    <h3>Seven levels, from ages 6–7 to 8–9</h3>
+    <ol class="picnic-level-guide">
+      <li><strong>Fair picnic shares:</strong> spot equal-area pieces, then explain why unequal cuts are not equal shares (ages 6–7).</li>
+      <li><strong>Name the serving:</strong> connect selected halves and quarters to words and fraction notation (ages 6–7).</li>
+      <li><strong>Build halves and quarters:</strong> tap pieces to make a serving (ages 6–7).</li>
+      <li><strong>Try thirds, sixths, and eighths:</strong> build portions from smaller equal pieces (ages 8–9).</li>
+      <li><strong>Compare:</strong> look at fractions of the same-size whole (ages 8–9).</li>
+      <li><strong>Match coverage:</strong> see how 1/2, 2/4, and 4/8 cover the same amount (ages 8–9).</li>
+      <li><strong>Finish the whole:</strong> choose the visible missing pieces, without a calculation rule (ages 8–9).</li>
+    </ol>
+    <p>There is no timer, points, or penalty for mistakes. Ask for a hint and try as often as you like.</p>
+    <div class="game-actions centered">
+      <button id="start-game" class="primary-button" type="button">Let’s pack!</button>
+      <button id="new-quest" class="secondary-button" type="button" hidden>Start a new picnic</button>
+    </div>
+  </div>
+  <div id="play-area" hidden>
+    <ol id="level-map" class="level-map" aria-label="Picnic Pizza levels"></ol>
+    <p id="level-count" class="eyebrow"></p>
+    <h2 id="level-title" tabindex="-1"></h2>
+    <p id="level-instructions"></p>
+    <p id="progress" class="progress" role="status"></p>
+    <h3 id="puzzle-heading" tabindex="-1"></h3>
+    <p id="puzzle-prompt"></p>
+    <div id="puzzle-visuals" class="picnic-visuals"></div>
+    <div id="piece-controls" class="fraction-controls" role="group" aria-labelledby="puzzle-heading" aria-describedby="piece-instructions"></div>
+    <p id="piece-instructions" class="fraction-note"></p>
+    <p id="feedback" class="feedback" role="status"></p>
+    <p id="hint" role="status" hidden></p>
+    <div class="game-actions">
+      <button id="show-hint" class="secondary-button" type="button">Show hint</button>
+      <button id="check-answer" class="primary-button" type="button" hidden>Check serving</button>
+      <button id="next-step" class="primary-button" type="button" hidden>Next puzzle</button>
+    </div>
+  </div>
+  <div id="quest-complete" class="quest-complete" hidden>
+    <p class="eyebrow">The picnic is ready!</p>
+    <h2 id="quest-heading" tabindex="-1">Show your parent!</h2>
+    <p>You explored equal shares, fraction names, comparisons, matching coverage, and completing a whole. Great sharing!</p>
+    <button id="play-again" class="primary-button" type="button">Play again</button>
+  </div>
+</section>
+<script src="{{ get_url(path='picnic-pizza.js', cachebust=true) }}" type="module"></script>
+{% endblock content %}
