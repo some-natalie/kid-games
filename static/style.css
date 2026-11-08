@@ -348,6 +348,8 @@ footer { padding-block: 1.5rem; text-align: center; }
 .bridge-tick { position: absolute; top: -0.55rem; bottom: -0.55rem; left: calc(var(--at) * 100%); width: 0.25rem; border-radius: 0.2rem; background: var(--text); transform: translateX(-50%); }
 .bridge-tick.end { top: -0.9rem; bottom: -0.9rem; width: 0.3rem; }
 .bridge-turtle { position: absolute; top: 0; left: calc(var(--at, 0) * 100%); font-size: 2rem; line-height: 1; transform: translateX(-50%) scaleX(-1); transition: left 0.2s ease; pointer-events: none; }
+/* The turtle emoji faces left; flip or rotate it so Tilly faces the way she last walked. */
+.bridge-line[data-facing="back"] .bridge-turtle { transform: translateX(-50%); }
 .dragging .bridge-turtle, .dragging .bridge-shade { transition: none; }
 .bridge-labels { position: relative; height: 3.9em; margin: 1.1rem 0 0; padding: 0; list-style: none; font-size: 0.8rem; line-height: 1.15; }
 .bridge-line[data-rows="2"] .bridge-labels { height: 7.9em; }
@@ -362,7 +364,8 @@ footer { padding-block: 1.5rem; text-align: center; }
   .bridge-shade { inset: auto 0 0; width: auto; height: calc(var(--selected, 0) * 100%); border-radius: 0 0 0.2rem 0.2rem; }
   .bridge-tick { inset: auto -0.55rem calc(var(--at) * 100%); width: auto; height: 0.25rem; transform: translateY(50%); }
   .bridge-tick.end { inset: auto -0.9rem calc(var(--at) * 100%); width: auto; height: 0.3rem; }
-  .bridge-turtle { top: auto; bottom: calc(var(--at, 0) * 100%); left: 0; transform: translateY(50%); transition-property: bottom; }
+  .bridge-turtle { top: auto; bottom: calc(var(--at, 0) * 100%); left: 0; transform: translateY(50%) rotate(90deg); transition-property: bottom; }
+  .bridge-line[data-facing="back"] .bridge-turtle { transform: translateY(50%) rotate(-90deg); }
   .bridge-labels { position: absolute; inset: 0 0 0 4.7rem; height: auto; margin: 0; }
   .bridge-line[data-rows="2"] .bridge-labels { height: auto; }
   .bridge-label, .bridge-label[data-row="1"] { top: auto; bottom: calc(var(--at) * 100%); left: 0; display: flex; flex-wrap: wrap; gap: 0 0.35em; max-width: 100%; text-align: start; transform: translateY(50%); }

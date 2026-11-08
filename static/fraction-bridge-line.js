@@ -26,6 +26,7 @@ export function createBridgeLine({
   const id = `fraction-bridge-${bridgeCount += 1}`;
   const wrapper = node("div", "bridge-line");
   wrapper.dataset.rows = intervals > 4 ? "2" : "1";
+  wrapper.dataset.facing = "forward";
   wrapper.style.setProperty("--intervals", String(intervals));
   const track = node("div", "bridge-track");
   const span = node("div", "bridge-span");
@@ -98,6 +99,7 @@ export function createBridgeLine({
 
   function moveTo(next) {
     const changed = next !== tick || !chosen;
+    if (next !== tick) wrapper.dataset.facing = next > tick ? "forward" : "back";
     tick = next;
     chosen = true;
     render();

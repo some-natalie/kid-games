@@ -178,7 +178,7 @@ and only offers mathematically valid tick positions. The denominator counts equa
 intervals, while the number line includes both endpoint tick marks. Each tick on
 the bridge is labelled with its fraction and name (for example, “1/2 one half”).
 Players tap the bridge, or tap and drag, to move Tilly the turtle; she snaps to the
-nearest valid tick, and letting go checks the spot. The part from 0 to Tilly is
+nearest valid tick and turns to face the way she is walking; letting go checks the spot. The part from 0 to Tilly is
 shaded with stripes, and a text summary names both the shaded and unshaded parts.
 With a keyboard, the bridge is a slider: arrow keys, Home, and End move Tilly, and
 Enter, Space, or **Check Tilly’s spot** checks the answer. On narrow screens the

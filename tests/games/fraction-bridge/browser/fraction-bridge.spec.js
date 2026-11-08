@@ -272,3 +272,29 @@ test("wide screens keep a horizontal bridge with non-overlapping fraction labels
   });
   expect(overlaps).toEqual([]);
 });
+
+// matrix(a, b, ...): a < 0 faces right (mirrored), a > 0 faces left; b > 0 faces up, b < 0 faces down.
+const turtleFacing = (page) => page.locator(".bridge-turtle").evaluate((turtle) => {
+  const [a, b] = getComputedStyle(turtle).transform.match(/-?[\d.e]+/g).map(Number);
+  if (Math.abs(a) > 0.5) return a < 0 ? "right" : "left";
+  return b > 0 ? "up" : "down";
+});
+
+for (const [width, forward, back] of [[1024, "right", "left"], [320, "up", "down"]]) {
+  test(`Tilly faces the way she walks on a ${width}px bridge`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 900 });
+    await start(page, 7);
+    const slider = page.getByRole("slider");
+    await slider.focus();
+    expect(await turtleFacing(page)).toBe(forward);
+    await slider.press("ArrowRight");
+    await slider.press("ArrowRight");
+    expect(await turtleFacing(page)).toBe(forward);
+    await slider.press("ArrowLeft");
+    expect(await turtleFacing(page)).toBe(back);
+    await tapBridge(page, 1);
+    expect(await turtleFacing(page)).toBe(forward);
+    await tapBridge(page, 0);
+    expect(await turtleFacing(page)).toBe(back);
+  });
+}
