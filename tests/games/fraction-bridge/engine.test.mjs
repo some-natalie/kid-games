@@ -94,7 +94,10 @@ test("bridge labels and shading describe the chosen part and the unshaded rest",
     shaded: "3/4 (three fourths)",
     unshaded: "1/4 (one fourth)",
     text: "Shaded part from 0: 3/4 (three fourths). Unshaded part: 1/4 (one fourth).",
+    short: "Shaded: 3/4 · Unshaded: 1/4",
   });
+  assert.equal(bridgeSummary(0, 8).short, "Shaded: 0 · Unshaded: 1");
+  assert.equal(bridgeSummary(8, 8).short, "Shaded: 1 · Unshaded: 0");
   assert.equal(bridgeSummary(0, 4).unshaded, "1 (one)");
   assert.equal(bridgeSummary(4, 4).shaded, "1 (one)");
   assert.throws(() => bridgeSummary(5, 4), RangeError);
@@ -102,7 +105,8 @@ test("bridge labels and shading describe the chosen part and the unshaded rest",
 
 test("quiz placement questions carry the bridge size and every tick label", () => {
   const placements = buildQuizQuestions().filter(({ kind }) => kind === "fraction-placement");
-  assert.deepEqual(placements.map(({ intervals, expected }) => [intervals, expected]), [[8, 4], [8, 4], [6, 2]]);
+  assert.deepEqual(placements.map(({ fraction, intervals, expected }) => [fraction, intervals, expected]),
+    [["1/2", 8, 4], ["2/4", 8, 4], ["1/3", 6, 2]]);
   for (const question of placements) {
     assert.equal(question.choices.length, question.intervals + 1);
     assert.deepEqual(question.choices.map(({ value }) => value), Array.from({ length: question.intervals + 1 }, (_, tick) => tick));

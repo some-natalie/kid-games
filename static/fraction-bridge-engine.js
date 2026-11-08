@@ -98,7 +98,13 @@ export function bridgeSummary(tick, intervals) {
   fractionAtTick(tick, intervals);
   const shaded = positionLabel(tick, intervals);
   const unshaded = positionLabel(intervals - tick, intervals);
-  return { shaded, unshaded, text: `Shaded part from 0: ${shaded}. Unshaded part: ${unshaded}.` };
+  const numeral = (value) => (value === 0 ? "0" : value === intervals ? "1" : fractionAtTick(value, intervals));
+  return {
+    shaded,
+    unshaded,
+    text: `Shaded part from 0: ${shaded}. Unshaded part: ${unshaded}.`,
+    short: `Shaded: ${numeral(tick)} · Unshaded: ${numeral(intervals - tick)}`,
+  };
 }
 
 export function evaluatePlacement(fractions, tick, intervals) {
@@ -124,6 +130,7 @@ export function buildQuizQuestions() {
     kind: "fraction-placement",
     title,
     prompt: `Where does ${fraction} (${fractionName(fraction)}) belong between 0 and 1?`,
+    fraction,
     intervals,
     choices: positionChoices(intervals).map(({ tick, label }) => ({ value: tick, label })),
     expected: positionOf(fraction, intervals),

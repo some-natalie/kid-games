@@ -56,18 +56,28 @@ test("the worked example explains intervals and tapping the bridge moves Tilly a
   await expect(page.locator(".bridge-label")).toHaveText(["0zero", "1/2one half", "1one"]);
   await expect(page.locator(".bridge-tick")).toHaveCount(3);
   await expect(page.locator("#challenge-area .fraction-position")).toHaveCount(0);
+  await expect(page.locator(".bridge-target")).toHaveText("Walk Tilly to1/2one half");
+  await expect(page.locator(".bridge-target-fraction")).toHaveCSS("font-weight", "800");
+  await expect(page.locator("#challenge-area h3")).toHaveCount(0);
+  for (const directions of await page.locator("#play-area").getByText(/arrow keys|No timer/).all()) {
+    expect((await directions.boundingBox()).width).toBeLessThanOrEqual(1);
+  }
+  await expect(page.locator("#progress")).toHaveText("Level 1 of 8.");
+  await expect(page.locator("#progress")).toHaveClass("visually-hidden");
+  await expect(page.locator(".bridge-summary [aria-hidden]")).toHaveText("");
   const slider = page.getByRole("slider", { name: "Tilly's spot on the fraction bridge, from 0 to 1" });
+  await expect(slider).toHaveAccessibleDescription(/Use the arrow keys to move Tilly, then press Enter or Space to check her spot\./);
   await expect(slider).toHaveAttribute("aria-valuetext", "No spot chosen yet; Tilly is at 0 (zero)");
   await tapBridge(page, 1);
   await expect(page.locator("#feedback")).toContainText("1 (one) is not the right spot yet");
   await expect(slider).toHaveAttribute("aria-valuetext", "1 (one)");
   await expectTillyAt(page, 1);
   await tapBridge(page, 0.4);
-  await expect(page.locator("#feedback")).toContainText("1/2 (one half) belongs at 1/2");
-  await expect(page.locator("#feedback")).toContainText("The shaded part shows 1/2 (one half)");
+  await expect(page.locator("#feedback")).toHaveText("Yes! 1/2 (one half) belongs here.");
   await expectTillyAt(page, 0.5);
   await expect(page.locator(".bridge-label.selected")).toHaveText("1/2one half");
-  await expect(page.locator(".bridge-summary")).toHaveText(
+  await expect(page.locator(".bridge-summary [aria-hidden]")).toHaveText("Shaded: 1/2 · Unshaded: 1/2");
+  await expect(page.locator(".bridge-summary")).toContainText(
     "Tilly is at 1/2 (one half). Shaded part from 0: 1/2 (one half). Unshaded part: 1/2 (one half).");
   await expect(slider).toHaveAttribute("aria-disabled", "true");
   await expect(page.locator("#next-level")).toBeFocused();
@@ -94,7 +104,7 @@ test("dragging snaps Tilly to the nearest tick and only checks when released", a
   await expect(page.locator("#feedback")).toHaveText("");
   await expectTillyAt(page, 5 / 8);
   await page.mouse.up();
-  await expect(page.locator("#feedback")).toContainText("5/8 (five eighths) belongs at 5/8");
+  await expect(page.locator("#feedback")).toHaveText("Yes! 5/8 (five eighths) belongs here.");
 });
 
 test("keyboard arrows move Tilly, Enter checks, and a button checks the current spot", async ({ page }) => {
@@ -113,7 +123,7 @@ test("keyboard arrows move Tilly, Enter checks, and a button checks the current 
   await expect(slider).toHaveAttribute("aria-valuenow", "3");
   await expect(page.locator("#feedback")).toHaveText("");
   await page.getByRole("button", { name: "Check Tilly’s spot" }).click();
-  await expect(page.locator("#feedback")).toContainText("3/4 (three fourths) belongs at 3/4");
+  await expect(page.locator("#feedback")).toHaveText("Yes! 3/4 (three fourths) belongs here.");
   await expect(page.getByRole("button", { name: "Check Tilly’s spot" })).toBeDisabled();
   await expect(page.locator("#next-level")).toBeFocused();
 });
@@ -123,16 +133,17 @@ test("touch taps move Tilly on the bridge", async ({ page, hasTouch }) => {
   await start(page, 2);
   const point = await bridgePoint(page, 2 / 6);
   await page.touchscreen.tap(point.x, point.y);
-  await expect(page.locator("#feedback")).toContainText("1/3 (one third) belongs at 1/3");
+  await expect(page.locator("#feedback")).toHaveText("Yes! 1/3 (one third) belongs here.");
   await expectTillyAt(page, 1 / 3);
 });
 
 test("equivalent fractions share one point and ordering uses keyboard controls", async ({ page }) => {
   await start(page, 4);
   await expect(page.locator("#level-title")).toHaveText("Share a stepping stone");
+  await expect(page.locator(".bridge-target")).toHaveText("Walk Tilly to1/2 = 2/4one half = two fourths");
   await expect(page.locator(".bridge-label")).toHaveCount(9);
   await tapBridge(page, 0.5);
-  await expect(page.locator("#feedback")).toContainText("1/2 (one half) and 2/4 (two fourths) share 1/2");
+  await expect(page.locator("#feedback")).toHaveText("Yes! 1/2 (one half) and 2/4 (two fourths) share this spot.");
   await page.locator("#next-level").click();
   await expect(page.locator("#level-title")).toHaveText("Order the stepping stones");
   await page.getByRole("button", { name: "Move 2/3 down" }).press("Enter");
@@ -178,12 +189,13 @@ test("quiz bridge taps and keyboard revisions withhold feedback until exact resu
   await page.getByRole("button", { name: "Start quiz" }).click();
   await expect(page.getByRole("heading", { name: "Find one half" })).toBeFocused();
   await expect(page.locator(".bridge-label")).toHaveCount(9);
+  await expect(page.locator(".bridge-target")).toHaveText("Walk Tilly to1/2one half");
   await expect(page.getByRole("button", { name: /Check/ })).toHaveCount(0);
   await tapBridge(page, 0.25);
-  await expect(page.locator(".bridge-summary")).toHaveText(
+  await expect(page.locator(".bridge-summary")).toContainText(
     "Tilly is at 1/4 (one fourth). Shaded part from 0: 1/4 (one fourth). Unshaded part: 3/4 (three fourths).");
   await expectTillyAt(page, 0.25);
-  await expect(page.locator(".fraction-bridge")).not.toContainText(/right spot|belongs at|Correct|Incorrect/);
+  await expect(page.locator(".fraction-bridge")).not.toContainText(/right spot|belongs|Yes!|Correct|Incorrect/);
   const slider = page.getByRole("slider");
   await slider.press("ArrowRight");
   await slider.press("ArrowRight");
@@ -254,7 +266,7 @@ test("the bridge reflows to a vertical line at phone width with OpenDyslexic and
   await slider.press("ArrowUp");
   await expect(slider).toHaveAttribute("aria-valuetext", "1/8 (one eighth)");
   await tapBridge(page, 5 / 8);
-  await expect(page.locator("#feedback")).toContainText("5/8 (five eighths) belongs at 5/8");
+  await expect(page.locator("#feedback")).toHaveText("Yes! 5/8 (five eighths) belongs here.");
   await expectTillyAt(page, 5 / 8);
   expect(await page.locator(".bridge-turtle").evaluate((turtle) => getComputedStyle(turtle).transitionDuration)).toBe("0s");
 });

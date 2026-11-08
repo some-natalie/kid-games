@@ -6,7 +6,7 @@ import { LEVELS as NUMBER_LEVELS, buildRound as numberRound, equationText } from
 import { LEVELS as ACORN_LEVELS, buildJourney } from "./acorn-adventure-engine.js";
 import { LEVELS as RIBBON_LEVELS, makeQuizQuestion as ribbonQuizQuestion } from "./ribbon-workshop-engine.js";
 import { buildQuizQuestions as fractionQuestions, fractionName } from "./fraction-bridge-engine.js";
-import { createBridgeLine } from "./fraction-bridge-line.js";
+import { createBridgeLine, createTargetCard } from "./fraction-bridge-line.js";
 import { quizQuestions as pizzaQuestions } from "./picnic-pizza-engine.js";
 import { createWorkspace, finalWords, groupQuizQuestions } from "./alphabet-groups-engine.js";
 import { mountWorkspace } from "./alphabet-groups-workspace.js";
@@ -176,7 +176,8 @@ function setupQuiz(game) {
     const heading = element("h2", question.title);
     heading.id = "quiz-question-heading";
     heading.tabIndex = -1;
-    area.replaceChildren(element("p", `Question ${current + 1} of ${questions.length}`, "eyebrow"), heading, element("p", question.prompt));
+    area.replaceChildren(element("p", `Question ${current + 1} of ${questions.length}`, "eyebrow"), heading,
+      question.kind === "fraction-placement" ? createTargetCard([question.fraction]) : element("p", question.prompt));
     if (kind === "alphabet") {
       if (question.grouped) {
         const workspace = element("div");
@@ -345,7 +346,7 @@ function setupQuiz(game) {
       return;
     }
     if (question.kind === "fraction-placement") {
-      area.append(element("p", "Tap or drag on the bridge to move Tilly. With a keyboard, use the arrow keys.", "bridge-help"));
+      area.append(element("p", "Tap or drag the bridge.", "bridge-help"));
       const bridge = createBridgeLine({
         intervals: question.intervals,
         selected: responses[current],
