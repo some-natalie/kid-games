@@ -86,6 +86,7 @@ import { clearProgress, loadProgress, saveProgress } from "./proofreading-progre
     button.className = "proof-token";
     button.dataset.token = tokenKey(sentenceIndex, tokenIndex);
     button.dataset.kind = token.kind === "word" || token.kind === "mistake" && /\w/.test(token.text) ? "word" : "mark";
+    if (button.dataset.kind === "mark" && token.text.trim()) button.classList.add("proof-punctuation");
     button.setAttribute("aria-pressed", "false");
     button.tabIndex = -1;
     fillToken(button, token);
@@ -150,6 +151,7 @@ import { clearProgress, loadProgress, saveProgress } from "./proofreading-progre
           wrapper.append(chunk);
         }
         chunk.append(buildToken(token, sentenceIndex, tokenIndex));
+        if (token.type === "space-after") chunk = undefined;
       });
       const note = document.createElement("span");
       note.className = "sentence-note";

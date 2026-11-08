@@ -211,9 +211,11 @@ footer { padding-block: 1.5rem; text-align: center; }
 }
 .mistake-kinds { display: inline-block; max-width: 100%; margin: 0 0 1rem; padding-left: 1.25rem; text-align: left; color: var(--muted); }
 .proof-text { margin: 0.5rem 0 1rem; padding: 0.75rem; border: 2px solid var(--border); border-radius: 0.65rem; color: var(--text); font-size: 1.5rem; line-height: 2.6; white-space: pre-wrap; user-select: none; -webkit-user-select: none; }
-.proof-chunk { white-space: normal; }
+.proof-chunk { display: inline-flex; align-items: baseline; max-width: 100%; white-space: normal; }
 .proof-token, .example-token { position: relative; min-width: 2.75rem; max-width: 100%; min-height: 2.75rem; margin: 0; padding: 0.1rem 0.15rem; border: 2px solid transparent; border-radius: 0.5rem; background: transparent; color: inherit; font: inherit; white-space: pre-wrap; overflow-wrap: anywhere; cursor: pointer; }
 .proof-token[data-kind="word"], .example-token[data-kind="word"] { min-width: 0; padding-inline: 0; }
+.proof-punctuation { flex-shrink: 0; min-width: 0; padding-inline: 0; margin-inline: -2px; }
+.proof-punctuation::before { content: ""; position: absolute; width: 2.75rem; height: 0.75rem; left: 50%; bottom: 100%; transform: translateX(-50%); }
 .proof-token:hover, .example-token:hover { border-color: var(--border); }
 .proof-token[aria-pressed="true"], .example-token[aria-pressed="true"] { border-color: var(--accent); background: var(--badge); color: var(--accent); font-weight: 700; }
 .proof-token:disabled, .example-token:disabled { opacity: 1; cursor: default; }

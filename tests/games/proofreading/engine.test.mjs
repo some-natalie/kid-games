@@ -9,7 +9,7 @@ test("parseSentence splits words, punctuation, spaces, and mistakes", () => {
   const { tokens, mistakes } = parseSentence("{my>My#capitalization} cat, hi.");
   assert.equal(mistakes, 1);
   assert.deepEqual(tokens.map((token) => token.kind),
-    ["mistake", "space", "word", "punct", "space", "word", "punct"]);
+    ["mistake", "space", "word", "space", "word"]);
   assert.equal(tokens[0].text, "my");
   assert.equal(tokens[0].right, "My");
   assert.equal(correctedText({ tokens }), "My cat, hi.");
@@ -24,7 +24,23 @@ test("deletions remain available for red strikethrough while extra spaces highli
 
 test("parseSentence keeps correct words and their apostrophes as one target", () => {
   const { tokens } = parseSentence("They're here.");
-  assert.deepEqual(tokens.map((token) => token.text), ["They're", " ", "here", "."]);
+  assert.deepEqual(tokens.map((token) => token.text), ["They're", " ", "here."]);
+});
+
+test("ordinary trailing punctuation belongs to its word without changing mistake grading or corrections", () => {
+  const sentence = parseSentence("Hello, {freind>friend#spelling}! It is {dig>big#flipped}.");
+  assert.deepEqual(sentence.tokens.map((token) => token.text),
+    ["Hello,", " ", "freind!", " ", "It", " ", "is", " ", "dig."]);
+  assert.equal(sentence.mistakes, 2);
+  assert.equal(correctedText(sentence), "Hello, friend! It is big.");
+  assert.deepEqual(correctionParts(sentence.tokens[2]),
+    { before: "fr", changed: "ie", after: "nd!", removed: "" });
+  assert.deepEqual(correctionParts(sentence.tokens[8]),
+    { before: "", changed: "b", after: "ig.", removed: "" });
+  const round = { sentences: [sentence] };
+  assert.equal(gradeRound(round, new Set(["0.2", "0.8"])).complete, true);
+  const removal = parseSentence("Hello{,>#comma} friend.");
+  assert.deepEqual(removal.tokens.map((token) => token.text), ["Hello", ",", " ", "friend."]);
 });
 
 test("word mistakes keep the whole target and highlight only the correction", () => {
@@ -153,7 +169,7 @@ test("every capitalization or flipped-character mistake keeps the full authored 
     for (const sentence of round.sentences) {
       for (const token of sentence.tokens) {
         if (token.type === "capitalization" || token.type === "flipped") {
-          assert.match(token.text, /^[A-Za-z0-9]+$/);
+          assert.match(token.text, /^[A-Za-z0-9]+[,.!?]*$/);
           assert.equal(token.text.length, token.right.length);
           assert.equal(correctionParts(token).changed.length, 1, token.text);
         }
