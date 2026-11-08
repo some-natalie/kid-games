@@ -205,9 +205,12 @@ npm run test:python
 
 A 10-level proofreading game for kids under 12 (`content/proofreading/`,
 `templates/proofreading.html`, `static/proofreading*.js`). Players tap every
-word, letter, or punctuation mark that looks wrong, then press **Check**.
-Capitalization and flipped-letter errors target only the affected letter;
-spelling and sound-alike errors target the whole word. Correct marks are fixed
+whole word if any letter looks wrong, or a punctuation mark or wide gap, then
+press **Check**. An optional interactive example demonstrates marking “my” and
+checking its capital-letter correction before starting the case.
+All word errors, including capitalization and flipped letters, target the whole
+word; punctuation has its own touch targets at least 44 pixels wide and tall.
+Extra spacing is shown as a larger blank gap, without dots. Correct marks are fixed
 in place after checking, even before the whole round is solved. Those fixes
 stay in place when changing or clearing the remaining marks.
 Level 1 is a single sentence with one mistake; level 10 is a five-sentence
@@ -225,7 +228,10 @@ An incorrect check fixes and highlights correctly identified mistakes in green,
 while remaining marks stay editable. It shows which marked spots were already
 correct (✗), how many mistakes remain, and which sentences still hide some.
 Changing a mark clears retry feedback but preserves confirmed fixes. Each
-confirmed fix is listed with a short tip. Progress autosaves under
+confirmed fix is listed with a short tip. Changed letters and inserted spaces
+are bold and underlined. Removed punctuation stays visible in red with a
+strikethrough and still counts as fixed, including after clearing other marks.
+Progress autosaves under
 `kid-games.proofreading.progress` as `{"version":1,"level":3}` and is cleared
 after level 10. Celebrations reuse `static/celebrations.json` effects with the
 game's own cheers.

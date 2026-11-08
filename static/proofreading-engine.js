@@ -36,7 +36,7 @@ export const MISTAKE_TYPES = Object.freeze({
 // Authoring format: plain text with mistakes written as {wrong>right#type}.
 // Inside `wrong`, a ^ mirrors the character after it, as in {^3>3#flipped}.
 const MISTAKE = /\{([^{}>#]*)>([^{}>#]*)#([a-z-]+)\}/g;
-const PIECE = /[^\s]|\s+/g;
+const PIECE = /[A-Za-z0-9'’]+|[^\sA-Za-z0-9'’]|\s+/g;
 const WORD_START = /^[A-Za-z0-9'’]/;
 
 function splitMirrored(text) {
@@ -77,24 +77,15 @@ export function parseSentence(source) {
     if (text === right && !parts.some((part) => part.mirrored)) {
       throw new TypeError(`The mistake "${wrong}" matches its fix.`);
     }
-    if (type === "capitalization" || type === "flipped") {
-      let start = 0;
-      let end = text.length;
-      let rightEnd = right.length;
-      const characters = parts.flatMap((part) =>
-        [...part.text].map((character) => ({ text: character, mirrored: part.mirrored })));
-      while (start < end && text[start] === right[start] && !characters[start].mirrored) start += 1;
-      while (end > start && rightEnd > start && text[end - 1] === right[rightEnd - 1] &&
-        !characters[end - 1].mirrored) {
-        end -= 1;
-        rightEnd -= 1;
+    if (type === "space-after") {
+      const punctuation = /[,.!?](?=\S)/.exec(text);
+      if (!punctuation || right !== `${text.slice(0, punctuation.index + 1)} ${text.slice(punctuation.index + 1)}`) {
+        throw new SyntaxError(`Space-after mistakes must add one space after punctuation in "${source}".`);
       }
-      addPlain(text.slice(0, start));
-      tokens.push({
-        kind: "mistake", text: text.slice(start, end),
-        parts: characters.slice(start, end), right: right.slice(start, rightEnd), type,
-      });
-      addPlain(text.slice(end));
+      addPlain(text.slice(0, punctuation.index));
+      tokens.push({ kind: "mistake", text: punctuation[0],
+        parts: [{ text: punctuation[0], mirrored: false }], right: `${punctuation[0]} `, type });
+      addPlain(text.slice(punctuation.index + 1));
     } else {
       tokens.push({ kind: "mistake", text, parts, right, type });
     }
@@ -102,6 +93,26 @@ export function parseSentence(source) {
   }
   addPlain(source.slice(last));
   return { tokens, mistakes: tokens.filter((token) => token.kind === "mistake").length };
+}
+
+export function correctionParts(token) {
+  if (!token.text.trim() && !token.right.trim()) {
+    return { before: "", changed: token.right, after: "", removed: "" };
+  }
+  const characters = token.parts.flatMap((part) =>
+    [...part.text].map((text) => ({ text, mirrored: part.mirrored })));
+  let start = 0;
+  let end = token.text.length;
+  let rightEnd = token.right.length;
+  while (start < end && start < rightEnd && token.text[start] === token.right[start] &&
+    !characters[start].mirrored) start += 1;
+  while (end > start && rightEnd > start && token.text[end - 1] === token.right[rightEnd - 1] &&
+    !characters[end - 1].mirrored) {
+    end -= 1;
+    rightEnd -= 1;
+  }
+  return { before: token.right.slice(0, start), changed: token.right.slice(start, rightEnd),
+    after: token.right.slice(rightEnd), removed: rightEnd === start ? token.text.slice(start, end) : "" };
 }
 
 export function buildRound(level) {
@@ -137,6 +148,7 @@ export function gradeRound(round, marked) {
 export function describeFix(token) {
   if (token.text.trim() === "") return "Use one space here, not two.";
   if (token.right === "") return `Take out the “${token.text}”.`;
+  if (token.type === "space-after") return `Add one space after the ${token.text === "," ? "comma" : "punctuation mark"}.`;
   if (token.parts.some((part) => part.mirrored)) return `The “${token.text}” is mirrored. It should face the other way: “${token.right}”.`;
   return `“${token.text}” should be “${token.right}”.`;
 }

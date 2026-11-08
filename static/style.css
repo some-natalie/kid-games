@@ -209,17 +209,20 @@ footer { padding-block: 1.5rem; text-align: center; }
 }
 .mistake-kinds { display: inline-block; max-width: 100%; margin: 0 0 1rem; padding-left: 1.25rem; text-align: left; color: var(--muted); }
 .proof-text { margin: 0.5rem 0 1rem; padding: 0.75rem; border: 2px solid var(--border); border-radius: 0.65rem; color: var(--text); font-size: 1.5rem; line-height: 2.6; white-space: pre-wrap; user-select: none; -webkit-user-select: none; }
-.proof-chunk { white-space: nowrap; }
-.proof-token { position: relative; min-height: 2.5rem; margin: 0 -2px; padding: 0.1rem 0.1rem; border: 2px solid transparent; border-radius: 0.5rem; background: transparent; color: inherit; font: inherit; white-space: pre; cursor: pointer; }
-.proof-token[data-kind="mark"] { padding-inline: 0; }
-.proof-token[data-kind="letter"] { padding-inline: 0; }
-.proof-token[data-kind="mark"]::before { content: ""; position: absolute; inset: 0 -0.25rem; }
-.proof-token:hover { border-color: var(--border); }
-.proof-token[aria-pressed="true"] { border-color: var(--accent); background: var(--badge); color: var(--accent); font-weight: 700; }
-.proof-token:disabled { opacity: 1; cursor: default; }
+.proof-chunk { white-space: normal; }
+.proof-token, .example-token { position: relative; min-width: 2.75rem; max-width: 100%; min-height: 2.75rem; margin: 0; padding: 0.1rem 0.15rem; border: 2px solid transparent; border-radius: 0.5rem; background: transparent; color: inherit; font: inherit; white-space: pre-wrap; overflow-wrap: anywhere; cursor: pointer; }
+.proof-token:hover, .example-token:hover { border-color: var(--border); }
+.proof-token[aria-pressed="true"], .example-token[aria-pressed="true"] { border-color: var(--accent); background: var(--badge); color: var(--accent); font-weight: 700; }
+.proof-token:disabled, .example-token:disabled { opacity: 1; cursor: default; }
 .proof-token .mirrored { display: inline-block; transform: scaleX(-1); }
-.proof-gap { min-width: 1.4rem; border-bottom: 3px dotted var(--muted); border-radius: 0.5rem 0.5rem 0 0; }
-.proof-token[data-result="found"] { border-color: #2f9c50; background: #e5f8e9; color: #1f5f31; }
+.proof-gap { min-width: 3.5rem; }
+.proof-token[data-result="found"], .example-token[data-result="found"] { border-color: #2f9c50; background: #e5f8e9; color: #1f5f31; }
+.proof-change { display: inline-block; min-width: 0.3em; text-decoration: underline; text-decoration-thickness: 0.12em; text-underline-offset: 0.15em; }
+.proof-token.proof-fixed-gap { min-width: 0; padding-inline: 0; border: 0; border-radius: 0; }
+.proof-token.proof-removed { border-color: #b91c1c; background: #fee2e2; color: #991b1b; }
+.proof-removed del { text-decoration-thickness: 0.12em; }
+.proof-deletion { background: #fee2e2; color: #991b1b; text-decoration-thickness: 0.12em; }
+.proof-example { margin-block: 1.5rem; padding: 1rem; border: 2px solid var(--border); border-radius: 0.65rem; text-align: left; }
 .proof-token[data-result="false"] { border-color: #c2410c; background: #fff0e6; color: #7c2d12; }
 .proof-token[data-result="false"]::after { content: "✗"; position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); font-size: 0.8rem; line-height: 1; }
 .sentence-note { color: #7c2d12; font-size: 1rem; font-weight: 700; }
@@ -227,7 +230,9 @@ footer { padding-block: 1.5rem; text-align: center; }
 .fixes li { margin-bottom: 0.5rem; }
 .detective { display: block; font-size: 4rem; animation: dino-sway 0.9s ease-in-out infinite alternate; }
 @media (prefers-color-scheme: dark) {
-  .proof-token[data-result="found"] { background: #1f3b28; color: #c9f2b8; border-color: #4cc26d; }
+  .proof-token[data-result="found"], .example-token[data-result="found"] { background: #1f3b28; color: #c9f2b8; border-color: #4cc26d; }
+  .proof-token.proof-removed { background: #450a0a; color: #fecaca; border-color: #f87171; }
+  .proof-deletion { background: #450a0a; color: #fecaca; }
   .proof-token[data-result="false"] { background: #4a2512; color: #ffd8bf; border-color: #fb923c; }
   .sentence-note { color: #ffd8bf; }
 }
