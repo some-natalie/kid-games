@@ -299,3 +299,52 @@ footer { padding-block: 1.5rem; text-align: center; }
   .sentence-note { color: #ffd8bf; }
 }
 @media (prefers-reduced-motion: reduce) { .detective { animation: none; } }
+
+.picnic-level-guide { text-align: left; }
+.picnic-pizza-game { max-width: 52rem; }
+.picnic-visuals { display: grid; justify-items: center; gap: 1rem; margin-block: 1rem; }
+.fraction-whole {
+  display: flex;
+  width: min(100%, 20rem);
+  aspect-ratio: 1;
+  overflow: hidden;
+  border: 2px solid var(--text);
+  background: var(--surface);
+}
+.fraction-whole.rectangle { width: min(100%, 24rem); aspect-ratio: 2.4; }
+.fraction-whole > span { min-width: 0; border-right: 2px solid var(--text); background: var(--surface); }
+.fraction-whole > span:last-child { border-right: 0; }
+.fraction-whole .served, .fraction-whole path.served { fill: var(--accent); background: var(--accent); }
+.fraction-whole.circle { overflow: visible; border: 0; border-radius: 0; }
+.fraction-whole svg { display: block; width: 100%; height: 100%; }
+.fraction-whole path { fill: var(--surface); stroke: var(--text); stroke-width: 1.5; }
+.fraction-whole circle.whole-outline { fill: none; stroke: var(--text); stroke-width: 1.5; }
+.fraction-whole.circle .served { fill: var(--accent); }
+.fraction-comparison { display: flex; flex-wrap: wrap; justify-content: center; gap: 1rem; }
+.fraction-comparison > div, .fraction-target { display: grid; justify-items: center; gap: 0.5rem; }
+.fraction-comparison .fraction-whole { width: min(38vw, 13rem); }
+.fraction-comparison .fraction-whole.rectangle { width: min(42vw, 17rem); }
+.fraction-target .fraction-whole { width: min(42vw, 15rem); }
+.fraction-controls { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 8rem), 1fr)); gap: 0.75rem; }
+.fraction-controls button { min-width: 0; min-height: 3rem; touch-action: manipulation; }
+.fraction-controls [aria-pressed="true"] { border-width: 4px; background: var(--badge); }
+.fraction-piece { font-size: 1rem; }
+.fraction-choice { display: grid; justify-items: center; gap: 0.5rem; }
+.fraction-preview .fraction-whole { width: min(20vw, 7rem); border-width: 1px; }
+.fraction-preview .fraction-whole.rectangle { width: min(30vw, 8rem); }
+.fraction-preview .fraction-whole > span { border-width: 1px; }
+.fraction-note { margin-block: 0.75rem; }
+@media (max-width: 30rem) {
+  .fraction-controls { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .fraction-whole { width: min(75vw, 17rem); }
+  .fraction-whole.rectangle { width: min(100%, 21rem); }
+  .fraction-preview .fraction-whole { width: min(20vw, 4.5rem); }
+  .fraction-preview .fraction-whole.rectangle { width: min(30vw, 5.5rem); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .picnic-pizza-game *, .picnic-pizza-game *::before, .picnic-pizza-game *::after {
+    animation: none !important;
+    scroll-behavior: auto !important;
+    transition: none !important;
+  }
+}

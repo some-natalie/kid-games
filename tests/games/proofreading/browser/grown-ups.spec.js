@@ -6,7 +6,7 @@ const license = readFileSync(new URL("../../../../LICENSE", import.meta.url), "u
 
 test("landing page links to grown-up settings without listing them as a game", async ({ page }) => {
   await page.goto("/");
-  await expect(page.locator(".game-tile")).toHaveCount(4);
+  await expect(page.locator(".game-tile")).toHaveCount(5);
   await page.getByRole("link", { name: "For grown-ups", exact: true }).click();
   await expect(page).toHaveURL(/\/for-grown-ups\/$/);
   await expect(page.getByRole("heading", { name: "For grown-ups", level: 1 })).toBeVisible();
