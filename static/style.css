@@ -185,7 +185,7 @@ button:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
 .dino-leg { transform-origin: 50% 0%; animation: dino-step 0.45s ease-in-out infinite alternate; }
 .dino-leg-right { animation-delay: -0.45s; }
 .dino-notes { animation: dino-notes 1.8s ease-in-out infinite; }
-@keyframes pop-in { from { transform: scale(0.7); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+@keyframes pop-in { from { transform: scale(0.7); } to { transform: scale(1); } }
 @keyframes dino-sway { from { transform: rotate(-6deg) translateY(0); } to { transform: rotate(6deg) translateY(-10px); } }
 @keyframes dino-nod { from { transform: rotate(-5deg); } to { transform: rotate(8deg); } }
 @keyframes dino-wave { from { transform: rotate(-25deg); } to { transform: rotate(20deg); } }
