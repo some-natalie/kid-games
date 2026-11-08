@@ -5,6 +5,7 @@ light/dark styling based on the device preference. Alphabetical Adventure is
 the site's alphabetical-order game, Proofreading Detectives is its
 proofreading game, Number Trail is its woodland math adventure for ages 6–9,
 and Acorn Adventure introduces cumulative, multistep arithmetic.
+Fraction Bridge helps children find, compare, and order fractions on a number line.
 
 ## Quiz mode
 
@@ -126,6 +127,19 @@ Add an effect with this structure:
 `colors`, or both; colors alone make confetti pieces, and colors tint text
 symbols such as `★`. If the file is missing or invalid, the game uses built-in
 confetti and sparkles.
+
+## Fraction Bridge
+
+Fraction Bridge is an untimed eight-level number-line game for ages 6–9. It starts
+with guided halves and quarters, introduces thirds, sixths, and eighths, and then
+practices equivalent positions, ordering, and comparison. Fraction placement and
+comparison use exact rational arithmetic; each puzzle keeps one fixed unit length
+and only offers mathematically valid tick positions. The denominator counts equal
+intervals, while the number line includes both endpoint tick marks. Players can
+choose positions with keyboard- and touch-accessible buttons, use hints to restore
+partition guides, and retry without losing points. Normal progress is saved in
+this browser under `kid-games.fraction-bridge.progress`; quiz answers remain in
+memory and do not load or change that progress.
 
 ## Themes and browser preferences
 

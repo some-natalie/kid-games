@@ -4,6 +4,7 @@ import { buildRound as proofRound, tokenKey, pickVariant, describeFix } from "./
 import { LEVELS as PROOF_LEVELS } from "./proofreading-levels.js";
 import { LEVELS as NUMBER_LEVELS, buildRound as numberRound, equationText } from "./number-trail-engine.js";
 import { LEVELS as ACORN_LEVELS, buildJourney } from "./acorn-adventure-engine.js";
+import { buildQuizQuestions as fractionQuestions, fractionName } from "./fraction-bridge-engine.js";
 
 const active = isQuizMode(window.location.search);
 if (active) {
@@ -61,6 +62,7 @@ function makeQuestions(kind, bank, theme) {
       correction: `Correct equation: ${equationText(problem, true)}.`,
     })));
   }
+  if (kind === "fraction") return fractionQuestions();
   return ACORN_LEVELS.flatMap((level, index) => {
     const journey = buildJourney(index);
     const expression = `${journey.start} ${journey.steps.map((step) =>
@@ -75,8 +77,9 @@ function makeQuestions(kind, bank, theme) {
 
 function setupQuiz(game) {
   const name = game.getAttribute("aria-label");
-  const kind = game.classList.contains("acorn-game") ? "acorn" : game.classList.contains("number-trail")
-    ? "number" : game.classList.contains("proofreading-game") ? "proof" : "alphabet";
+  const kind = game.classList.contains("fraction-bridge") ? "fraction"
+    : game.classList.contains("acorn-game") ? "acorn" : game.classList.contains("number-trail")
+      ? "number" : game.classList.contains("proofreading-game") ? "proof" : "alphabet";
   game.replaceChildren();
   const notice = element("p", QUIZ_NOTICE, "quiz-notice");
   const area = element("div");
@@ -117,7 +120,8 @@ function setupQuiz(game) {
     }
     area.append(button("Start quiz", () => {
       questions = makeQuestions(kind, bank, theme);
-      responses = questions.map((question) => question.kind === "alphabet" ? [...question.initial] : question.kind === "proof" ? [] : undefined);
+      responses = questions.map((question) => question.kind === "alphabet" ? [...question.initial]
+        : question.kind === "proof" ? [] : question.kind === "fraction-order" ? [...question.initial] : undefined);
       current = 0;
       showQuestion();
     }, true));
@@ -147,6 +151,7 @@ function setupQuiz(game) {
       });
       area.append(choices);
     }
+    if (kind === "fraction") renderFraction(question);
     if (kind === "acorn") {
       area.append(element("p", "Use your previous answer as the running total. If you revise an earlier answer, review the later stops too; they do not change automatically. Each stop is scored against the original journey."));
       const before = question.position === 0 ? question.start : responses[current - 1];
@@ -236,6 +241,59 @@ function setupQuiz(game) {
     area.append(text, button("Clear marks", () => { responses[current] = []; showQuestion(); }));
   }
 
+  function renderFraction(question) {
+    if (question.kind === "fraction-order") {
+      renderFractionOrder(question);
+      return;
+    }
+    const choices = element("div", undefined, "answer-stones fraction-position-grid");
+    choices.setAttribute("role", "group");
+    choices.setAttribute("aria-labelledby", "quiz-question-heading");
+    question.choices.forEach((option, index) => {
+      const objectChoice = typeof option === "object";
+      const value = objectChoice ? option.value : index;
+      const label = objectChoice ? option.label : `${option} (${fractionName(option)})`;
+      const choice = button(label, () => {
+        responses[current] = value;
+        for (const item of choices.children) item.setAttribute("aria-pressed", String(item === choice));
+        status.textContent = "Answer selected. You can change it before submitting.";
+      });
+      choice.classList.add("fraction-position");
+      choice.setAttribute("aria-label", objectChoice ? `Position ${label} on the number line` : label);
+      choice.setAttribute("aria-pressed", String(responses[current] === value));
+      choices.append(choice);
+    });
+    area.append(choices);
+  }
+
+  function renderFractionOrder(question, focusPosition, direction) {
+    area.querySelector(".fraction-order-list")?.remove();
+    const list = element("ol", undefined, "fraction-order-list quiz-fraction-order");
+    list.setAttribute("aria-label", "Your fraction order");
+    responses[current].forEach((fraction, position) => {
+      const item = element("li");
+      item.append(element("span", `${fraction} (${fractionName(fraction)})`));
+      for (const [label, delta] of [["Up", -1], ["Down", 1]]) {
+        const move = button(label, () => {
+          const order = responses[current];
+          [order[position], order[position + delta]] = [order[position + delta], order[position]];
+          renderFractionOrder(question, position + delta, label);
+        });
+        move.setAttribute("aria-label", `Move ${fraction} ${label.toLowerCase()}`);
+        move.disabled = position + delta < 0 || position + delta >= responses[current].length;
+        item.append(move);
+      }
+      list.append(item);
+    });
+    const navigation = area.querySelector(".quiz-navigation");
+    area.insertBefore(list, navigation);
+    if (focusPosition !== undefined) {
+      const item = list.children[focusPosition];
+      const target = item.querySelector(`button[aria-label$="${direction.toLowerCase()}"]`);
+      (target.disabled ? item.querySelector("button:not(:disabled)") : target).focus();
+    }
+  }
+
   function showReview() {
     if (kind === "acorn" && responses.some((response) => response !== undefined && response !== "" &&
         (!Number.isInteger(Number(response)) || Number(response) < 0))) {
@@ -251,7 +309,11 @@ function setupQuiz(game) {
       const item = element("li");
       const answer = responses[index];
       const description = kind === "proof" ? `${answer.length} items marked`
-        : Array.isArray(answer) ? answer.join(", ") : answer === undefined || answer === "" ? "No answer" : String(answer);
+        : question.kind === "fraction-placement" && answer !== undefined
+          ? question.choices.find((choice) => choice.value === answer)?.label
+          : ["fraction-equivalent", "fraction-compare"].includes(question.kind) && answer !== undefined
+            ? question.choices[answer]
+            : Array.isArray(answer) ? answer.join(", ") : answer === undefined || answer === "" ? "No answer" : String(answer);
       item.append(element("p", `${question.title}: ${description}`),
         button(`Edit question ${index + 1}`, () => { current = index; showQuestion(); }));
       list.append(item);
@@ -276,7 +338,11 @@ function setupQuiz(game) {
       item.append(element("strong", `${question.title}: ${correct ? "Correct" : "Incorrect"}`));
       item.append(element("p", question.prompt));
       if (!correct) {
-        const answer = Array.isArray(response)
+        const answer = question.kind === "fraction-placement" && response !== undefined
+          ? question.choices.find((choice) => choice.value === response)?.label
+          : ["fraction-equivalent", "fraction-compare"].includes(question.kind) && response !== undefined
+            ? question.choices[response]
+            : Array.isArray(response)
           ? question.kind === "proof" ? question.tokens.filter((token) => response.includes(token.key)).map((token) => token.text.trim() || "wide gap").join(", ") || "No marks"
             : response.join(", ")
           : response === undefined || response === "" ? "No answer" : String(response);
