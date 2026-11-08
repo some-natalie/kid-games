@@ -55,8 +55,12 @@ The game is a 10-level quest that ramps from 4 words to 12:
 | 10 | 12 | Dinosaur challenge, with at least one pair sharing two letters |
 
 Arrange the list by dragging words up or down with a mouse, pen,
-or finger, then press **Check order**. Dragging near the screen edge scrolls
-the page; dropping outside the list or pressing Escape cancels a move.
+or finger, or tap the large **Up/Down** buttons beside a word for a precise
+one-position move. Then press **Check order**. Dragging snaps the center of the
+word to the nearest row, keeping the original grip offset; the thick line shows
+the insertion position. Dragging near the screen edge scrolls the page.
+Drops within 48 pixels of the list edges still land; dropping farther outside
+the list or pressing Escape cancels a move.
 Keyboard users can focus a word and use Up/Down, Home, or End to move it.
 **Undo move** reverses the last change. Incorrect checks leave the list editable,
 so players can fix their order without starting over.

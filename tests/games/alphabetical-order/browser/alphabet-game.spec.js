@@ -297,9 +297,71 @@ test("mouse dragging reorders, clicking does not, and undo and cancellation pres
   await expect(page.locator(".drag-ghost")).toHaveCount(0);
   await page.mouse.move(first.x + 30, first.y + 20);
   await page.mouse.down();
-  await page.mouse.move(2, first.y + 90, { steps: 4 });
+  const listBox = await page.locator("#answer-list").boundingBox();
+  await page.mouse.move(listBox.x + listBox.width + 100, first.y + 90, { steps: 4 });
   await page.mouse.up();
   expect(await words(page)).toEqual(initial);
+});
+
+test("move buttons give precise one-step changes, retain focus, and save the order", async ({ page }, testInfo) => {
+  await startGame(page);
+  const initial = await words(page);
+  const up = page.locator(".move-word[data-direction='up']");
+  const down = page.locator(".move-word[data-direction='down']");
+  await expect(up.first()).toBeDisabled();
+  await expect(down.last()).toBeDisabled();
+  const tap = async (locator) => testInfo.project.name === "touch-chromium" ? locator.tap() : locator.click();
+  const sizes = await page.locator(".move-word").evaluateAll((items) =>
+    items.map((item) => ({ width: item.getBoundingClientRect().width, height: item.getBoundingClientRect().height })));
+  expect(sizes.every(({ width, height }) => width >= 44 && height >= 44)).toBe(true);
+  await tap(down.first());
+  expect(await words(page)).toEqual([initial[1], initial[0], ...initial.slice(2)]);
+  await expect(down.nth(1)).toBeFocused();
+  await expect(page.locator("#progress")).toContainText(`${initial[0]} moved to position 2`);
+  await tap(up.nth(1));
+  expect(await words(page)).toEqual(initial);
+  await expect(buttons(page).first()).toBeFocused();
+  await tap(up.last());
+  const changed = [initial[0], initial[1], initial[3], initial[2]];
+  expect(await words(page)).toEqual(changed);
+  await page.locator("#undo-word").click();
+  expect(await words(page)).toEqual(initial);
+  await tap(up.last());
+  expect(await words(page)).toEqual(changed);
+  await page.reload();
+  await page.locator("#start-game").click();
+  expect(await words(page)).toEqual(changed);
+  await expect(page.locator("#undo-word")).toBeDisabled();
+  await solve(page);
+  await expect(page.locator(".move-word:enabled")).toHaveCount(0);
+});
+
+test("dragging by a word edge snaps to the adjacent row and tolerates a near-edge drop", async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name === "touch-chromium", "Real touch is covered separately.");
+  await startGame(page);
+  const initial = await words(page);
+  await page.locator("#answer-list").evaluate((list) => list.scrollIntoView({ block: "center" }));
+  const source = await buttons(page).first().boundingBox();
+  const target = await buttons(page).nth(1).boundingBox();
+  const x = source.x + 30;
+  const y = source.y + source.height - 4;
+  await page.mouse.move(x, y);
+  await page.mouse.down();
+  await page.mouse.move(x, y + target.y - source.y, { steps: 8 });
+  await expect(page.locator("#answer-list li").nth(2)).toHaveClass("drop-before");
+  await page.mouse.up();
+  expect(await words(page)).toEqual([initial[1], initial[0], ...initial.slice(2)]);
+  await page.locator("#undo-word").click();
+  await page.locator("#answer-list").evaluate((list) => list.scrollIntoView({ block: "center" }));
+  const last = await buttons(page).last().boundingBox();
+  const previous = await buttons(page).nth(2).boundingBox();
+  const listBox = await page.locator("#answer-list").boundingBox();
+  await page.mouse.move(last.x + 30, last.y + 4);
+  await page.mouse.down();
+  await page.mouse.move(listBox.x + listBox.width + 24, previous.y + 4, { steps: 8 });
+  await expect(page.locator("#answer-list li").nth(2)).toHaveClass("drop-before");
+  await page.mouse.up();
+  expect(await words(page)).toEqual([initial[0], initial[1], initial[3], initial[2]]);
 });
 
 test("incorrect checks stay editable and retries retain the same words", async ({ page }) => {
@@ -451,6 +513,14 @@ test("real touch dragging reorders and auto-scrolls without scrolling during an 
   });
   const x = source.x + source.width / 2;
   const before = await page.evaluate(() => scrollY);
+  const adjacent = await buttons(page).nth(1).boundingBox();
+  await touch("touchStart", x, source.y + source.height - 4);
+  await touch("touchMove", x, adjacent.y + adjacent.height - 4);
+  await expect(page.locator("#answer-list li").nth(2)).toHaveClass("drop-before");
+  await touch("touchEnd");
+  expect(await words(page)).toEqual([initial[1], initial[0], ...initial.slice(2)]);
+  await page.locator("#undo-word").click();
+  await page.locator("#answer-list").evaluate((list) => list.scrollIntoView({ block: "start" }));
   await touch("touchStart", x, source.y + source.height / 2);
   // A child may rest a finger on the word before beginning to move it.
   await page.waitForTimeout(800);
