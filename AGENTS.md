@@ -45,12 +45,39 @@ the "Keep dragging" feedback message) can break them. Update tests together with
 - Build links with `get_url`, `page.permalink` or `config.base_url`; Pages overrides `base_url`, so never hard-code the host.
 - Every game under `content/` must have browser tests in `tests/games/<game>/browser/` or CI fails.
 
+## Feature requirements
+
+- Every feature must add or update automated tests for its behavior, edge cases,
+  and regressions. Cover testable logic with unit tests and user-visible behavior
+  with browser tests. Run `npm test` before finishing any change and
+  `npm run test:e2e` for UI, copy, or interaction changes.
+- Validate accessibility in all affected states, including quiz mode: keyboard
+  operation, visible focus and sensible focus movement, screen-reader labels and
+  announcements, touch targets, non-color feedback, light/dark contrast, reduced
+  motion, and enlarged-text reflow with OpenDyslexic. Add or update axe and
+  interaction/reflow coverage as appropriate; automated scans alone are not a
+  complete accessibility review.
+- Every new game must support `?quiz=1`, and every gameplay feature must work in
+  both normal and quiz mode. Integrate with `static/site-quiz.js`,
+  `static/quiz-mode.js`, and `static/quiz-engine.js` rather than introducing a
+  separate flag or scoring flow. Preserve the URL flag through internal links.
+- Quiz mode must omit worked examples, hints, and correctness feedback until
+  final submission, including indirect leaks such as correct running totals.
+  Allow unlimited answer changes and previous-question/review navigation before
+  submission; use **Next question**, not **Check**. Final results must include a
+  percent correct and expandable answer details explaining incorrect responses.
+  Do not load, overwrite, or clear normal saved progress in quiz mode.
+- Test both modes, including withheld feedback, retained revisions, exact final
+  scores and corrections, URL propagation, and unchanged normal saved progress.
+  Document any new scoring rules or intentional mode-specific behavior.
+
 ## Adding a game
 
 1. Create `content/<game>/index.md` and a template in `templates/`.
 2. Add scripts/assets in `static/`.
 3. Add unit tests and `tests/games/<game>/browser/*.spec.js`.
 4. Document it in `README.md`.
+5. Meet the test, accessibility, and quiz-mode requirements above.
 
 ## GitHub Actions rules
 
