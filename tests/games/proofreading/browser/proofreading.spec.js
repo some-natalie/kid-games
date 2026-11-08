@@ -337,6 +337,8 @@ test("final level is a five-sentence paragraph and finishing it ends the case", 
   await markMistakes(page, 9);
   await page.locator("#check-marks").click();
   await expect(page.locator("#feedback")).toContainText("You found all 7 mistakes!");
+  await expect(page.locator("#finish-case")).toBeFocused();
+  await page.locator("#finish-case").click();
   await expect(page.locator("#quest-complete")).toBeVisible({ timeout: 10000 });
   expect(await page.evaluate((key) => localStorage.getItem(key), progressKey)).toBeNull();
   await page.locator("#play-again").click();
