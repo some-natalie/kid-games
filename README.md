@@ -4,7 +4,8 @@ A small Zola site for kid-games.dev, with responsive game tiles and automatic
 light/dark styling based on the device preference. Alphabetical Adventure is
 the site's alphabetical-order game, Proofreading Detectives is its
 proofreading game, Number Trail is its woodland math adventure for ages 6–9,
-and Acorn Adventure introduces cumulative, multistep arithmetic.
+Acorn Adventure introduces cumulative, multistep arithmetic, and Picnic Pizza
+introduces equal shares and visual fractions for ages 6–9.
 
 ## Quiz mode
 
@@ -20,7 +21,8 @@ The “Show your parent!” screen then gives a rounded percent correct and
 expandable **Answer details**, including incorrect responses and corrections.
 
 Each completely correct question earns one point: an entire word order or
-proofreading passage, one Number Trail puzzle, or one Acorn Adventure stop.
+proofreading passage, one Number Trail puzzle, one Acorn Adventure stop, or one
+Picnic Pizza fraction question.
 Unanswered questions count as incorrect. Proofreading requires marking every
 mistake without marking correct text. Acorn Adventure uses a numeric input
 instead of answer choices and carries the player's entered totals, so later
@@ -374,6 +376,26 @@ level-progress helper saves the unlocked level separately under
 Returning begins that level with a new journey; individual stops are not saved.
 Starting a new adventure or finishing clears that save without touching other
 games. Storage failures display a warning and do not block play.
+
+## Picnic Pizza
+
+Prepare a fair picnic by sharing pizzas and rectangular foods into equal-area
+pieces. The worked example introduces one half (1/2), the numerator (selected
+pieces), and the denominator (all equal pieces). Seven untimed levels progress
+from equal and unequal shares, naming and building halves and quarters (ages
+6–7), to thirds, sixths, and eighths, comparing same-size wholes, matching
+equivalent coverage, and completing a whole by looking for its missing pieces
+(ages 8–9). Unequal-area cuts are explicitly identified as not being equal
+shares. Formal fraction arithmetic and number-line placement are not included.
+
+Tap piece controls or use the keyboard; hints and unlimited retries never cost
+points. Circles and rectangles show the quantity, with synchronized fraction
+words and notation. `static/picnic-pizza-engine.js` contains the fraction and
+puzzle logic; `static/picnic-pizza.js` handles the DOM. The unlocked level is
+saved locally under `kid-games.picnic-pizza.progress` as
+`{"version":1,"level":3}` using the shared level-progress helper. Quiz mode
+offers seven questions, keeps answers in memory, and scores each question only
+after submission; it never reads or changes saved game progress.
 
 ## Accessibility
 

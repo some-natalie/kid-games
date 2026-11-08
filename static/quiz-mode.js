@@ -4,6 +4,7 @@ import { buildRound as proofRound, tokenKey, pickVariant, describeFix } from "./
 import { LEVELS as PROOF_LEVELS } from "./proofreading-levels.js";
 import { LEVELS as NUMBER_LEVELS, buildRound as numberRound, equationText } from "./number-trail-engine.js";
 import { LEVELS as ACORN_LEVELS, buildJourney } from "./acorn-adventure-engine.js";
+import { quizQuestions as pizzaQuestions } from "./picnic-pizza-engine.js";
 
 const active = isQuizMode(window.location.search);
 if (active) {
@@ -61,6 +62,7 @@ function makeQuestions(kind, bank, theme) {
       correction: `Correct equation: ${equationText(problem, true)}.`,
     })));
   }
+  if (kind === "pizza") return pizzaQuestions();
   return ACORN_LEVELS.flatMap((level, index) => {
     const journey = buildJourney(index);
     const expression = `${journey.start} ${journey.steps.map((step) =>
@@ -76,7 +78,8 @@ function makeQuestions(kind, bank, theme) {
 function setupQuiz(game) {
   const name = game.getAttribute("aria-label");
   const kind = game.classList.contains("acorn-game") ? "acorn" : game.classList.contains("number-trail")
-    ? "number" : game.classList.contains("proofreading-game") ? "proof" : "alphabet";
+    ? "number" : game.classList.contains("proofreading-game") ? "proof"
+      : game.classList.contains("picnic-pizza-game") ? "pizza" : "alphabet";
   game.replaceChildren();
   const notice = element("p", QUIZ_NOTICE, "quiz-notice");
   const area = element("div");
@@ -143,6 +146,37 @@ function setupQuiz(game) {
           status.textContent = "Answer selected. You can change it before submitting.";
         });
         choice.setAttribute("aria-pressed", String(responses[current] === value));
+        choices.append(choice);
+      });
+      area.append(choices);
+    }
+    if (kind === "pizza") {
+      area.append(element("p", question.visualDescription));
+      const choices = element("div", undefined, "answer-stones");
+      choices.setAttribute("role", "group");
+      choices.setAttribute("aria-labelledby", heading.id);
+      question.choices.forEach((value) => {
+        const choice = button(value, () => {
+          if (question.multiple) {
+            const selected = responses[current] ?? [];
+            const position = selected.indexOf(value);
+            if (position === -1) selected.push(value);
+            else selected.splice(position, 1);
+            responses[current] = selected;
+          } else {
+            responses[current] = value;
+          }
+          for (const item of choices.children) {
+            const pressed = question.multiple
+              ? responses[current].includes(item.value) : item.value === responses[current];
+            item.setAttribute("aria-pressed", String(pressed));
+          }
+          status.textContent = "Answer selected. You can change it before submitting.";
+        });
+        choice.value = value;
+        const selected = responses[current];
+        choice.setAttribute("aria-pressed", String(question.multiple
+          ? Array.isArray(selected) && selected.includes(value) : selected === value));
         choices.append(choice);
       });
       area.append(choices);

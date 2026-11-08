@@ -10,10 +10,13 @@ export function gradeQuiz(questions, responses) {
     const response = responses[index];
     const correct = Array.isArray(question.expected)
       ? Array.isArray(response) && response.length === question.expected.length &&
-        (question.kind === "proof"
-          ? question.expected.every((key) => response.includes(key))
+        new Set(response).size === response.length &&
+        (question.kind === "proof" || question.kind === "pizza"
+          ? question.expected.every((item) => response.includes(item))
           : question.expected.every((word, position) => response[position] === word))
-      : response !== undefined && response !== "" && Number(response) === question.expected;
+      : typeof question.expected === "string"
+        ? response === question.expected
+        : response !== undefined && response !== "" && Number(response) === question.expected;
     return { question, response, correct };
   });
   const correct = results.filter((result) => result.correct).length;
