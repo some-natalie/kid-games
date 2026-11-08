@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block title %}{{ page.title }} · {{ config.title }}{% endblock title %}
+{% block description %}{{ page.description }}{% endblock description %}
+
+{% block content %}
+<section class="intro">
+  <a class="back-link" href="{{ get_url(path='/') }}">← All games</a>
+  <span class="game-icon" aria-hidden="true">{{ page.extra.icon }}</span>
+  <h1>{{ page.title }}</h1>
+  <p>{{ page.description }}</p>
+</section>
+
+<section class="alphabet-game ribbon-workshop" aria-label="{{ page.title }}">
+  <div class="theme-picker">
+    <a class="back-link play-only" href="{{ get_url(path='/') }}">← All games</a>
+    <p id="preference-status" role="status">Your level is saved only in this browser.</p>
+  </div>
+  <div id="tutorial" class="tutorial">
+    <p class="eyebrow">Fold it. Color it. Compare it.</p>
+    <h2>Make fractions with ribbons</h2>
+    <p>Every ribbon is one whole. Fold marks split it into equal lengths, and you can select the parts with a tap, click, or keyboard.</p>
+    <div class="ribbon-example">
+      <h3>Worked example: show one half</h3>
+      <div class="ribbon-example-parts" role="img" aria-label="A ribbon divided into four equal parts, with two parts selected">
+        <span class="ribbon-part ribbon-selected">1</span><span class="ribbon-part ribbon-selected">2</span>
+        <span class="ribbon-part">3</span><span class="ribbon-part">4</span>
+      </div>
+      <p>Fold the whole into four equal parts. Select two: <strong>2/4</strong>. Those two quarters have the same length as <strong>1/2</strong> of the whole.</p>
+    </div>
+    <h3>Level path for ages 6–9</h3>
+    <ol class="ribbon-progression">
+      <li><strong>Ages 6–7, levels 1–3:</strong> fold halves and quarters; select 1/2, 1/4, and 3/4.</li>
+      <li><strong>Ages 7–8, levels 4–5:</strong> select 2/3, then align halves and quarters to see 1/2 = 2/4.</li>
+      <li><strong>Ages 8–9, levels 6–7:</strong> explore eighths and sixths: 1/2 = 4/8 and 1/3 = 2/6.</li>
+      <li><strong>Ages 8–9, levels 8–9:</strong> compare 3/4 with 2/3, then complete a whole from 5/8.</li>
+    </ol>
+    <p>There is no timer and no score to lose. Ask for a hint and try as many folds and selections as you need.</p>
+    <div class="game-actions centered">
+      <button id="start-game" class="primary-button" type="button">Start making ribbons</button>
+      <button id="new-quest" class="secondary-button" type="button" hidden>Start from the first fold</button>
+    </div>
+  </div>
+
+  <div id="play-area" hidden>
+    <ol id="level-map" class="level-map" aria-label="Ribbon Workshop levels"></ol>
+    <p id="level-count" class="eyebrow"></p>
+    <h2 id="level-title" tabindex="-1"></h2>
+    <p id="level-instructions"></p>
+    <p id="fraction-target" class="ribbon-target"></p>
+    <div id="ribbon-boards" class="ribbon-boards" role="group" aria-label="Interactive ribbons"></div>
+    <div id="overlay-panel" class="ribbon-overlay" hidden>
+      <button id="overlay-toggle" class="secondary-button" type="button" aria-pressed="false">Show aligned overlay</button>
+      <svg id="overlay-visual" viewBox="0 0 100 44" role="img" aria-hidden="true" hidden></svg>
+      <p id="overlay-description" hidden></p>
+    </div>
+    <p id="ribbon-progress" class="progress" role="status"></p>
+    <p id="feedback" class="feedback" role="status"></p>
+    <p id="ribbon-hint" role="status" hidden></p>
+    <div class="game-actions">
+      <button id="show-hint" class="secondary-button" type="button">Show hint</button>
+      <button id="check-ribbons" class="primary-button" type="button">Check the ribbons</button>
+      <button id="next-level" class="primary-button" type="button" hidden>Next level</button>
+    </div>
+  </div>
+
+  <div id="quest-complete" class="quest-complete" hidden>
+    <p class="trail-home" aria-hidden="true">🎀 ✂️ ⭐</p>
+    <p class="eyebrow">Every ribbon is a whole!</p>
+    <h2 id="quest-heading" tabindex="-1">Ribbon Workshop complete</h2>
+    <p>You folded, selected, matched, compared, and completed fraction lengths from halves to eighths.</p>
+    <button id="play-again" class="primary-button" type="button">Play again</button>
+  </div>
+</section>
+<script src="{{ get_url(path='ribbon-workshop.js', cachebust=true) }}" type="module"></script>
+{% endblock content %}
