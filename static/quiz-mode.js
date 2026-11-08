@@ -7,6 +7,8 @@ import { LEVELS as ACORN_LEVELS, buildJourney } from "./acorn-adventure-engine.j
 import { LEVELS as RIBBON_LEVELS, makeQuizQuestion as ribbonQuizQuestion } from "./ribbon-workshop-engine.js";
 import { buildQuizQuestions as fractionQuestions, fractionName } from "./fraction-bridge-engine.js";
 import { quizQuestions as pizzaQuestions } from "./picnic-pizza-engine.js";
+import { createWorkspace, finalWords, groupQuizQuestions } from "./alphabet-groups-engine.js";
+import { mountWorkspace } from "./alphabet-groups-workspace.js";
 
 const active = isQuizMode(window.location.search);
 if (active) {
@@ -35,8 +37,9 @@ function element(tag, text, className) {
   return node;
 }
 
-function makeQuestions(kind, bank, theme) {
+function makeQuestions(kind, bank, theme, grouped = false) {
   if (kind === "alphabet") {
+    if (grouped) return groupQuizQuestions(bank);
     return QUEST_LEVELS.map((level, index) => {
       const words = theme === "general" ? selectLevelWords(bank, level) : selectThemeWords(bank, theme, level.count);
       const expected = [...words].sort((a, b) => a.localeCompare(b, "en", { sensitivity: "base" }));
@@ -99,6 +102,8 @@ function setupQuiz(game) {
   let current = 0;
   let bank;
   let theme = "general";
+  let grouped = new URLSearchParams(location.search).get("sort") === "groups";
+  let groupWorkspaces = [];
 
   const button = (text, action, primary = false) => {
     const node = element("button", text, primary ? "primary-button" : "secondary-button");
@@ -112,21 +117,51 @@ function setupQuiz(game) {
     area.replaceChildren(element("h2", `${name} quiz`),
       element("p", "There are no hints or answer checks during the quiz. Use Next question to continue and Previous question to revise. Review your answers before submitting. Quiz answers are not saved when you leave this page."));
     if (kind === "alphabet") {
-      const label = element("label", "Pick your theme ");
-      const select = element("select");
-      for (const option of [{ id: "general", label: "ABC adventure (all topics)" }, ...playableThemes(bank)]) {
-        const node = element("option", option.label);
-        node.value = option.id;
-        select.append(node);
+      const modeLabel = element("label", "Sorting mode ");
+      const mode = element("select");
+      mode.setAttribute("aria-label", "Sorting mode");
+      for (const [value, text] of [["classic", "Classic ABC quest"], ["groups", "Sort in smaller lists"]]) {
+        const option = element("option", text);
+        option.value = value;
+        mode.append(option);
       }
-      select.value = theme;
-      select.addEventListener("change", () => { theme = select.value; });
-      label.append(select);
-      area.append(label);
+      mode.value = grouped ? "groups" : "classic";
+      mode.addEventListener("change", () => {
+        grouped = mode.value === "groups";
+        const url = new URL(location.href);
+        if (grouped) url.searchParams.set("sort", "groups");
+        else url.searchParams.delete("sort");
+        history.replaceState(null, "", url);
+        showStart();
+        area.querySelector("select").focus();
+      });
+      modeLabel.append(mode);
+      area.append(modeLabel);
+      if (!grouped) {
+        const label = element("label", "Pick your theme ");
+        const select = element("select");
+        select.setAttribute("aria-label", "Pick your theme");
+        for (const option of [{ id: "general", label: "ABC adventure (all topics)" }, ...playableThemes(bank)]) {
+          const node = element("option", option.label);
+          node.value = option.id;
+          select.append(node);
+        }
+        select.value = theme;
+        select.addEventListener("change", () => { theme = select.value; });
+        label.append(select);
+        area.append(label);
+      }
     }
     area.append(button("Start quiz", () => {
-      questions = makeQuestions(kind, bank, theme);
-      responses = questions.map((question) => question.kind === "alphabet" ? [...question.initial]
+      try {
+        questions = makeQuestions(kind, bank, theme, grouped);
+      } catch (error) {
+        console.error("Unable to prepare quiz questions:", error);
+        status.textContent = "We couldn't prepare the quiz. Reload the page to try again.";
+        return;
+      }
+      groupWorkspaces = questions.map((question) => question.grouped ? createWorkspace(question.initial) : undefined);
+      responses = questions.map((question) => question.grouped ? [] : question.kind === "alphabet" ? [...question.initial]
         : question.kind === "proof" || question.multiple ? []
           : question.kind === "fraction-order" ? [...question.initial] : undefined);
       current = 0;
@@ -141,7 +176,16 @@ function setupQuiz(game) {
     heading.id = "quiz-question-heading";
     heading.tabIndex = -1;
     area.replaceChildren(element("p", `Question ${current + 1} of ${questions.length}`, "eyebrow"), heading, element("p", question.prompt));
-    if (kind === "alphabet") renderWords();
+    if (kind === "alphabet") {
+      if (question.grouped) {
+        const workspace = element("div");
+        area.append(workspace);
+        mountWorkspace(workspace, groupWorkspaces[current], (state) => {
+          groupWorkspaces[current] = state;
+          responses[current] = finalWords(state);
+        }, { quiz: true });
+      } else renderWords();
+    }
     if (kind === "proof") renderProof(question);
     if (kind === "number") {
       const choices = element("div", undefined, "answer-stones");
@@ -367,7 +411,8 @@ function setupQuiz(game) {
             ? question.choices.find((choice) => choice.value === answer)?.label
             : ["fraction-equivalent", "fraction-compare"].includes(question.kind) && answer !== undefined
               ? question.choices[answer]
-              : Array.isArray(answer) ? answer.join(", ") : answer === undefined || answer === "" ? "No answer" : String(answer);
+              : question.grouped && answer.length === 0 ? "No words in the final ABC list"
+                : Array.isArray(answer) ? answer.join(", ") : answer === undefined || answer === "" ? "No answer" : String(answer);
       item.append(element("p", `${question.title}: ${description}`),
         button(`Edit question ${index + 1}`, () => { current = index; showQuestion(); }));
       list.append(item);
@@ -398,6 +443,7 @@ function setupQuiz(game) {
             ? question.choices.find((choice) => choice.value === response)?.label
             : ["fraction-equivalent", "fraction-compare"].includes(question.kind) && response !== undefined
               ? question.choices[response]
+              : question.grouped && response.length === 0 ? "No words in the final ABC list"
               : Array.isArray(response)
           ? question.kind === "proof" ? question.tokens.filter((token) => response.includes(token.key)).map((token) => token.text.trim() || "wide gap").join(", ") || "No marks"
             : response.join(", ")

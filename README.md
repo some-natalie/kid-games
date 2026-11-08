@@ -89,6 +89,39 @@ The game is a 10-level quest that ramps from 4 words to 12:
 | 9 | 12 | Two third-letter pairs and four second-letter pairs |
 | 10 | 12 | Dinosaur challenge, with at least one pair sharing two letters |
 
+### Sort in smaller lists
+
+Choose **Sort in smaller lists** on the Alphabetical Adventure page for a
+separate seven-level quest (`?sort=groups`). Create and name your own working
+lists, move words into first-letter groups, and refine matching groups by
+their second, third, fourth, fifth, sixth, or seventh letters. Nothing is
+grouped or ordered automatically. Only compare a later letter once earlier
+letters match; a shorter word comes first when it ends at the shared prefix.
+
+Each working list has a chosen comparison position, highlighted with an
+underline in normal play. Use Up/Down buttons or arrow keys, Home, and End to
+arrange its words. Send each smaller list to the end of the **Final ABC list**
+in your chosen order, then **Check order**. You can move words back into
+working lists, remove empty lists, undo changes, and retry without a timer.
+The curated rounds deliberately include comparisons at each level's target
+depth, including words that end at a shared prefix.
+
+Lists and their current order are saved under the separate `@letter-groups`
+entry in `kid-games.alphabetical-order.progress`; classic quest and theme saves
+are unchanged. Reloading resumes the same workspace. The new quest has six
+words initially and grows to twelve; themes remain available in the classic
+quest rather than diluting the deeper-letter progression.
+
+With `?sort=groups&quiz=1`, all seven rounds use the same list-building tools
+without worked examples, highlighted comparison letters, hints, or correctness
+feedback. You can revise and revisit each workspace before submitting. Each
+question earns one point only when its final list contains every word in the
+correct order; intermediate group names and arrangements are not scored.
+Final answer details explain the correct order. Quiz mode never accesses normal
+saved progress.
+
+### Classic quest controls
+
 Arrange the list by dragging words up or down with a mouse, pen,
 or finger, or tap the large **Up/Down** buttons beside a word for a precise
 one-position move. Then press **Check order**. Dragging snaps the center of the

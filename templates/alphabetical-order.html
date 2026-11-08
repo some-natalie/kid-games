@@ -19,6 +19,11 @@
   <p>{{ page.description }}</p>
 </section>
 
+<nav class="alphabet-modes" aria-label="Alphabet sorting modes">
+  <a href="{{ get_url(path='alphabetical-order/') }}">Classic ABC quest</a>
+  <a href="{{ get_url(path='alphabetical-order/') }}?sort=groups">Sort in smaller lists</a>
+</nav>
+
 <section class="alphabet-game" aria-label="{{ page.title }}">
   <div class="theme-picker">
     <a class="back-link play-only" href="{{ config.base_url }}/">← All games</a>
@@ -126,4 +131,5 @@
   </div>
 </section>
 <script src="{{ get_url(path='alphabetical-order.js') }}" type="module"></script>
+<script src="{{ get_url(path='alphabet-groups.js', cachebust=true) }}" type="module"></script>
 {% endblock content %}
