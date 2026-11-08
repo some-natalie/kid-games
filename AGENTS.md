@@ -7,13 +7,14 @@ Guidance for AI coding agents (and humans) working in this repository.
 kid-games.dev is a static [Zola](https://www.getzola.org/) site (pinned to 0.23.6) of
 small browser games for kids, with responsive tiles and automatic light/dark styling.
 There is no bundler or framework: games are plain ES modules in `static/`.
-The only game today is Alphabetical Adventure, a 10-level drag-and-drop ABC-order quest.
+Games include Alphabetical Adventure (ABC ordering), Proofreading Detectives
+(finding writing mistakes), and Number Trail (a 10-level woodland math quest).
 
 ## Layout
 
 - `content/<game>/index.md` – one directory per game; front matter sets title, description, weight, template, icon. The home page lists games automatically.
-- `templates/` – Zola templates (`base.html`, `index.html`, `alphabetical-order.html`).
-- `static/` – game JS (`alphabetical-order.js` is the UI; `alphabet-*.js` are testable helpers), `style.css`, `words.json` (tagged word bank), `celebrations.json`.
+- `templates/` – Zola templates (`base.html`, `index.html`, and one per game).
+- `static/` – game UI modules and testable helpers (`alphabet-*.js`, `proofreading-*.js`, `number-trail-engine.js`), shared `level-progress.js`, `style.css`, `words.json` (tagged word bank), `celebrations.json`.
 - `tools/expand-word-bank.py` – builds the word bank (WordNet; see `static/wordnet-license.txt`).
 - `tests/games/<game>/` – unit tests (`*.test.mjs`, `*_test.py`) and `browser/*.spec.js` Playwright tests.
 
@@ -37,7 +38,7 @@ the "Keep dragging" feedback message) can break them. Update tests together with
 ## Conventions
 
 - Keep it dependency-free: vanilla JS, one shared `static/style.css`, no build step.
-- Put logic that can be unit-tested in the `alphabet-*.js` helper modules; keep DOM code in `alphabetical-order.js`.
+- Keep testable game logic in helper modules; keep DOM code in the game's UI module (`alphabetical-order.js`, `proofreading.js`, or `number-trail.js`).
 - Accessibility matters: don't rely on colour alone (pair it with text), keep `aria-label`s accurate, support keyboard moves and touch, and keep dark-mode styles in the `prefers-color-scheme` blocks.
 - Build links with `get_url`, `page.permalink` or `config.base_url`; Pages overrides `base_url`, so never hard-code the host.
 - Every game under `content/` must have browser tests in `tests/games/<game>/browser/` or CI fails.

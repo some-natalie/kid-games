@@ -242,6 +242,15 @@ footer { padding-block: 1.5rem; text-align: center; }
 .quest-complete .dino-body, .quest-complete .dino-head, .quest-complete .dino-arm,
 .quest-complete .dino-leg, .quest-complete .dino-notes,
 .quest-complete .victory-character, .quest-complete .detective { animation-iteration-count: 2; }
+.trail-example { padding: 0.5rem 1rem; border-radius: 1rem; background: var(--badge); }
+.trail-path { display: flex; flex-wrap: wrap; gap: 0.5rem; list-style: none; padding: 0; }
+.trail-path li { min-width: 2.75rem; padding: 0.4rem; text-align: center; border: 2px solid var(--border); border-radius: 1rem; }
+.trail-path li.crossed { border-color: var(--accent); color: var(--accent); font-weight: 700; }
+.trail-equation { font-size: clamp(1.5rem, 5vw, 2.5rem); text-align: center; }
+.answer-stones { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 7rem), 1fr)); gap: 0.75rem; }
+.trail-stone { min-height: 3.5rem; min-width: 2.75rem; padding: 0.5rem; border-radius: 1.5rem; font-size: 1.5rem; touch-action: manipulation; }
+.trail-stone.correct:disabled { opacity: 1; background: var(--badge); color: var(--accent); border-width: 4px; }
+.trail-home { font-size: clamp(2rem, 10vw, 4rem); }
 @media (prefers-color-scheme: dark) {
   .proof-token[data-result="found"], .example-token[data-result="found"] { background: #1f3b28; color: #c9f2b8; border-color: #4cc26d; }
   .proof-token.proof-removed { background: #450a0a; color: #fecaca; border-color: #f87171; }

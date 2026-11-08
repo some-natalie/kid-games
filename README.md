@@ -2,8 +2,8 @@
 
 A small Zola site for kid-games.dev, with responsive game tiles and automatic
 light/dark styling based on the device preference. Alphabetical Adventure is
-the site's alphabetical-order game, and Proofreading Detectives is its
-proofreading game.
+the site's alphabetical-order game, Proofreading Detectives is its
+proofreading game, and Number Trail is its woodland math adventure for ages 6–9.
 
 ## Community and license
 
@@ -266,6 +266,38 @@ wrap each mistake as `{wrong>right#type}`, for example
 (`{  > #spacing}`), and a `^` to mirror the next character (`{^3>3#flipped}`).
 Keep topics friendly and kid-appropriate; `tests/games/proofreading/` checks the
 level shape and that every mistake type is used.
+
+## Number Trail
+
+Help Bunny get home by choosing the missing number from four stepping stones.
+There are 10 untimed levels with five puzzles each:
+
+| Levels | Puzzles |
+|---|---|
+| 1–2 | Addition, then subtraction, within 10 |
+| 3–4 | Addition, then subtraction, within 20 |
+| 5–6 | Missing operands in addition, then subtraction, within 20 |
+| 7–8 | Addition, then subtraction, with multiples of 10 within 100 |
+| 9 | Mixed addition and subtraction within 100 |
+| 10 | Mixed missing operands within 100 |
+
+A worked example introduces the game. Tap an answer or use Tab and Enter/Space.
+Wrong answers offer a strategy hint and unlimited retries, with no lost points
+or time pressure. **Show hint** is also available before answering.
+Correct answers show the full equation and wait for **Next step**, **Next level**,
+or **Finish trail**. Finishing brings Bunny home with a short celebration.
+
+Each level draws five distinct randomized puzzles; answers are whole numbers
+between 0 and the level's limit, with no negative subtraction results. The math
+and distractor generation live in `static/number-trail-engine.js`, separate from
+the DOM code in `static/number-trail.js`.
+
+The current unlocked level is saved under `kid-games.number-trail.progress`
+as `{"version":1,"level":3}`. Returning starts that level with new puzzles;
+individual stones within a level are not saved. **Start a new trail** resets
+progress; **Finish trail** clears it. Storage errors show a warning without
+blocking play. Proofreading and Number Trail share `static/level-progress.js`
+for versioned level storage, retaining separate keys.
 
 ## Accessibility
 
