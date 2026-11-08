@@ -4,7 +4,7 @@ Guidance for AI coding agents (and humans) working in this repository.
 
 ## Project
 
-kid-games.dev is a static [Zola](https://www.getzola.org/) site (pinned to 0.23.6) of
+kid-games.dev is a static site using the latest [Zola](https://www.getzola.org/) release, with
 small browser games for kids, with responsive tiles and automatic light/dark styling.
 There is no bundler or framework: games are plain ES modules in `static/`.
 Games include Alphabetical Adventure (ABC ordering), Proofreading Detectives
@@ -14,6 +14,7 @@ and Acorn Adventure (cumulative addition and subtraction).
 ## Layout
 
 - `content/<game>/index.md` – one directory per game; front matter sets title, description, weight, template, icon. The home page lists games automatically.
+- `content/for-grown-ups.md` – quiz settings, public repository links, and licensing credits; not a game.
 - `templates/` – Zola templates (`base.html`, `index.html`, and one per game).
 - `static/` – game UI modules and testable helpers (`alphabet-*.js`, `proofreading-*.js`, `number-trail-engine.js`, `acorn-adventure-engine.js`), shared `level-progress.js`, `style.css`, `words.json` (tagged word bank), `celebrations.json`.
 - `tools/expand-word-bank.py` – builds the word bank (WordNet; see `static/wordnet-license.txt`).

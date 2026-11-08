@@ -19,8 +19,8 @@ public issue.
 ## Development
 
 See [README.md](README.md#local-development) for setup and
-[AGENTS.md](AGENTS.md) for project layout and conventions. Use Zola 0.23.6 and
-a current Node.js LTS release supported by Playwright.
+[AGENTS.md](AGENTS.md) for project layout and conventions. Use the latest Zola
+release and the latest Node.js LTS release supported by Playwright.
 
 ```sh
 npm ci

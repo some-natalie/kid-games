@@ -278,6 +278,14 @@ footer { padding-block: 1.5rem; text-align: center; }
 .quiz-mode summary { min-height: 2.75rem; padding-block: 0.4rem; cursor: pointer; }
 .quiz-mode summary:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
 .quiz-mode .answer-stones [aria-pressed="true"] { background: var(--badge); border-width: 4px; }
+.grown-ups { max-width: 48rem; margin-inline: auto; }
+.grown-ups-link { margin-top: 1.5rem; text-align: center; }
+.grown-ups-link a, .grown-ups label, .grown-ups summary { display: inline-block; min-height: 2.75rem; padding-block: 0.5rem; }
+.grown-ups label, .grown-ups summary { cursor: pointer; }
+.grown-ups input { width: 1.25rem; height: 1.25rem; accent-color: var(--accent); }
+.grown-ups input:focus-visible, .grown-ups summary:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+.grown-ups-play { display: inline-block; text-decoration: none; }
+.license-text { white-space: pre-wrap; overflow-wrap: anywhere; font: inherit; }
 @media (prefers-color-scheme: dark) {
   .trail-bank { background: linear-gradient(160deg, #567741, #395c2c 55%, #496a36); }
   .trail-bank-far { border-color: #789a55; }

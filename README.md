@@ -9,6 +9,9 @@ and Acorn Adventure introduces cumulative, multistep arithmetic.
 ## Quiz mode
 
 Add `?quiz=1` to the home page or any game URL to opt into quiz mode.
+The landing page's **For grown-ups** link opens a page with a quiz-mode toggle,
+the public GitHub repository, and MIT licensing and third-party attribution
+information. The toggle changes the URL setting, not a saved browser preference.
 Internal navigation keeps the flag; omit it (or use `?quiz=0`) for normal play.
 Quiz mode removes worked examples, reference hints, and immediate grading.
 **Next question**, **Previous question**, and **Review answers** let players
@@ -42,7 +45,8 @@ Report vulnerabilities privately as described in [Security](SECURITY.md).
 
 ## Local development
 
-Install [Zola 0.23.6](https://www.getzola.org/documentation/getting-started/installation/),
+Install the latest [Zola release](https://www.getzola.org/documentation/getting-started/installation/)
+and the latest Node.js LTS release supported by Playwright,
 then run these commands from the repository root:
 
 ```sh

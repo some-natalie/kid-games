@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block title %}{{ page.title }} · {{ config.title }}{% endblock title %}
+{% block description %}{{ page.description }}{% endblock description %}
+
+{% block content %}
+<article class="grown-ups">
+  <a class="back-link" href="{{ get_url(path='/') }}">← All games</a>
+  <h1>{{ page.title }}</h1>
+  <section aria-labelledby="quiz-settings-heading">
+    <h2 id="quiz-settings-heading">Choose how to play</h2>
+    <div id="quiz-setting" hidden>
+      <label><input id="quiz-toggle" type="checkbox" aria-describedby="quiz-setting-help"> Use quiz mode</label>
+    </div>
+    <noscript><p>Enable JavaScript to change quiz mode and play the games.</p></noscript>
+    <p id="quiz-setting-help">Quiz mode removes examples, hints, and immediate answer checks from all games.
+      Children can change answers as often as they like before submitting, then see a percentage
+      correct and expandable answer details to share with you.</p>
+    <p>The setting travels with links on this site using <code>?quiz=1</code>, not a saved browser
+      preference. Share a quiz-mode link to use the same setting on another device.
+      Turn it off here to return to normal play.</p>
+    <p>Quiz answers are not saved when you leave or reload a game. Normal saved game progress
+      is left alone. Each completely correct question earns one point; unanswered questions
+      count as incorrect. In Acorn Adventure, later stops carry the child's entered total
+      without revealing the correct answer; each stop is scored against the original journey.</p>
+    <p><a class="primary-button grown-ups-play" href="{{ get_url(path='/') }}">Choose a game</a></p>
+  </section>
+  <section aria-labelledby="source-heading">
+    <h2 id="source-heading">Public source code</h2>
+    <p>kid-games is open source.
+      <a href="https://github.com/some-natalie/kid-games">Visit the repository on GitHub</a>
+      to explore the code, report a bug, or suggest an improvement.</p>
+    <p>Contributions and educational feedback are welcome. Read our
+      <a href="https://github.com/some-natalie/kid-games/blob/main/CONTRIBUTING.md">contributing guide</a>
+      and meet the <a href="https://github.com/some-natalie/kid-games/blob/main/CONTRIBUTORS.md">contributors</a>.
+      Please do not share children's names, photos, saved answers, or other identifying information.</p>
+  </section>
+  <section aria-labelledby="license-heading">
+    <h2 id="license-heading">License and credits</h2>
+    <p>Original kid-games code, documentation, authored content, and artwork use the
+      <a href="https://github.com/some-natalie/kid-games/blob/main/LICENSE">MIT license</a>.
+      You may use, copy, modify, and share them, including commercially, as long as you
+      keep the copyright and permission notice. The software comes without a warranty.</p>
+    <details>
+      <summary>Read the full MIT license</summary>
+      <pre class="license-text">{{ load_data(path="LICENSE", format="plain") }}</pre>
+    </details>
+    <h3>Third-party material</h3>
+    <p>The optional <a href="https://github.com/antijingoist/opendyslexic">OpenDyslexic</a>
+      fonts are credited to their original authors and distributed under the
+      <a href="{{ get_url(path='fonts/OFL.txt') }}">SIL Open Font License 1.1</a>,
+      with the Reserved Font Name OpenDyslexic.</p>
+    <p>Part of the word bank is derived from Princeton WordNet 3.0, copyright 2006
+      Princeton University, and retains the
+      <a href="{{ get_url(path='wordnet-license.txt') }}">WordNet license</a>, not MIT.</p>
+    <p>See <a href="https://github.com/some-natalie/kid-games/blob/main/THIRD_PARTY_NOTICES.md">third-party notices</a>
+      for exact sources and redistribution requirements. Development tools retain their own licenses.</p>
+  </section>
+</article>
+{% endblock content %}
