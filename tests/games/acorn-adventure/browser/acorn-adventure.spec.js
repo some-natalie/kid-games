@@ -29,9 +29,10 @@ async function audit(page) {
 test("home tile, worked example, keyboard steps, and retries preserve the running total", async ({ page }) => {
   await page.goto("/");
   await page.getByRole("link", { name: /Acorn Adventure/ }).click();
-  await expect(page.locator("#tutorial")).toContainText("5 + 19 − 4 + 7 = 27");
+  await expect(page.locator("#tutorial")).toContainText("5 + 4 − 3 + 6 = 12");
   await expect(page.locator("#tutorial")).toContainText("equal priority");
-  for (const [index, total] of [24, 20, 27].entries()) {
+  await expect(page.locator(".acorn-example li")).toHaveCount(3);
+  for (const [index, total] of [9, 6, 12].entries()) {
     const basket = page.locator(".acorn-example li").nth(index);
     await expect(basket.locator(".acorn-example-nuts > span")).toHaveCount(total);
     await expect(basket.locator("p")).toContainText(`Your basket: ${total} nuts`);

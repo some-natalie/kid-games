@@ -54,11 +54,12 @@ test("random generation is reproducible, varied, and rejects invalid inputs", ()
 
 test("the example evaluates left to right and story hints use the carried total", () => {
   const steps = [
-    { before: 5, operation: "+", amount: 19, total: 24 },
-    { before: 24, operation: "-", amount: 4, total: 20 },
-    { before: 20, operation: "+", amount: 7, total: 27 },
+    { before: 5, operation: "+", amount: 4, total: 9 },
+    { before: 9, operation: "-", amount: 3, total: 6 },
+    { before: 6, operation: "+", amount: 6, total: 12 },
   ];
-  assert.deepEqual(steps.map(stepEquation), ["5 + 19 = 24", "24 \u2212 4 = 20", "20 + 7 = 27"]);
-  assert.match(stepStory(steps[1]), /Share 4.*your 24/);
-  assert.match(stepHint(steps[2]), /Start with 20.*forward 7/);
+  assert.deepEqual(steps.map(stepEquation), ["5 + 4 = 9", "9 \u2212 3 = 6", "6 + 6 = 12"]);
+  assert.ok(steps.every((step) => step.total <= 12));
+  assert.match(stepStory(steps[1]), /Share 3.*your 9/);
+  assert.match(stepHint(steps[2]), /Start with 6.*forward 6/);
 });
