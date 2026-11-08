@@ -4,6 +4,7 @@ import { buildRound as proofRound, tokenKey, pickVariant, describeFix } from "./
 import { LEVELS as PROOF_LEVELS } from "./proofreading-levels.js";
 import { LEVELS as NUMBER_LEVELS, buildRound as numberRound, equationText } from "./number-trail-engine.js";
 import { LEVELS as ACORN_LEVELS, buildJourney } from "./acorn-adventure-engine.js";
+import { LEVELS as RIBBON_LEVELS, makeQuizQuestion as ribbonQuizQuestion } from "./ribbon-workshop-engine.js";
 import { buildQuizQuestions as fractionQuestions, fractionName } from "./fraction-bridge-engine.js";
 import { quizQuestions as pizzaQuestions } from "./picnic-pizza-engine.js";
 
@@ -63,6 +64,7 @@ function makeQuestions(kind, bank, theme) {
       correction: `Correct equation: ${equationText(problem, true)}.`,
     })));
   }
+  if (kind === "ribbon") return RIBBON_LEVELS.map((_, index) => ribbonQuizQuestion(index));
   if (kind === "fraction") return fractionQuestions();
   if (kind === "pizza") return pizzaQuestions();
   return ACORN_LEVELS.flatMap((level, index) => {
@@ -79,10 +81,11 @@ function makeQuestions(kind, bank, theme) {
 
 function setupQuiz(game) {
   const name = game.getAttribute("aria-label");
-  const kind = game.classList.contains("fraction-bridge") ? "fraction"
-    : game.classList.contains("acorn-game") ? "acorn" : game.classList.contains("number-trail")
-      ? "number" : game.classList.contains("proofreading-game") ? "proof"
-        : game.classList.contains("picnic-pizza-game") ? "pizza" : "alphabet";
+  const kind = game.classList.contains("ribbon-workshop") ? "ribbon" : game.classList.contains("acorn-game")
+    ? "acorn" : game.classList.contains("number-trail") ? "number"
+      : game.classList.contains("proofreading-game") ? "proof"
+        : game.classList.contains("picnic-pizza-game") ? "pizza"
+          : game.classList.contains("fraction-bridge") ? "fraction" : "alphabet";
   game.replaceChildren();
   const notice = element("p", QUIZ_NOTICE, "quiz-notice");
   const area = element("div");
@@ -124,7 +127,7 @@ function setupQuiz(game) {
     area.append(button("Start quiz", () => {
       questions = makeQuestions(kind, bank, theme);
       responses = questions.map((question) => question.kind === "alphabet" ? [...question.initial]
-        : question.kind === "proof" || question.kind === "pizza" && question.multiple ? []
+        : question.kind === "proof" || question.multiple ? []
           : question.kind === "fraction-order" ? [...question.initial] : undefined);
       current = 0;
       showQuestion();
@@ -146,6 +149,21 @@ function setupQuiz(game) {
       choices.setAttribute("aria-labelledby", heading.id);
       question.choices.forEach((value) => {
         const choice = button(String(value), () => {
+          responses[current] = value;
+          for (const item of choices.children) item.setAttribute("aria-pressed", String(item === choice));
+          status.textContent = "Answer selected. You can change it before submitting.";
+        });
+        choice.setAttribute("aria-pressed", String(responses[current] === value));
+        choices.append(choice);
+      });
+      area.append(choices);
+    }
+    if (kind === "ribbon") {
+      const choices = element("div", undefined, "answer-stones");
+      choices.setAttribute("role", "group");
+      choices.setAttribute("aria-labelledby", heading.id);
+      question.choices.forEach(({ value, label }) => {
+        const choice = button(label, () => {
           responses[current] = value;
           for (const item of choices.children) item.setAttribute("aria-pressed", String(item === choice));
           status.textContent = "Answer selected. You can change it before submitting.";
@@ -344,11 +362,12 @@ function setupQuiz(game) {
       const item = element("li");
       const answer = responses[index];
       const description = kind === "proof" ? `${answer.length} items marked`
-        : question.kind === "fraction-placement" && answer !== undefined
-          ? question.choices.find((choice) => choice.value === answer)?.label
-          : ["fraction-equivalent", "fraction-compare"].includes(question.kind) && answer !== undefined
-            ? question.choices[answer]
-            : Array.isArray(answer) ? answer.join(", ") : answer === undefined || answer === "" ? "No answer" : String(answer);
+        : question.kind === "ribbon" ? question.choices.find((choice) => choice.value === answer)?.label ?? "No answer"
+          : question.kind === "fraction-placement" && answer !== undefined
+            ? question.choices.find((choice) => choice.value === answer)?.label
+            : ["fraction-equivalent", "fraction-compare"].includes(question.kind) && answer !== undefined
+              ? question.choices[answer]
+              : Array.isArray(answer) ? answer.join(", ") : answer === undefined || answer === "" ? "No answer" : String(answer);
       item.append(element("p", `${question.title}: ${description}`),
         button(`Edit question ${index + 1}`, () => { current = index; showQuestion(); }));
       list.append(item);
@@ -373,11 +392,13 @@ function setupQuiz(game) {
       item.append(element("strong", `${question.title}: ${correct ? "Correct" : "Incorrect"}`));
       item.append(element("p", question.prompt));
       if (!correct) {
-        const answer = question.kind === "fraction-placement" && response !== undefined
-          ? question.choices.find((choice) => choice.value === response)?.label
-          : ["fraction-equivalent", "fraction-compare"].includes(question.kind) && response !== undefined
-            ? question.choices[response]
-            : Array.isArray(response)
+        const answer = question.kind === "ribbon"
+          ? question.choices.find((choice) => choice.value === response)?.label ?? "No answer"
+          : question.kind === "fraction-placement" && response !== undefined
+            ? question.choices.find((choice) => choice.value === response)?.label
+            : ["fraction-equivalent", "fraction-compare"].includes(question.kind) && response !== undefined
+              ? question.choices[response]
+              : Array.isArray(response)
           ? question.kind === "proof" ? question.tokens.filter((token) => response.includes(token.key)).map((token) => token.text.trim() || "wide gap").join(", ") || "No marks"
             : response.join(", ")
           : response === undefined || response === "" ? "No answer" : String(response);

@@ -4,8 +4,9 @@ A small Zola site for kid-games.dev, with responsive game tiles and automatic
 light/dark styling based on the device preference. Alphabetical Adventure is
 the site's alphabetical-order game, Proofreading Detectives is its
 proofreading game, Number Trail is its woodland math adventure for ages 6–9,
-Acorn Adventure introduces cumulative, multistep arithmetic, Picnic Pizza
-introduces equal shares and visual fractions for ages 6–9, and Fraction Bridge
+Acorn Adventure introduces cumulative, multistep arithmetic, and Picnic Pizza
+introduces equal shares and visual fractions for ages 6–9, while Ribbon
+Workshop explores fractions with equal-length ribbons, and Fraction Bridge
 helps children find, compare, and order fractions on a number line.
 
 ## Quiz mode
@@ -23,7 +24,8 @@ expandable **Answer details**, including incorrect responses and corrections.
 
 Each completely correct question earns one point: an entire word order or
 proofreading passage, one Number Trail puzzle, one Acorn Adventure stop, one
-Picnic Pizza fraction question, or one Fraction Bridge challenge.
+Picnic Pizza or Ribbon Workshop fraction question, or one Fraction Bridge
+challenge.
 Unanswered questions count as incorrect. Proofreading requires marking every
 mistake without marking correct text. Acorn Adventure uses a numeric input
 instead of answer choices and carries the player's entered totals, so later
@@ -34,6 +36,8 @@ and touch-friendly Up/Down controls.
 
 Quiz answers live only in memory: leaving or reloading discards them, and
 ordinary saved game progress is neither loaded nor changed.
+Ribbon Workshop quiz questions use the same level progression and score one
+point for each fully correct fraction response.
 
 ## Community and license
 
@@ -391,6 +395,36 @@ Returning begins that level with a new journey; individual stops are not saved.
 Starting a new adventure or finishing clears that save without touching other
 games. Storage failures display a warning and do not block play.
 
+## Ribbon Workshop
+
+Fold equal-length rectangular ribbons into halves, thirds, quarters, sixths,
+and eighths. The worked example shows how two of four equal parts have the same
+length as one half. Its nine untimed levels progress from selecting halves and
+quarters for ages 6–7, through thirds and equivalent lengths for ages 7–8, to
+eighths, comparisons, and completing a whole for ages 8–9.
+
+| Levels | Fraction skill |
+|---|---|
+| 1–3 | Select 1/2, 1/4, and 3/4 |
+| 4–5 | Select 2/3; align 1/2 and 2/4 |
+| 6–7 | Match 1/2 = 4/8 and 1/3 = 2/6 |
+| 8–9 | Compare 3/4 and 2/3; complete a whole from 5/8 |
+
+Use the fold buttons to divide a ribbon into equal parts, and the large
+**Select one more part** and **Remove one selected part** controls to color its
+length. The aligned overlay uses a shared origin and whole length, with distinct
+partition guides and hatching. Selection labels name both the fraction and the
+number of equal parts. Wrong attempts keep the current selection, show a hint,
+and can be retried without a timer or point loss.
+
+Fraction and partition logic lives in `static/ribbon-workshop-engine.js`;
+`static/ribbon-workshop.js` renders the accessible HTML controls and overlay.
+Exact comparisons use integer numerators and denominators with BigInt
+cross-products, not floating-point equality. The unlocked level is saved
+locally as `kid-games.ribbon-workshop.progress`; quiz mode neither reads nor
+changes that key. In quiz mode, the same nine skills are asked as revisable
+fraction questions, with grading and answer details held until submission.
+
 ## Picnic Pizza
 
 Prepare a fair picnic by sharing pizzas and rectangular foods into equal-area
@@ -410,6 +444,21 @@ saved locally under `kid-games.picnic-pizza.progress` as
 `{"version":1,"level":3}` using the shared level-progress helper. Quiz mode
 offers seven questions, keeps answers in memory, and scores each question only
 after submission; it never reads or changes saved game progress.
+
+## Fraction Bridge
+
+Find fractions on a number line from zero to one. The eight levels move from
+placing halves, quarters, thirds, and eighths to recognizing equivalent
+positions, ordering fractions, comparing values, and placing fractions when
+partition guides are hidden. The number-line model complements Picnic Pizza's
+serving activities and Ribbon Workshop's equal-length overlays.
+
+`static/fraction-bridge-engine.js` keeps exact fraction comparison, tick
+placement, equivalence, and ordering separate from the UI in
+`static/fraction-bridge.js`. The game supports keyboard and touch, provides
+visual and text feedback, and stores its unlocked level locally with the shared
+level-progress helper. Quiz mode asks six revisable placement, equivalence,
+comparison, and ordering questions without loading or modifying normal progress.
 
 ## Accessibility
 
