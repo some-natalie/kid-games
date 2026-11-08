@@ -1,6 +1,9 @@
 import { LEVELS, buildJourney, stepEquation, stepStory, stepHint } from "./acorn-adventure-engine.js";
 import { createLevelProgress } from "./level-progress.js";
 import { celebrate, stopCelebration } from "./alphabet-celebration.js";
+import { isQuizMode } from "./quiz-engine.js";
+
+if (!isQuizMode(window.location.search)) {
 
 const { loadProgress, saveProgress, clearProgress } =
   createLevelProgress("kid-games.acorn-adventure.progress", "Acorn Adventure");
@@ -165,4 +168,5 @@ warn(saved.warning);
 if (saved.level !== undefined) {
   find("start-game").textContent = `Continue level ${saved.level + 1}`;
   find("new-quest").hidden = false;
+}
 }

@@ -4,8 +4,10 @@ import { clearProgress, loadProgress, saveProgress } from "./alphabet-progress.j
 import { attachSorter, moveWord } from "./alphabet-sorter.js";
 import { celebrate, DEFAULT_CELEBRATIONS, readCelebrations, stopCelebration } from "./alphabet-celebration.js";
 import { pickVictory } from "./alphabet-victory.js";
+import { isQuizMode } from "./quiz-engine.js";
 
 (() => {
+  if (isQuizMode(window.location.search)) return;
   const levels = QUEST_LEVELS;
   const tutorial = document.querySelector("#tutorial");
   const playArea = document.querySelector("#play-area");
