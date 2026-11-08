@@ -266,6 +266,28 @@ footer { padding-block: 1.5rem; text-align: center; }
 .acorn-term { display: inline-block; padding: 0.2rem 0.35rem; border: 2px solid transparent; border-radius: 0.4rem; }
 .acorn-term.current { border-color: var(--accent); background: var(--badge); font-weight: 800; text-decoration: underline; }
 .acorn-term.done { font-weight: 700; }
+.ribbon-workshop { max-width: 56rem; }
+.ribbon-progression { max-width: 45rem; margin-inline: auto; text-align: left; }
+.ribbon-example { padding: 0.75rem 1rem; border: 2px solid var(--border); border-radius: 0.85rem; text-align: left; }
+.ribbon-example-parts, .ribbon-segments { display: flex; width: 100%; min-height: 3.25rem; overflow: hidden; border: 2px solid var(--text); border-radius: 0.5rem; }
+.ribbon-part { display: grid; flex: 1 1 0; place-items: center; min-width: 0; padding: 0.1rem; border: 0; border-right: 1px solid var(--text); background: var(--surface); color: var(--text); font-size: clamp(0.7rem, 3vw, 1rem); font-weight: 700; }
+.ribbon-part:last-child { border-right: 0; }
+.ribbon-part.ribbon-selected { border-bottom: 4px solid var(--accent); background: repeating-linear-gradient(135deg, var(--badge) 0 0.15rem, var(--surface) 0.15rem 0.45rem); color: var(--text); }
+.ribbon-target { font-weight: 700; color: var(--text); }
+.ribbon-boards { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr)); gap: 1rem; }
+.ribbon-board { min-width: 0; padding: 0.75rem; border: 1px solid var(--border); border-radius: 0.75rem; }
+.ribbon-board h3 { margin-top: 0; }
+.ribbon-fold-controls { display: flex; flex-wrap: wrap; gap: 0.35rem; min-width: 0; margin: 0 0 0.75rem; padding: 0.5rem; border: 1px solid var(--border); border-radius: 0.5rem; }
+.ribbon-fold-controls legend { padding-inline: 0.25rem; font-size: 0.9rem; font-weight: 700; }
+.ribbon-fold-controls p { flex-basis: 100%; margin: 0; }
+.ribbon-fold-button { min-height: 2.75rem; padding: 0.35rem 0.65rem; }
+.ribbon-fold-button[aria-pressed="true"] { border-width: 4px; background: var(--badge); }
+.ribbon-select-controls { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.5rem; }
+.ribbon-select-controls button { min-height: 2.75rem; flex: 1 1 8rem; }
+.ribbon-quantity { margin-block: 0.5rem 0; font-weight: 700; color: var(--text); }
+.ribbon-overlay { margin-block: 1rem; padding: 0.75rem; border: 2px solid var(--border); border-radius: 0.75rem; }
+.ribbon-overlay svg { display: block; width: 100%; height: auto; margin-top: 0.75rem; color: var(--text); }
+.ribbon-overlay p { margin-bottom: 0; }
 .quiz-notice { padding: 0.75rem; border: 2px solid var(--accent); border-radius: 0.65rem; color: var(--text); background: var(--badge); }
 .quiz-mode #tutorial, .quiz-mode .alphabet-rail { display: none; }
 .quiz-navigation { margin-top: 1rem; }

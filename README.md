@@ -4,7 +4,8 @@ A small Zola site for kid-games.dev, with responsive game tiles and automatic
 light/dark styling based on the device preference. Alphabetical Adventure is
 the site's alphabetical-order game, Proofreading Detectives is its
 proofreading game, Number Trail is its woodland math adventure for ages 6–9,
-and Acorn Adventure introduces cumulative, multistep arithmetic.
+Acorn Adventure introduces cumulative, multistep arithmetic, and Ribbon
+Workshop explores fractions with equal-length ribbons.
 
 ## Quiz mode
 
@@ -31,6 +32,8 @@ and touch-friendly Up/Down controls.
 
 Quiz answers live only in memory: leaving or reloading discards them, and
 ordinary saved game progress is neither loaded nor changed.
+Ribbon Workshop quiz questions use the same level progression and score one
+point for each fully correct fraction response.
 
 ## Community and license
 
@@ -374,6 +377,36 @@ level-progress helper saves the unlocked level separately under
 Returning begins that level with a new journey; individual stops are not saved.
 Starting a new adventure or finishing clears that save without touching other
 games. Storage failures display a warning and do not block play.
+
+## Ribbon Workshop
+
+Fold equal-length rectangular ribbons into halves, thirds, quarters, sixths,
+and eighths. The worked example shows how two of four equal parts have the same
+length as one half. Its nine untimed levels progress from selecting halves and
+quarters for ages 6–7, through thirds and equivalent lengths for ages 7–8, to
+eighths, comparisons, and completing a whole for ages 8–9.
+
+| Levels | Fraction skill |
+|---|---|
+| 1–3 | Select 1/2, 1/4, and 3/4 |
+| 4–5 | Select 2/3; align 1/2 and 2/4 |
+| 6–7 | Match 1/2 = 4/8 and 1/3 = 2/6 |
+| 8–9 | Compare 3/4 and 2/3; complete a whole from 5/8 |
+
+Use the fold buttons to divide a ribbon into equal parts, and the large
+**Select one more part** and **Remove one selected part** controls to color its
+length. The aligned overlay uses a shared origin and whole length, with distinct
+partition guides and hatching. Selection labels name both the fraction and the
+number of equal parts. Wrong attempts keep the current selection, show a hint,
+and can be retried without a timer or point loss.
+
+Fraction and partition logic lives in `static/ribbon-workshop-engine.js`;
+`static/ribbon-workshop.js` renders the accessible HTML controls and overlay.
+Exact comparisons use integer numerators and denominators with BigInt
+cross-products, not floating-point equality. The unlocked level is saved
+locally as `kid-games.ribbon-workshop.progress`; quiz mode neither reads nor
+changes that key. In quiz mode, the same nine skills are asked as revisable
+fraction questions, with grading and answer details held until submission.
 
 ## Accessibility
 

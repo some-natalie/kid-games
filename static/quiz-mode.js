@@ -4,6 +4,7 @@ import { buildRound as proofRound, tokenKey, pickVariant, describeFix } from "./
 import { LEVELS as PROOF_LEVELS } from "./proofreading-levels.js";
 import { LEVELS as NUMBER_LEVELS, buildRound as numberRound, equationText } from "./number-trail-engine.js";
 import { LEVELS as ACORN_LEVELS, buildJourney } from "./acorn-adventure-engine.js";
+import { LEVELS as RIBBON_LEVELS, makeQuizQuestion as ribbonQuizQuestion } from "./ribbon-workshop-engine.js";
 
 const active = isQuizMode(window.location.search);
 if (active) {
@@ -61,6 +62,7 @@ function makeQuestions(kind, bank, theme) {
       correction: `Correct equation: ${equationText(problem, true)}.`,
     })));
   }
+  if (kind === "ribbon") return RIBBON_LEVELS.map((_, index) => ribbonQuizQuestion(index));
   return ACORN_LEVELS.flatMap((level, index) => {
     const journey = buildJourney(index);
     const expression = `${journey.start} ${journey.steps.map((step) =>
@@ -75,8 +77,9 @@ function makeQuestions(kind, bank, theme) {
 
 function setupQuiz(game) {
   const name = game.getAttribute("aria-label");
-  const kind = game.classList.contains("acorn-game") ? "acorn" : game.classList.contains("number-trail")
-    ? "number" : game.classList.contains("proofreading-game") ? "proof" : "alphabet";
+  const kind = game.classList.contains("ribbon-workshop") ? "ribbon" : game.classList.contains("acorn-game")
+    ? "acorn" : game.classList.contains("number-trail") ? "number"
+      : game.classList.contains("proofreading-game") ? "proof" : "alphabet";
   game.replaceChildren();
   const notice = element("p", QUIZ_NOTICE, "quiz-notice");
   const area = element("div");
@@ -138,6 +141,21 @@ function setupQuiz(game) {
       choices.setAttribute("aria-labelledby", heading.id);
       question.choices.forEach((value) => {
         const choice = button(String(value), () => {
+          responses[current] = value;
+          for (const item of choices.children) item.setAttribute("aria-pressed", String(item === choice));
+          status.textContent = "Answer selected. You can change it before submitting.";
+        });
+        choice.setAttribute("aria-pressed", String(responses[current] === value));
+        choices.append(choice);
+      });
+      area.append(choices);
+    }
+    if (kind === "ribbon") {
+      const choices = element("div", undefined, "answer-stones");
+      choices.setAttribute("role", "group");
+      choices.setAttribute("aria-labelledby", heading.id);
+      question.choices.forEach(({ value, label }) => {
+        const choice = button(label, () => {
           responses[current] = value;
           for (const item of choices.children) item.setAttribute("aria-pressed", String(item === choice));
           status.textContent = "Answer selected. You can change it before submitting.";
@@ -251,6 +269,7 @@ function setupQuiz(game) {
       const item = element("li");
       const answer = responses[index];
       const description = kind === "proof" ? `${answer.length} items marked`
+        : kind === "ribbon" ? question.choices.find((choice) => choice.value === answer)?.label ?? "No answer"
         : Array.isArray(answer) ? answer.join(", ") : answer === undefined || answer === "" ? "No answer" : String(answer);
       item.append(element("p", `${question.title}: ${description}`),
         button(`Edit question ${index + 1}`, () => { current = index; showQuestion(); }));
@@ -276,7 +295,9 @@ function setupQuiz(game) {
       item.append(element("strong", `${question.title}: ${correct ? "Correct" : "Incorrect"}`));
       item.append(element("p", question.prompt));
       if (!correct) {
-        const answer = Array.isArray(response)
+        const answer = question.kind === "ribbon"
+          ? question.choices.find((choice) => choice.value === response)?.label ?? "No answer"
+          : Array.isArray(response)
           ? question.kind === "proof" ? question.tokens.filter((token) => response.includes(token.key)).map((token) => token.text.trim() || "wide gap").join(", ") || "No marks"
             : response.join(", ")
           : response === undefined || response === "" ? "No answer" : String(response);
