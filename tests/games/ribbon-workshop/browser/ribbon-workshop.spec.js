@@ -1,6 +1,10 @@
 import { test, expect } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 import { makeQuizQuestion } from "../../../../static/ribbon-workshop-engine.js";
+import { GAME_CELEBRATIONS } from "../../../../static/game-celebrations.js";
+import { cheerPattern, expectThemedCelebration } from "../../shared/celebrations.js";
+
+const rewards = GAME_CELEBRATIONS["ribbon-workshop"];
 
 const progressKey = "kid-games.ribbon-workshop.progress";
 
@@ -45,10 +49,12 @@ test("the worked example explains equal parts and keyboard play supports folds a
   await page.getByRole("button", { name: "Select one more part on ribbon 1" }).press("Space");
   await expect(page.locator(".ribbon-quantity")).toContainText("1/2");
   await page.getByRole("button", { name: "Check the ribbons" }).press("Enter");
-  await expect(page.locator("#feedback")).toContainText("That's it! 1/2");
+  await expect(page.locator("#feedback")).toHaveText(cheerPattern(rewards, "1/2 is selected as equal ribbon parts."));
+  await expectThemedCelebration(page, rewards);
   await expect(page.locator("#next-level")).toBeFocused();
   await page.locator("#next-level").press("Enter");
   await expect(page.locator("#level-count")).toContainText("Level 2 of 9");
+  await expect(page.locator(".celebration")).toHaveCount(0);
 });
 
 test("folding into eighths, equivalent selections, and the aligned overlay show matching lengths", async ({ page }) => {
@@ -81,6 +87,7 @@ test("wrong selections get a hint and unlimited retries; comparisons and complet
   await page.getByRole("button", { name: "Check the ribbons" }).click();
   await expect(page.locator("#feedback")).toContainText("Not quite yet");
   await expect(page.locator("#ribbon-hint")).toContainText("Compare the ends");
+  await expect(page.locator(".celebration")).toHaveCount(0);
   await audit(page);
   await page.getByRole("button", { name: "Select one more part on ribbon 2" }).click();
   await page.getByRole("button", { name: "Check the ribbons" }).click();
@@ -93,6 +100,7 @@ test("wrong selections get a hint and unlimited retries; comparisons and complet
   await expect(page.locator("#feedback")).toContainText("completes one whole");
   await page.getByRole("button", { name: "Finish workshop" }).click();
   await expect(page.locator("#quest-heading")).toBeFocused();
+  await expectThemedCelebration(page, rewards);
   expect(await page.evaluate((key) => localStorage.getItem(key), progressKey)).toBeNull();
 });
 
@@ -119,6 +127,7 @@ test("quiz keeps progress untouched, allows revisions, and grades only after sub
   for (let index = 2; index < questions.length; index += 1) {
     const correct = questions[index].choices.find((choice) => choice.value === questions[index].expected);
     await page.getByRole("button", { name: correct.label, exact: true }).click();
+    await expect(page.locator(".celebration")).toHaveCount(0);
     await page.getByRole("button", { name: index === questions.length - 1 ? "Review answers" : "Next question" }).click();
   }
   await expect(page.locator(".quiz-score")).toHaveCount(0);
@@ -127,6 +136,7 @@ test("quiz keeps progress untouched, allows revisions, and grades only after sub
   await page.getByRole("button", { name: "Review answers" }).click();
   await page.getByRole("button", { name: "Submit quiz" }).click();
   await expect(page.locator(".quiz-score")).toHaveText("89% correct (8 of 9 questions)");
+  await expect(page.locator(".celebration")).toHaveCount(0);
   await page.getByText("Answer details", { exact: true }).click();
   await expect(page.locator("#quest-complete details")).toContainText(wrong0.label);
   await expect(page.locator("#quest-complete details")).toContainText("Select 1/2");
@@ -170,5 +180,5 @@ test("storage failures are visible and do not prevent selecting fractions", asyn
   await expect(page.locator("#preference-status")).toContainText("couldn't save");
   await addParts(page, 1, 1);
   await page.getByRole("button", { name: "Check the ribbons" }).click();
-  await expect(page.locator("#feedback")).toContainText("That's it!");
+  await expect(page.locator("#feedback")).toHaveText(cheerPattern(rewards));
 });

@@ -1,5 +1,7 @@
 import { test, expect } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
+import { GAME_CELEBRATIONS } from "../../../../static/game-celebrations.js";
+import { expectThemedCelebration } from "../../shared/celebrations.js";
 import { LEVELS } from "../../../../static/acorn-adventure-engine.js";
 
 const key = "kid-games.acorn-adventure.progress";
@@ -57,6 +59,7 @@ test("home tile, worked example, keyboard steps, and retries preserve the runnin
     buttons.map((button) => Number(button.value)).find((value) => value !== answer), answer);
   await page.getByRole("button", { name: `${wrong} nuts`, exact: true }).press("Space");
   await expect(page.locator("#feedback")).toContainText("earlier steps are safe");
+  await expect(page.locator(".celebration")).toHaveCount(0);
   await expect(page.locator("#journey-log li")).toHaveCount(1);
   await expect(page.locator("#basket-total")).toContainText(`${total} `);
   await expect(page.locator(".acorn-term.current")).toHaveAttribute("aria-current", "step");
@@ -90,6 +93,7 @@ test("all ten cumulative journeys carry totals, save the next level, and wait be
   }
   await expect(page.locator("#quest-heading")).toBeFocused();
   expect(await page.evaluate((key) => localStorage.getItem(key), key)).toBeNull();
+  await expectThemedCelebration(page, GAME_CELEBRATIONS["acorn-adventure"]);
   expect(await page.locator(".celebration").evaluate((el) => el.getAnimations({ subtree: true }).length)).toBe(0);
   await page.locator("#play-again").click();
   await expect(page.locator("#level-count")).toHaveText("Level 1 of 10");

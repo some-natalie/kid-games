@@ -1,6 +1,7 @@
 import { LEVELS, STEPS_PER_LEVEL, buildRound, equationText, spokenEquation, hintText } from "./number-trail-engine.js";
 import { createLevelProgress } from "./level-progress.js";
 import { celebrate, stopCelebration } from "./alphabet-celebration.js";
+import { GAME_CELEBRATIONS } from "./game-celebrations.js";
 import { isQuizMode } from "./quiz-engine.js";
 
 if (!isQuizMode(window.location.search)) {
@@ -169,13 +170,13 @@ next.addEventListener("click", () => {
     showPuzzle();
   } else if (levelIndex < LEVELS.length - 1) {
     startLevel(levelIndex + 1);
-    celebrate();
+    celebrate(GAME_CELEBRATIONS["number-trail"]);
   } else {
     showWarning(clearProgress(getStorage));
     playArea.hidden = true;
     finale.hidden = false;
     find("quest-heading").focus();
-    celebrate();
+    celebrate(GAME_CELEBRATIONS["number-trail"]);
   }
 });
 

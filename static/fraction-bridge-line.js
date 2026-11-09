@@ -187,6 +187,9 @@ export function createBridgeLine({
       drawMarks();
       render();
     },
+    celebrate() {
+      wrapper.classList.add("celebrating");
+    },
     disable() {
       disabled = true;
       wrapper.classList.add("is-disabled");

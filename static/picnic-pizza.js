@@ -1,6 +1,8 @@
 import {
   LEVELS, PUZZLES_PER_LEVEL, buildPuzzle, fractionText, hintText, matchesAnswer,
 } from "./picnic-pizza-engine.js";
+import { celebrate, stopCelebration } from "./alphabet-celebration.js";
+import { GAME_CELEBRATIONS } from "./game-celebrations.js";
 import { createLevelProgress } from "./level-progress.js";
 import { isQuizMode } from "./quiz-engine.js";
 
@@ -194,6 +196,7 @@ if (!isQuizMode(window.location.search)) {
     puzzle = buildPuzzle(levelIndex, puzzleIndex);
     selected = new Set();
     answered = false;
+    stopCelebration();
     find("puzzle-heading").textContent = `Picnic puzzle ${puzzleIndex + 1}`;
     find("puzzle-prompt").textContent = puzzle.prompt;
     find("feedback").textContent = "";
@@ -265,20 +268,21 @@ if (!isQuizMode(window.location.search)) {
       return;
     }
     answered = true;
+    const { message: cheer } = celebrate(GAME_CELEBRATIONS["picnic-pizza"]);
     find("feedback").classList.add("success");
-    find("feedback").textContent = puzzle.activity === "equal"
+    find("feedback").textContent = `${cheer} ` + (puzzle.activity === "equal"
       ? puzzle.expected === "equal"
-        ? "Yes! Equal shares have the same area."
+        ? "Equal shares have the same area."
         : "These pieces are unequal, so they are not equal shares of the whole."
       : puzzle.activity === "name"
-        ? `That's right! ${fractionText(puzzle.numerator, puzzle.denominator)}. The denominator counts all equal pieces; the numerator counts the selected pieces.`
+        ? `${fractionText(puzzle.numerator, puzzle.denominator)}. The denominator counts all equal pieces; the numerator counts the selected pieces.`
         : puzzle.activity === "build"
-          ? `Great serving! ${fractionText(puzzle.numerator, puzzle.denominator)}.`
+          ? `You served ${fractionText(puzzle.numerator, puzzle.denominator)}.`
           : puzzle.activity === "compare"
-            ? `That's right! Both are the same-size whole, and ${puzzle.expected} covers more.`
+            ? `Both are the same-size whole, and ${puzzle.expected} covers more.`
             : puzzle.activity === "equivalent"
-              ? "They match! One half = two fourths = four eighths; each covers the same amount."
-              : "The missing piece fills the gap. Now all four equal pieces make one whole!";
+              ? "They match: one half = two fourths = four eighths; each covers the same amount."
+              : "The missing piece fills the gap. Now all four equal pieces make one whole!");
     find("hint").hidden = true;
     find("show-hint").hidden = true;
     checkButton.hidden = true;
@@ -324,6 +328,7 @@ if (!isQuizMode(window.location.search)) {
     playArea.hidden = true;
     finale.hidden = false;
     find("quest-heading").focus();
+    celebrate(GAME_CELEBRATIONS["picnic-pizza"]);
   }
 
   function advance() {

@@ -1,6 +1,7 @@
 import { LEVELS, buildJourney, stepEquation, stepStory, stepHint } from "./acorn-adventure-engine.js";
 import { createLevelProgress } from "./level-progress.js";
 import { celebrate, stopCelebration } from "./alphabet-celebration.js";
+import { GAME_CELEBRATIONS } from "./game-celebrations.js";
 import { isQuizMode } from "./quiz-engine.js";
 
 if (!isQuizMode(window.location.search)) {
@@ -153,13 +154,13 @@ find("next-step").addEventListener("click", () => {
     showStep();
   } else if (levelIndex < LEVELS.length - 1) {
     startLevel(levelIndex + 1);
-    celebrate();
+    celebrate(GAME_CELEBRATIONS["acorn-adventure"]);
   } else {
     warn(clearProgress(storage));
     find("play-area").hidden = true;
     find("quest-complete").hidden = false;
     find("quest-heading").focus();
-    celebrate();
+    celebrate(GAME_CELEBRATIONS["acorn-adventure"]);
   }
 });
 

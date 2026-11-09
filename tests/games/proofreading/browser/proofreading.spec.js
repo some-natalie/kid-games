@@ -1,6 +1,10 @@
 import { test, expect } from "@playwright/test";
 import { buildRound, correctedText, tokenKey } from "../../../../static/proofreading-engine.js";
 import { LEVELS } from "../../../../static/proofreading-levels.js";
+import { GAME_CELEBRATIONS } from "../../../../static/game-celebrations.js";
+import { cheerPattern, expectThemedCelebration } from "../../shared/celebrations.js";
+
+const rewards = GAME_CELEBRATIONS.proofreading;
 
 const progressKey = "kid-games.proofreading.progress";
 const token = (page, sentence, index) => page.locator(`[data-token="${tokenKey(sentence, index)}"]`);
@@ -70,7 +74,8 @@ test("level 1 can be solved and advances", async ({ page }) => {
   await expect(page.locator("#progress")).toContainText("1 mistake to find");
   await markMistakes(page, 0);
   await page.locator("#check-marks").click();
-  await expect(page.locator("#feedback")).toContainText("You found all 1 mistake!");
+  await expect(page.locator("#feedback")).toHaveText(cheerPattern(rewards, "You found all 1 mistake! 🎉"));
+  await expectThemedCelebration(page, rewards);
   await expect(page.locator("#fix-list li")).toHaveCount(1);
   await expect(page.locator("#fix-list")).toContainText("“my” should be “My”");
   await expect(page.locator(".proof-token").first()).toHaveText("My");
@@ -78,6 +83,7 @@ test("level 1 can be solved and advances", async ({ page }) => {
   await expect(page.locator("#proof-text")).toContainText("My cat likes to nap in the sun.");
   await page.locator("#next-level").click();
   await expect(page.locator("#level-count")).toHaveText("Level 2 of 10");
+  await expect(page.locator(".celebration")).toHaveCount(0);
   expect(await page.evaluate((key) => localStorage.getItem(key), progressKey)).toContain('"level":1');
 });
 
@@ -340,6 +346,7 @@ test("final level is a five-sentence paragraph and finishing it ends the case", 
   await expect(page.locator("#finish-case")).toBeFocused();
   await page.locator("#finish-case").click();
   await expect(page.locator("#quest-complete")).toBeVisible({ timeout: 10000 });
+  await expectThemedCelebration(page, rewards);
   expect(await page.evaluate((key) => localStorage.getItem(key), progressKey)).toBeNull();
   await page.locator("#play-again").click();
   await expect(page.locator("#level-count")).toHaveText("Level 1 of 10");

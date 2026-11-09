@@ -1,6 +1,10 @@
 import { test, expect } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
+import { readFileSync } from "node:fs";
 import { GROUPS_PROGRESS, createWorkspace } from "../../../../static/alphabet-groups-engine.js";
+import { cheerPattern, expectThemedCelebration } from "../../shared/celebrations.js";
+
+const rewards = JSON.parse(readFileSync(new URL("../../../../static/celebrations.json", import.meta.url), "utf8"));
 
 const progressKey = "kid-games.alphabetical-order.progress";
 const preferencesKey = "kid-games.alphabetical-order.preferences";
@@ -63,6 +67,7 @@ test("children refine first, second, third, and fourth-letter lists and assemble
   await activate(page.getByRole("button", { name: "Check order", exact: true }));
   await expect(page.locator("#feedback")).toContainText("Gather every word");
   await expect(page.locator("#feedback")).not.toContainText("right place");
+  await expect(page.locator(".celebration")).toHaveCount(0);
 
   await createList(page, "c");
   for (const word of ["cart", "cat", "car"]) await move(page, word, "group-1");
@@ -92,7 +97,8 @@ test("children refine first, second, third, and fourth-letter lists and assemble
   await activate(page.getByRole("button", { name: "Send cat to final ABC list", exact: true }));
   expect(await listed(page, "final")).toEqual(["apple", "banana", "book", "car", "cart", "cat"]);
   await activate(page.getByRole("button", { name: "Check order", exact: true }));
-  await expect(page.locator("#feedback")).toContainText("Every word is in the right place");
+  await expect(page.locator("#feedback")).toHaveText(cheerPattern(rewards, "Every word is in the right place."));
+  await expectThemedCelebration(page, rewards);
   await expect(page.getByRole("button", { name: "Next level", exact: true })).toBeFocused();
   await expect(board(page, "final").locator("[data-word]").first()).toBeDisabled();
   await audit(page);
@@ -113,6 +119,7 @@ test("list validation, wrong final orders, revisions, and clearing empty groups 
   await activate(page.getByRole("button", { name: "Send Word tray to final ABC list", exact: true }));
   await activate(page.getByRole("button", { name: "Check order", exact: true }));
   await expect(page.locator("#feedback")).toContainText("try again");
+  await expect(page.locator(".celebration")).toHaveCount(0);
   await move(page, "car", "group-1");
   await expect(page.getByRole("button", { name: "Remove empty list c", exact: true })).toBeDisabled();
   await move(page, "car", "final");
@@ -160,11 +167,13 @@ test("all seven deeper-letter rounds complete, and the finale clears only group 
     await activate(page.getByRole("button", { name: level < 6 ? "Next level" : "Finish sorting", exact: true }));
   }
   await expect(page.getByRole("heading", { name: "Show your parent!", exact: true })).toBeFocused();
+  await expectThemedCelebration(page, rewards);
   const saved = await page.evaluate((key) => JSON.parse(localStorage.getItem(key)), progressKey);
   expect(saved.themes.general).toEqual(classicSave);
   expect(saved.themes[GROUPS_PROGRESS]).toBeUndefined();
   await activate(page.getByRole("button", { name: "Play again", exact: true }));
   await expect(page.locator("#level-count")).toHaveText("Level 1 of 7");
+  await expect(page.locator(".celebration")).toHaveCount(0);
 });
 
 test("group quiz retains every workspace, withholds help and feedback, and grades final orders exactly", async ({ page }) => {
@@ -197,6 +206,7 @@ test("group quiz retains every workspace, withholds help and feedback, and grade
       await sortList(page, "final");
     }
     await expect(page.locator("body")).not.toContainText(/Correct order:|right place|86%/);
+    await expect(page.locator(".celebration")).toHaveCount(0);
   }
   await activate(page.getByRole("button", { name: "Review answers", exact: true }));
   await activate(page.getByRole("button", { name: "Edit question 1", exact: true }));
@@ -207,6 +217,7 @@ test("group quiz retains every workspace, withholds help and feedback, and grade
   await activate(page.getByRole("button", { name: "Review answers", exact: true }));
   await activate(page.getByRole("button", { name: "Submit quiz", exact: true }));
   await expect(page.locator(".quiz-score")).toHaveText("86% correct (6 of 7 questions)");
+  await expect(page.locator(".celebration")).toHaveCount(0);
   await page.getByText("Answer details", { exact: true }).click();
   await expect(page.locator("#quest-complete details")).toContainText("Correct order:");
   await expect(page.locator("#quest-complete details")).toContainText("shared prefix");

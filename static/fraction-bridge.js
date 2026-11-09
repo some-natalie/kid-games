@@ -2,8 +2,12 @@ import {
   LEVELS, compareFractions, evaluatePlacement, fractionName, isOrdered, positionLabel,
 } from "./fraction-bridge-engine.js";
 import { createBridgeLine, createTargetCard } from "./fraction-bridge-line.js";
+import { celebrate, stopCelebration } from "./alphabet-celebration.js";
+import { GAME_CELEBRATIONS } from "./game-celebrations.js";
 import { createLevelProgress } from "./level-progress.js";
 import { isQuizMode } from "./quiz-engine.js";
+
+const BRIDGE_CELEBRATIONS = GAME_CELEBRATIONS["fraction-bridge"];
 
 if (!isQuizMode(window.location.search)) {
   const { loadProgress, saveProgress, clearProgress } =
@@ -62,7 +66,7 @@ if (!isQuizMode(window.location.search)) {
       return;
     }
     const target = level.fractions.map((fraction) => `${fraction} (${fractionName(fraction)})`).join(" and ");
-    finishLevel(`Yes! ${target} ${level.fractions.length > 1 ? "share this spot" : "belongs here"}.`);
+    finishLevel(`${target} ${level.fractions.length > 1 ? "share this spot" : "belongs here"}.`);
   }
 
   function showAnswerControls(level) {
@@ -115,7 +119,7 @@ if (!isQuizMode(window.location.search)) {
     check.addEventListener("click", () => {
       if (solved) return;
       if (isOrdered(currentOrder)) {
-        finishLevel(`That's right! ${currentOrder.map((fraction) => `${fraction} (${fractionName(fraction)})`).join(", ")} are in order.`);
+        finishLevel(`${currentOrder.map((fraction) => `${fraction} (${fractionName(fraction)})`).join(", ")} are in order.`);
       } else {
         feedback.textContent = "Not quite. Compare how far each fraction is from 0, then try another order.";
       }
@@ -137,7 +141,7 @@ if (!isQuizMode(window.location.search)) {
       choice.addEventListener("click", () => {
         if (solved) return;
         if (compareFractions(fraction, level.fractions[0]) > 0) {
-          finishLevel(`Yes! ${fraction} (${fractionName(fraction)}) is greater because it is farther from 0.`);
+          finishLevel(`${fraction} (${fractionName(fraction)}) is greater because it is farther from 0.`);
         } else {
           feedback.textContent = `${fraction} is not greater yet. Compare the two positions and try again.`;
         }
@@ -164,7 +168,10 @@ if (!isQuizMode(window.location.search)) {
 
   function finishLevel(message) {
     solved = true;
-    feedback.textContent = message;
+    const { message: cheer } = celebrate(BRIDGE_CELEBRATIONS);
+    feedback.textContent = `${cheer} ${message}`;
+    feedback.classList.add("success");
+    bridge?.celebrate();
     challengeArea.querySelectorAll("button").forEach((choice) => { choice.disabled = true; });
     bridge?.disable();
     hint.hidden = true;
@@ -181,6 +188,8 @@ if (!isQuizMode(window.location.search)) {
     hintShown = false;
     currentOrder = [];
     bridge = undefined;
+    stopCelebration();
+    feedback.classList.remove("success");
     feedback.textContent = "";
     hint.textContent = "";
     hint.hidden = true;
@@ -214,6 +223,7 @@ if (!isQuizMode(window.location.search)) {
     showWarning(clearProgress(getStorage));
     playArea.hidden = true;
     finale.hidden = false;
+    celebrate(BRIDGE_CELEBRATIONS);
     find("quest-heading").focus();
   }
 

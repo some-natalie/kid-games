@@ -1,5 +1,7 @@
 import { test, expect } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
+import { GAME_CELEBRATIONS } from "../../../../static/game-celebrations.js";
+import { expectThemedCelebration } from "../../shared/celebrations.js";
 
 const progressKey = "kid-games.number-trail.progress";
 const stones = (page) => page.locator("#answer-stones button");
@@ -61,6 +63,7 @@ test("the home tile opens a worked example and keyboard-accessible untimed play"
   const values = await stones(page).evaluateAll((buttons) => buttons.map((button) => Number(button.value)));
   await page.getByRole("button", { name: `Stepping stone ${values.find((item) => item !== value)}`, exact: true }).press("Space");
   await expect(page.locator("#feedback")).toContainText("Try another stone!");
+  await expect(page.locator(".celebration")).toHaveCount(0);
   await expect(page.locator("#progress")).toHaveText("0 of 5 stones crossed in this level.");
   await expect(stones(page).first()).toBeEnabled();
   await solve(page, true);
@@ -106,6 +109,7 @@ test("all 50 stones can be crossed, progress advances, and finishing waits for t
   await expect(page.locator("#quest-heading")).toBeFocused();
   await expect(page.locator("#quest-complete")).toContainText("all 50 stepping stones");
   expect(await page.evaluate((key) => localStorage.getItem(key), progressKey)).toBeNull();
+  await expectThemedCelebration(page, GAME_CELEBRATIONS["number-trail"]);
   await expect(page.locator(".celebration")).toBeVisible();
   expect(await page.locator(".celebration").evaluate((element) => element.getAnimations({ subtree: true }).length)).toBe(0);
   await page.locator("#play-again").click();

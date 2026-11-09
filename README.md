@@ -73,7 +73,8 @@ Generated files go into `public/` and are not committed.
 
 Each game has a directory under `content/`, containing an `index.md`. Set its
 title, description, weight (tile order), template, and icon. The root page lists
-these games automatically. The alphabetical
+these games automatically. Every game also needs at least 10 themed rewards
+(see [Themed rewards](#themed-rewards)). The alphabetical
 game uses `templates/alphabetical-order.html` and `static/alphabetical-order.js`;
 it loads the tagged word bank from `static/words.json`. Each new round randomly
 selects appropriate words for the current level; retries keep the same set in a
@@ -88,6 +89,30 @@ The game is a 10-level quest that ramps from 4 words to 12:
 | 8 | 11 | Adds a pair sharing two letters (look at the third letter) |
 | 9 | 12 | Two third-letter pairs and four second-letter pairs |
 | 10 | 12 | Dinosaur challenge, with at least one pair sharing two letters |
+
+## Themed rewards
+
+Every game celebrates right answers (and its finale) with at least 10 rewards
+that match its theme, drawn at random by the shared celebration layer in
+`static/alphabet-celebration.js`. Each reward set also has themed cheers that
+prefix the success feedback.
+
+| Game | Reward set | Examples |
+|---|---|---|
+| Alphabetical Adventure (both modes) | `static/celebrations.json` | letter showers, letter blocks, storybooks, pencils, sparkles, dinosaurs |
+| Proofreading Detectives | `GAME_CELEBRATIONS.proofreading` | magnifying glasses, clue notes, check marks, detective badges, footprints |
+| Number Trail | `GAME_CELEBRATIONS["number-trail"]` | number showers, stepping stones, foxes, deer, wildflowers, star paths |
+| Acorn Adventure | `GAME_CELEBRATIONS["acorn-adventure"]` | acorn rain, autumn leaves, squirrels, hedgehogs, owls, fireflies |
+| Fraction Bridge | `GAME_CELEBRATIONS["fraction-bridge"]` | pond bubbles, lily blossoms, frogs, ducks, turtle friends, fraction stars |
+| Picnic Pizza | `GAME_CELEBRATIONS["picnic-pizza"]` | pizza slices, picnic fruit, ladybugs, marching ants, checkered confetti |
+| Ribbon Workshop | `GAME_CELEBRATIONS["ribbon-workshop"]` | ribbon confetti, bows, thread spools, yarn, sequins, fraction tags |
+
+`GAME_CELEBRATIONS` lives in `static/game-celebrations.js`. Each set is checked
+by `readCelebrations` and must use every motion (`burst`, `shower`, and `rise`).
+`tests/games/shared/celebrations.test.mjs` fails if any game under `content/`
+has fewer than 10 rewards or reuses another game's set. Wrong answers and quiz
+mode never celebrate. With reduced motion, five still pieces appear instead of
+the animation.
 
 ### Sort in smaller lists
 
@@ -154,8 +179,9 @@ styles after deployment instead of reusing a cached version of the layout.
 
 ### Celebrations
 
-Cheers and effects are picked at random from `static/celebrations.json`
-(sparkles, flowers, stars, confetti, balloons, hearts, dinosaurs, and more).
+Cheers and effects for both Alphabetical Adventure modes are picked at random
+from `static/celebrations.json` (letter showers, letter blocks, storybooks,
+pencils, sparkles, flowers, stars, confetti, balloons, dinosaurs, and more).
 Add an effect with this structure:
 
 ```json
@@ -190,6 +216,12 @@ Enter, Space, or **Check Tilly’s spot** checks the answer. On narrow screens t
 bridge turns vertical, with 0 at the bottom and 1 at the top, so every label stays
 readable. Players can use hints to restore partition guides and their labels, and
 retry without losing points. The comparison level shows a non-interactive bridge.
+Each right answer starts one of ten randomly chosen pond-themed celebrations from
+`GAME_CELEBRATIONS["fraction-bridge"]` (such as pond bubbles, lily blossoms, frog
+hops, duck parades, turtle friends, or fraction stars), using the shared celebration
+layer with a cheer such as “Tilly made it!”. On the bridge, Tilly hops, the chosen
+label twinkles, and the stripes shimmer. Wrong answers and quiz mode never
+celebrate, and reduced-motion settings show still sparkles without animation.
 In quiz mode, moving Tilly only records the answer; there is no check and no
 correctness feedback until the quiz is submitted. Normal progress is saved in
 this browser under `kid-games.fraction-bridge.progress`; quiz answers remain in
@@ -347,8 +379,8 @@ are bold and underlined. Removed punctuation stays visible in red with a
 strikethrough and still counts as fixed, including after clearing other marks.
 Progress autosaves under
 `kid-games.proofreading.progress` as `{"version":1,"level":3}` and is cleared
-after level 10. Celebrations reuse `static/celebrations.json` effects with the
-game's own cheers.
+after level 10. Celebrations use the detective-themed rewards in
+`GAME_CELEBRATIONS.proofreading` with the game's own cheers.
 
 Final corrections stay available until the player chooses **Finish case**.
 Decorative victory animations stop within five seconds and respect reduced
@@ -463,7 +495,8 @@ Use the fold buttons to divide a ribbon into equal parts, and the large
 length. The aligned overlay uses a shared origin and whole length, with distinct
 partition guides and hatching. Selection labels name both the fraction and the
 number of equal parts. Wrong attempts keep the current selection, show a hint,
-and can be retried without a timer or point loss.
+and can be retried without a timer or point loss. Right answers add a themed
+cheer and a ribbon, bow, or sewing celebration.
 
 Fraction and partition logic lives in `static/ribbon-workshop-engine.js`;
 `static/ribbon-workshop.js` renders the accessible HTML controls and overlay.
@@ -485,7 +518,7 @@ Unequal-area cuts are explicitly identified as not being equal shares.
 Formal fraction arithmetic and number-line placement are not included.
 
 Tap piece controls or use the keyboard; hints and unlimited retries never cost
-points. Circles and rectangles show the quantity, with synchronized fraction
+points. Right answers add a picnic cheer and a picnic-themed celebration. Circles and rectangles show the quantity, with synchronized fraction
 words and notation. `static/picnic-pizza-engine.js` contains the fraction and
 puzzle logic; `static/picnic-pizza.js` handles the DOM. The unlocked level is
 saved locally under `kid-games.picnic-pizza.progress` as

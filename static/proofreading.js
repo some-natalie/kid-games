@@ -1,6 +1,7 @@
-import { celebrate, DEFAULT_CELEBRATIONS, readCelebrations, stopCelebration } from "./alphabet-celebration.js";
+import { celebrate, stopCelebration } from "./alphabet-celebration.js";
+import { GAME_CELEBRATIONS } from "./game-celebrations.js";
 import { buildRound, correctionParts, describeFix, gradeRound, MISTAKE_TYPES, pickVariant, tokenKey } from "./proofreading-engine.js";
-import { CELEBRATION_MESSAGES, LEVELS } from "./proofreading-levels.js";
+import { LEVELS } from "./proofreading-levels.js";
 import { clearProgress, loadProgress, saveProgress } from "./proofreading-progress.js";
 import { isQuizMode } from "./quiz-engine.js";
 
@@ -27,7 +28,7 @@ import { isQuizMode } from "./quiz-engine.js";
   const savedMessage = "Your level is saved only in this browser.";
   const punctuationNames = { ",": "comma", ".": "period", "!": "exclamation mark", "?": "question mark" };
   const plural = (count, word) => `${count} ${word}${count === 1 ? "" : "s"}`;
-  let celebrations = { ...DEFAULT_CELEBRATIONS, messages: CELEBRATION_MESSAGES };
+  const celebrations = GAME_CELEBRATIONS.proofreading;
   let levelIndex = 0;
   let round;
   let marked = new Set();
@@ -324,16 +325,6 @@ import { isQuizMode } from "./quiz-engine.js";
     checkButton.focus();
   }
 
-  async function loadCelebrations() {
-    try {
-      const response = await fetch(new URL("./celebrations.json", import.meta.url));
-      if (!response.ok) throw new Error(`Celebrations request failed (${response.status}).`);
-      celebrations = { ...readCelebrations(await response.json()), messages: CELEBRATION_MESSAGES };
-    } catch (error) {
-      console.warn("Using built-in celebrations:", error);
-    }
-  }
-
   proofText.addEventListener("click", (event) => {
     const button = event.target.closest(".proof-token");
     if (button && !button.disabled) {
@@ -413,6 +404,5 @@ import { isQuizMode } from "./quiz-engine.js";
   }
 
   setupExample();
-  loadCelebrations();
   updateStart();
 })();

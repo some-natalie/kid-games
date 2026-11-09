@@ -28,6 +28,10 @@
     {"id": "snowflakes", "label": "Snowflakes", "motion": "shower", "count": 50, "symbols": ["❄", "❅", "❆"], "colors": ["#7fd1ff", "#b8e6ff", "#3fa7f5"]},
     {"id": "butterflies", "label": "Butterflies", "motion": "rise", "count": 24, "symbols": ["🦋"], "colors": []},
     {"id": "rockets", "label": "Rockets", "motion": "rise", "count": 16, "symbols": ["🚀", "✨"], "colors": []},
-    {"id": "fireworks", "label": "Fireworks", "motion": "burst", "count": 60, "symbols": ["🎆", "🎇", "✨"], "colors": []}
+    {"id": "fireworks", "label": "Fireworks", "motion": "burst", "count": 60, "symbols": ["🎆", "🎇", "✨"], "colors": []},
+    {"id": "letter-shower", "label": "Letter shower", "motion": "shower", "count": 60, "symbols": ["A", "B", "C", "D", "E", "F", "G", "H", "X", "Y", "Z"], "colors": ["#ff5d8f", "#ffb627", "#3ccf91", "#3fa7f5", "#9b5de5", "#ff7a3d"]},
+    {"id": "letter-blocks", "label": "Letter blocks", "motion": "burst", "count": 40, "symbols": ["🔤", "🔠", "🔡"], "colors": []},
+    {"id": "storybooks", "label": "Storybooks", "motion": "rise", "count": 30, "symbols": ["📚", "📖"], "colors": []},
+    {"id": "pencils", "label": "Pencils", "motion": "shower", "count": 35, "symbols": ["✏️", "🖍️"], "colors": []}
   ]
 }

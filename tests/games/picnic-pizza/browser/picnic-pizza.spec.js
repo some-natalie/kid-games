@@ -3,6 +3,10 @@ import AxeBuilder from "@axe-core/playwright";
 import {
   LEVELS, PUZZLES_PER_LEVEL, buildPuzzle, fractionText, quizQuestions,
 } from "../../../../static/picnic-pizza-engine.js";
+import { GAME_CELEBRATIONS } from "../../../../static/game-celebrations.js";
+import { cheerPattern, expectThemedCelebration } from "../../shared/celebrations.js";
+
+const rewards = GAME_CELEBRATIONS["picnic-pizza"];
 
 const progressKey = "kid-games.picnic-pizza.progress";
 
@@ -91,9 +95,12 @@ test("unequal cuts explain the mismatch, and all seven levels can be completed w
   await expect(page.locator("#feedback")).toContainText("not match");
   await expect(page.locator("#hint")).toContainText("same area");
   await expect(page.locator("#feedback")).not.toHaveClass(/success/);
+  await expect(page.locator(".celebration")).toHaveCount(0);
   await page.getByRole("button", { name: first.expected === "equal" ? "Equal shares" : "Unequal shares", exact: true }).press("Enter");
-  await expect(page.locator("#feedback")).toContainText("Equal shares have the same area");
+  await expect(page.locator("#feedback")).toHaveText(cheerPattern(rewards, "Equal shares have the same area."));
+  await expectThemedCelebration(page, rewards);
   await page.locator("#next-step").click();
+  await expect(page.locator(".celebration")).toHaveCount(0);
   await expect(page.locator("#puzzle-visuals .fraction-whole.rectangle > span")).toHaveCount(2);
   await expect(page.locator("#puzzle-visuals .fraction-whole.rectangle")).toHaveAttribute("aria-label", /unequal pieces/);
   await expect(page.locator("#puzzle-visuals .fraction-whole.rectangle > span").nth(1)).toHaveCSS("flex-grow", "0.75");
@@ -121,10 +128,22 @@ test("unequal cuts explain the mismatch, and all seven levels can be completed w
   }
   await expect(page.locator("#quest-heading")).toBeFocused();
   await expect(page.locator("#quest-complete")).toContainText("Great sharing");
+  await expectThemedCelebration(page, rewards);
   expect(await page.evaluate((key) => localStorage.getItem(key), progressKey)).toBeNull();
   expect(await page.evaluate(() => document.getAnimations({ subtree: true }).length)).toBe(0);
   await page.locator("#play-again").click();
   await expect(page.locator("#level-title")).toHaveText(LEVELS[0].title);
+});
+
+test("correct answers set off a picnic-themed celebration in full motion", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "no-preference" });
+  await start(page);
+  const first = buildPuzzle(0, 0);
+  await page.getByRole("button", { name: first.expected === "equal" ? "Equal shares" : "Unequal shares", exact: true }).click();
+  await expect(page.locator("#feedback")).toHaveText(cheerPattern(rewards));
+  await expectThemedCelebration(page, rewards);
+  expect(await page.locator(".celebration").evaluate((layer) => layer.getAnimations({ subtree: true }).length)).toBeGreaterThan(0);
+  await audit(page);
 });
 
 test("level progress resumes locally, preserves other games, and reports blocked storage", async ({ page }) => {
@@ -178,6 +197,7 @@ test("quiz answers can be revised, are graded only at submission, and never touc
       await page.getByRole("button", { name: question.expected, exact: true }).click();
     }
     await expect(page.locator(".quiz-score")).toHaveCount(0);
+    await expect(page.locator(".celebration")).toHaveCount(0);
     await page.getByRole("button", { name: index === LEVELS.length - 1 ? "Review answers" : "Next question", exact: true }).click();
   }
   await page.getByRole("button", { name: "Edit question 1", exact: true }).click();
@@ -186,6 +206,7 @@ test("quiz answers can be revised, are graded only at submission, and never touc
   await expect(page.locator(".quiz-score")).toHaveCount(0);
   await page.getByRole("button", { name: "Submit quiz", exact: true }).click();
   await expect(page.locator(".quiz-score")).toHaveText("86% correct (6 of 7 questions)");
+  await expect(page.locator(".celebration")).toHaveCount(0);
   await page.getByText("Answer details", { exact: true }).click();
   await expect(page.locator("#quest-complete details")).toContainText("Your answer: unequal");
   await expect(page.locator("#quest-complete details")).toContainText("Equal shares have the same area.");

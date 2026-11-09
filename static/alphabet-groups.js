@@ -1,4 +1,5 @@
 import { isQuizMode } from "./quiz-engine.js";
+import { celebrate, DEFAULT_CELEBRATIONS, readCelebrations, stopCelebration } from "./alphabet-celebration.js";
 import { readWordBank, shuffled } from "./alphabet-word-lists.js";
 import { clearProgress, loadProgress, saveProgress } from "./alphabet-progress.js";
 import {
@@ -42,6 +43,7 @@ function startGroups() {
   let round;
   let workspace;
   let view;
+  let celebrations = DEFAULT_CELEBRATIONS;
 
   const button = (text, action, primary = false) => {
     const node = element("button", text, primary ? "primary-button" : "secondary-button");
@@ -71,6 +73,7 @@ function startGroups() {
     workspace = restore?.workspace ?? createWorkspace(shuffled(round));
     tutorial.hidden = true;
     play.hidden = false;
+    stopCelebration();
     play.replaceChildren();
     const title = element("h2", GROUP_LEVELS[index].title);
     title.id = "level-title";
@@ -100,7 +103,8 @@ function startGroups() {
         check.focus();
         return;
       }
-      feedback.textContent = "Every word is in the right place! Your smaller lists made one big ABC list.";
+      const { message: cheer } = celebrate(celebrations);
+      feedback.textContent = `${cheer} Every word is in the right place. Your smaller lists made one big ABC list.`;
       feedback.classList.add("success");
       view.lock();
       check.disabled = true;
@@ -121,6 +125,7 @@ function startGroups() {
           play.append(finale, element("p", "You compared words from the first letter all the way to the seventh!"),
             button("Play again", () => begin(0), true));
           finale.focus();
+          celebrate(celebrations);
         }, true);
         actions.append(finish);
         finish.focus();
@@ -176,5 +181,15 @@ function startGroups() {
       retry.hidden = false;
     }
   }
+  async function loadCelebrations() {
+    try {
+      const response = await fetch(new URL("./celebrations.json", import.meta.url));
+      if (!response.ok) throw new Error(`Celebrations request failed (${response.status}).`);
+      celebrations = readCelebrations(await response.json());
+    } catch (error) {
+      console.warn("Using built-in celebrations:", error);
+    }
+  }
+  loadCelebrations();
   loadWords();
 }

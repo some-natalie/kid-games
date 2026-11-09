@@ -16,8 +16,9 @@ and Acorn Adventure (cumulative addition and subtraction).
 - `content/<game>/index.md` – one directory per game; front matter sets title, description, weight, template, icon. The home page lists games automatically.
 - `content/for-grown-ups.md` – quiz settings, public repository links, and licensing credits; not a game.
 - `templates/` – Zola templates (`base.html`, `index.html`, and one per game).
-- `static/` – game UI modules and testable helpers (`alphabet-*.js`, `proofreading-*.js`, `number-trail-engine.js`, `acorn-adventure-engine.js`), shared `level-progress.js`, `style.css`, `words.json` (tagged word bank), `celebrations.json`.
+- `static/` – game UI modules and testable helpers (`alphabet-*.js`, `proofreading-*.js`, `number-trail-engine.js`, `acorn-adventure-engine.js`), shared `level-progress.js`, `style.css`, `words.json` (tagged word bank), `celebrations.json` (alphabet rewards), and `game-celebrations.js` (every other game's themed rewards).
 - `tools/expand-word-bank.py` – builds the word bank (WordNet; see `static/wordnet-license.txt`).
+- `tests/games/shared/` – cross-game tests and browser helpers (themed rewards).
 - `tests/games/<game>/` – unit tests (`*.test.mjs`, `*_test.py`) and `browser/*.spec.js` Playwright tests.
 
 ## Commands
@@ -71,14 +72,27 @@ the "Keep dragging" feedback message) can break them. Update tests together with
 - Test both modes, including withheld feedback, retained revisions, exact final
   scores and corrections, URL propagation, and unchanged normal saved progress.
   Document any new scoring rules or intentional mode-specific behavior.
+- Every game must have at least 10 themed rewards: CSS celebrations that match
+  the game's theme (for example, acorns and squirrels for Acorn Adventure), plus
+  themed cheers. Add the set to `GAME_CELEBRATIONS` in
+  `static/game-celebrations.js` (Alphabetical Adventure uses
+  `static/celebrations.json`), use every motion (`burst`, `shower`, `rise`), and
+  play them with `celebrate()`/`stopCelebration()` from
+  `static/alphabet-celebration.js`. Celebrate right answers and the finale, never
+  wrong answers or quiz mode, and stop the celebration when moving on. Keep the
+  layer `aria-hidden`, pair it with text feedback, and show still pieces under
+  reduced motion. `tests/games/shared/celebrations.test.mjs` enforces the count;
+  browser tests must assert the celebration (see `tests/games/shared/celebrations.js`).
 
 ## Adding a game
 
 1. Create `content/<game>/index.md` and a template in `templates/`.
 2. Add scripts/assets in `static/`.
 3. Add unit tests and `tests/games/<game>/browser/*.spec.js`.
-4. Document it in `README.md`.
-5. Meet the test, accessibility, and quiz-mode requirements above.
+4. Add at least 10 themed rewards to `static/game-celebrations.js` and wire them
+   into right answers and the finale.
+5. Document it in `README.md`, including its row in the Themed rewards table.
+6. Meet the test, accessibility, quiz-mode, and themed-reward requirements above.
 
 ## GitHub Actions rules
 
