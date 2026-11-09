@@ -76,7 +76,7 @@ export function buildQuizQuestions(operation, random = Math.random) {
     const problem = buildProblem(operation, maxForWave(wave), random);
     return {
       kind: "math-meteor",
-      title: `Question ${index + 1}`,
+      title: `Question ${index + 1}: ${OPERATIONS[operation].label}`,
       prompt: `${problem.left} ${OPERATIONS[operation].symbol} ${problem.right} = ?`,
       expected: problem.answer,
       correction: `Correct equation: ${equationText(problem)}. ${strategyText(problem)}`,

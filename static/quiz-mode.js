@@ -10,6 +10,7 @@ import { createBridgeLine, createTargetCard } from "./fraction-bridge-line.js";
 import { quizQuestions as pizzaQuestions } from "./picnic-pizza-engine.js";
 import { createWorkspace, finalWords, groupQuizQuestions } from "./alphabet-groups-engine.js";
 import { mountWorkspace } from "./alphabet-groups-workspace.js";
+import { buildQuizQuestions as meteorQuestions } from "./math-meteor-patrol-engine.js";
 
 const active = isQuizMode(window.location.search);
 if (active) {
@@ -38,7 +39,7 @@ function element(tag, text, className) {
   return node;
 }
 
-function makeQuestions(kind, bank, theme, grouped = false) {
+function makeQuestions(kind, bank, theme, grouped = false, mathOperation = "addition") {
   if (kind === "alphabet") {
     if (grouped) return groupQuizQuestions(bank);
     return QUEST_LEVELS.map((level, index) => {
@@ -68,6 +69,7 @@ function makeQuestions(kind, bank, theme, grouped = false) {
       correction: `Correct equation: ${equationText(problem, true)}.`,
     })));
   }
+  if (kind === "math-meteor") return meteorQuestions(mathOperation);
   if (kind === "ribbon") return RIBBON_LEVELS.map((_, index) => ribbonQuizQuestion(index));
   if (kind === "fraction") return fractionQuestions();
   if (kind === "pizza") return pizzaQuestions();
@@ -89,7 +91,8 @@ function setupQuiz(game) {
     ? "acorn" : game.classList.contains("number-trail") ? "number"
       : game.classList.contains("proofreading-game") ? "proof"
         : game.classList.contains("picnic-pizza-game") ? "pizza"
-          : game.classList.contains("fraction-bridge") ? "fraction" : "alphabet";
+          : game.classList.contains("fraction-bridge") ? "fraction"
+            : game.classList.contains("math-meteor-patrol") ? "math-meteor" : "alphabet";
   game.replaceChildren();
   const notice = element("p", QUIZ_NOTICE, "quiz-notice");
   const area = element("div");
@@ -105,6 +108,7 @@ function setupQuiz(game) {
   let theme = "general";
   let grouped = new URLSearchParams(location.search).get("sort") === "groups";
   let groupWorkspaces = [];
+  let mathOperation = "addition";
 
   const button = (text, action, primary = false) => {
     const node = element("button", text, primary ? "primary-button" : "secondary-button");
@@ -153,9 +157,25 @@ function setupQuiz(game) {
         area.append(label);
       }
     }
+    if (kind === "math-meteor") {
+      const label = element("label", "Choose an arithmetic target ");
+      const select = element("select");
+      select.setAttribute("aria-label", "Choose an arithmetic target");
+      for (const [value, text] of [
+        ["addition", "Addition"], ["subtraction", "Subtraction"], ["multiplication", "Multiplication (optional)"],
+      ]) {
+        const option = element("option", text);
+        option.value = value;
+        select.append(option);
+      }
+      select.value = mathOperation;
+      select.addEventListener("change", () => { mathOperation = select.value; });
+      label.append(select);
+      area.append(label, element("p", "This quiz is untimed. You can revise answers before submitting; there are no worked examples or answer checks during the quiz."));
+    }
     area.append(button("Start quiz", () => {
       try {
-        questions = makeQuestions(kind, bank, theme, grouped);
+        questions = makeQuestions(kind, bank, theme, grouped, mathOperation);
       } catch (error) {
         console.error("Unable to prepare quiz questions:", error);
         status.textContent = "We couldn't prepare the quiz. Reload the page to try again.";
@@ -164,7 +184,8 @@ function setupQuiz(game) {
       groupWorkspaces = questions.map((question) => question.grouped ? createWorkspace(question.initial) : undefined);
       responses = questions.map((question) => question.grouped ? [] : question.kind === "alphabet" ? [...question.initial]
         : question.kind === "proof" || question.multiple ? []
-          : question.kind === "fraction-order" ? [...question.initial] : undefined);
+          : question.kind === "fraction-order" ? [...question.initial]
+            : question.kind === "math-meteor" ? "" : undefined);
       current = 0;
       showQuestion();
     }, true));
@@ -203,6 +224,38 @@ function setupQuiz(game) {
         choices.append(choice);
       });
       area.append(choices);
+    }
+    if (kind === "math-meteor") {
+      const label = element("label", "Your answer ");
+      const input = element("input");
+      input.type = "text";
+      input.inputMode = "numeric";
+      input.pattern = "[0-9]*";
+      input.maxLength = 2;
+      input.autocomplete = "off";
+      input.setAttribute("aria-label", "Your answer");
+      input.value = responses[current] ?? "";
+      input.addEventListener("input", () => {
+        input.value = input.value.replace(/\D/g, "").slice(0, 2);
+        responses[current] = input.value;
+      });
+      label.append(input);
+      const pad = element("div", undefined, "number-pad");
+      pad.setAttribute("role", "group");
+      pad.setAttribute("aria-label", "Number buttons");
+      for (const digit of ["1", "2", "3", "4", "5", "6", "7", "8", "9", "Clear", "0", "Delete"]) {
+        const key = button(digit);
+        key.setAttribute("aria-label", digit === "Delete" ? "Delete last digit" : digit);
+        key.addEventListener("click", () => {
+          if (digit === "Clear") input.value = "";
+          else if (digit === "Delete") input.value = input.value.slice(0, -1);
+          else if (input.value.length < 2) input.value += digit;
+          input.dispatchEvent(new Event("input", { bubbles: true }));
+          input.focus();
+        });
+        pad.append(key);
+      }
+      area.append(label, pad);
     }
     if (kind === "ribbon") {
       const choices = element("div", undefined, "answer-stones");
