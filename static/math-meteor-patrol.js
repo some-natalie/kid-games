@@ -119,6 +119,7 @@ if (!isQuizMode(window.location.search)) {
     find("target-label").textContent = `Target: ${OPERATIONS[operation].label}, within ${problem.max}`;
     find("equation").textContent = `${problem.left} ${OPERATIONS[operation].symbol} ${problem.right} = ?`;
     find("equation").setAttribute("aria-label", `${problem.left} ${operation === "addition" ? "plus" : operation === "subtraction" ? "minus" : "times"} ${problem.right} equals what?`);
+    find("meteor-card").hidden = false;
     input.value = "";
     setAnswerDisabled(false);
     feedback.textContent = "";
@@ -177,6 +178,7 @@ if (!isQuizMode(window.location.search)) {
     solved = true;
     correctCount += 1;
     setAnswerDisabled(true);
+    find("meteor-card").hidden = true;
     const { message } = celebrate(GAME_CELEBRATIONS["math-meteor-patrol"]);
     feedback.textContent = `${message} Correct! ${equationText(problem)} The shield is safe.`;
     if (mode === "practice") {

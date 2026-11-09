@@ -234,6 +234,9 @@ function setupQuiz(game) {
       input.maxLength = 2;
       input.autocomplete = "off";
       input.setAttribute("aria-label", "Your answer");
+      const prompt = area.querySelector("#quiz-question-heading + p");
+      prompt.id = "quiz-equation";
+      input.setAttribute("aria-describedby", "quiz-equation");
       input.value = responses[current] ?? "";
       input.addEventListener("input", () => {
         input.value = input.value.replace(/\D/g, "").slice(0, 2);

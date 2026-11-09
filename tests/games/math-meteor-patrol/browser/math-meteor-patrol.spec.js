@@ -46,6 +46,7 @@ test("worked example leads to editable untimed practice with keyboard and touch 
   }
   await expect(page.locator("#feedback")).toContainText("Correct!");
   await expect(page.locator("#next-meteor")).toBeVisible();
+  await expect(page.locator("#meteor-card")).toBeHidden();
   await expectThemedCelebration(page, celebrations);
   await page.locator("#next-meteor").click();
   await expect(page.locator("#wave-label")).toHaveText("Meteor 2");
@@ -149,6 +150,22 @@ test("a missed timed meteor shows its equation and strategy before the next wave
   await expect(page.locator("#feedback")).toContainText(equation.replace(" = ?", ` = ${answerFor(equation)}`));
   await expect(page.locator("#feedback")).toContainText(/count on|count back|groups/);
   await page.clock.runFor(2500);
+  await expect(page.locator("#wave-label")).toHaveText("Meteor 2");
+});
+
+test("a correct timed answer clears the meteor and leaves a short breather", async ({ page }) => {
+  await page.clock.install();
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/math-meteor-patrol/");
+  await page.locator("#mode").selectOption("gentle");
+  await page.locator("#start-game").click();
+  const equation = await page.locator("#equation").textContent();
+  await page.locator("#answer").fill(String(answerFor(equation)));
+  await page.locator("#answer").press("Enter");
+  await expect(page.locator("#meteor-card")).toBeHidden();
+  await page.clock.runFor(1000);
+  await expect(page.locator("#wave-label")).toHaveText("Meteor 1");
+  await page.clock.runFor(500);
   await expect(page.locator("#wave-label")).toHaveText("Meteor 2");
 });
 

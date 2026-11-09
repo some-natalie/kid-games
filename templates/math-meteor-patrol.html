@@ -55,7 +55,7 @@
       <button id="resume-game" class="secondary-button" type="button" hidden>Resume patrol</button>
       <button id="end-game" class="secondary-button" type="button">Finish patrol</button>
     </div>
-    <p id="suspension-note" class="meteor-note" hidden>Patrol paused while this tab is hidden.</p>
+    <p id="suspension-note" class="meteor-note" role="status" hidden>Patrol paused while this tab is hidden.</p>
     <div id="timer-panel" class="timer-panel" hidden>
       <label for="time-left">Time before the meteor reaches the shield</label>
       <progress id="time-left" max="1" value="1"></progress>
@@ -72,7 +72,7 @@
     <form id="answer-form" class="meteor-answer">
       <label for="answer">Enter the answer</label>
       <div class="answer-entry">
-        <input id="answer" name="answer" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="2" autocomplete="off" aria-describedby="answer-help">
+        <input id="answer" name="answer" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="2" autocomplete="off" aria-describedby="equation answer-help">
         <button class="primary-button" type="submit">Zap meteor</button>
       </div>
       <p id="answer-help">Type a number, press Enter, or use the number buttons.</p>
