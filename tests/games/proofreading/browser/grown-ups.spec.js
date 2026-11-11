@@ -25,11 +25,12 @@ for (const mode of ["", "?quiz=1"]) {
 
 test("landing page links to grown-up settings without listing them as a game", async ({ page }) => {
   await page.goto("/");
-  await expect(page.locator(".game-tile")).toHaveCount(8);
+  await expect(page.locator(".game-tile")).toHaveCount(9);
   await expect(page.getByRole("link", { name: /Ribbon Workshop/ })).toBeVisible();
   await expect(page.getByRole("link", { name: /Picnic Pizza/ })).toBeVisible();
   await expect(page.getByRole("link", { name: /Fraction Bridge/ })).toBeVisible();
   await expect(page.getByRole("link", { name: /Math Meteor Patrol/ })).toBeVisible();
+  await expect(page.getByRole("link", { name: /Place-Value Builders/ })).toBeVisible();
   await page.getByRole("link", { name: "For grown-ups", exact: true }).click();
   await expect(page).toHaveURL(/\/for-grown-ups\/$/);
   await expect(page.getByRole("heading", { name: "For grown-ups", level: 1 })).toBeVisible();
