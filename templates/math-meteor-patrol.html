@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{% block title %}{{ page.title }} · {{ config.title }}{% endblock title %}
+{% block description %}{{ page.description }}{% endblock description %}
+
+{% block content %}
+<section class="intro">
+  <a class="back-link" href="{{ get_url(path='/') }}">← All games</a>
+  <span class="game-icon" aria-hidden="true">{{ page.extra.icon }}</span>
+  <h1>{{ page.title }}</h1>
+  <p>{{ page.description }}</p>
+</section>
+
+<section class="alphabet-game math-meteor-patrol" aria-label="{{ page.title }}">
+  <div class="theme-picker">
+    <a class="back-link play-only" href="{{ get_url(path='/') }}">← All games</a>
+    <p id="preference-status" role="status">Your patrol choices are saved only in this browser.</p>
+  </div>
+
+  <div id="tutorial" class="tutorial">
+    <p class="eyebrow">A space-number mission</p>
+    <h2>Guide the meteors away!</h2>
+    <p>Each meteor carries one equation. Solve it before the meteor reaches the shield. Only one meteor is active, and the equation is shown in text.</p>
+    <div class="meteor-example">
+      <h3>Worked example: 2 + 3 = ?</h3>
+      <p>Start at 2 and count on 3: 3, 4, 5. The answer is <strong>5</strong>.</p>
+    </div>
+    <div class="meteor-options">
+      <label for="operation">Choose your target</label>
+      <select id="operation">
+        <option value="addition">Addition</option>
+        <option value="subtraction">Subtraction</option>
+        <option value="multiplication">Multiplication (optional)</option>
+      </select>
+      <label for="mode">Choose a patrol pace</label>
+      <select id="mode">
+        <option value="practice">Untimed practice</option>
+        <option value="gentle">Gentle patrol</option>
+        <option value="challenge">Challenge patrol</option>
+      </select>
+      <p id="mode-description">Untimed practice has no countdown. Correct mistakes and continue when you are ready.</p>
+    </div>
+    <p>Numbers begin within 10 and gradually grow toward 20. Subtraction answers never go below zero. In timed modes, a correct answer gives you a short breather before the next meteor.</p>
+    <p>Gentle patrol starts with 18 seconds per meteor; challenge starts with 12. The countdown is explained before play. Pause whenever you need a break. If time runs out, you’ll see the answer and a strategy—there are no penalties.</p>
+    <div class="game-actions centered">
+      <button id="start-game" class="primary-button" type="button">Start patrol</button>
+    </div>
+  </div>
+
+  <div id="play-area" class="meteor-patrol" hidden>
+    <div class="meteor-toolbar">
+      <p id="wave-label" class="eyebrow"></p>
+      <p id="target-label"></p>
+      <button id="pause-game" class="secondary-button" type="button">Pause patrol</button>
+      <button id="resume-game" class="secondary-button" type="button" hidden>Resume patrol</button>
+      <button id="end-game" class="secondary-button" type="button">Finish patrol</button>
+    </div>
+    <p id="suspension-note" class="meteor-note" role="status" hidden>Patrol paused while this tab is hidden.</p>
+    <div id="timer-panel" class="timer-panel" hidden>
+      <label for="time-left">Time before the meteor reaches the shield</label>
+      <progress id="time-left" max="1" value="1"></progress>
+      <p id="countdown" class="countdown"></p>
+    </div>
+    <div id="meteor-lane" class="meteor-lane" aria-label="One active meteor approaching the shield">
+      <div id="meteor-card" class="meteor-card">
+        <span aria-hidden="true">☄️</span>
+        <span class="meteor-card-label">Active meteor</span>
+      </div>
+      <span class="meteor-shield" aria-hidden="true">🛡️</span>
+    </div>
+    <h2 id="equation" class="meteor-equation" tabindex="-1"></h2>
+    <form id="answer-form" class="meteor-answer">
+      <label for="answer">Enter the answer</label>
+      <div class="answer-entry">
+        <input id="answer" name="answer" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="2" autocomplete="off" aria-describedby="equation answer-help">
+        <button class="primary-button" type="submit">Zap meteor</button>
+      </div>
+      <p id="answer-help">Type a number, press Enter, or use the number buttons.</p>
+      <div id="number-pad" class="number-pad" role="group" aria-label="Number buttons"></div>
+    </form>
+    <p id="feedback" class="feedback" role="status" aria-live="polite"></p>
+    <button id="next-meteor" class="primary-button" type="button" hidden>Next meteor</button>
+  </div>
+
+  <div id="quest-complete" class="quest-complete" hidden>
+    <p class="eyebrow">Patrol complete!</p>
+    <h2 id="quest-heading" tabindex="-1">Thanks for guiding the meteors.</h2>
+    <p id="final-score"></p>
+    <button id="play-again" class="primary-button" type="button">Start another patrol</button>
+  </div>
+</section>
+<script src="{{ get_url(path='math-meteor-patrol.js', cachebust=true) }}" type="module"></script>
+{% endblock content %}

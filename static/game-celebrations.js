@@ -99,4 +99,19 @@ export const GAME_CELEBRATIONS = Object.freeze({
       effect("fraction-tags", "Fraction tags", "shower", 50, ["½", "⅓", "¼", "⅙", "⅛"], RAINBOW),
     ],
   ),
+  "math-meteor-patrol": set(
+    ["Meteor master!", "Shield superstar!", "Orbit on target!", "Asteroid ace!", "A star solution!", "Space math whiz!"],
+    [
+      effect("meteor-sparkles", "Meteor sparkles", "shower", 36, ["✦", "✧", "✨"], ["#ffb627", "#9b5de5", "#3fa7f5"]),
+      effect("rocket-boost", "Rocket boost", "rise", 24, ["🚀", "🌠"]),
+      effect("planet-rings", "Planet rings", "burst", 32, ["🪐"]),
+      effect("star-map", "Star map", "shower", 40, ["⭐", "🌟"]),
+      effect("moon-dust", "Moon dust", "rise", 36, ["🌙", "✨"]),
+      effect("satellite-flight", "Satellite flight", "rise", 24, ["🛰️"]),
+      effect("comet-trail", "Comet trail", "burst", 30, ["☄️"]),
+      effect("space-numbers", "Space numbers", "shower", 36, ["1", "2", "3", "+", "−", "×"], RAINBOW),
+      effect("shield-shimmer", "Shield shimmer", "burst", 30, ["🛡️", "💫"]),
+      effect("galaxy-confetti", "Galaxy confetti", "shower", 72, [], ["#1d4ed8", "#9b5de5", "#ffb627", "#3fa7f5"]),
+    ],
+  ),
 });

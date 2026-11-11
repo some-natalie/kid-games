@@ -452,3 +452,43 @@ footer { padding-block: 1.5rem; text-align: center; }
     transition: none !important;
   }
 }
+.meteor-example { max-width: 32rem; margin: 1rem auto; padding: 0.75rem 1rem; border-radius: 0.75rem; background: var(--badge); text-align: left; }
+.meteor-example h3 { margin-top: 0; color: var(--text); }
+.meteor-options { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr); align-items: center; gap: 0.5rem 1rem; max-width: 34rem; margin: 1.25rem auto; text-align: left; }
+.meteor-options label { font-weight: 700; }
+.meteor-options select, .meteor-answer input, .quiz-mode .math-meteor-patrol input { width: 100%; min-height: 2.75rem; padding: 0.4rem 0.6rem; border: 2px solid var(--accent); border-radius: 0.65rem; background: var(--surface); color: var(--text); font: inherit; }
+.meteor-options select:focus-visible, .meteor-answer input:focus-visible, .quiz-mode .math-meteor-patrol input:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+.meteor-options p { grid-column: 1 / -1; margin: 0; font-size: 0.9rem; }
+.meteor-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 1rem; }
+.meteor-toolbar p { margin-block: 0.35rem; }
+.meteor-toolbar .eyebrow { margin-right: auto; }
+.meteor-note { padding: 0.5rem; border-inline-start: 4px solid var(--accent); background: var(--badge); }
+.timer-panel { margin-block: 0.75rem; }
+.timer-panel label { display: block; font-weight: 700; }
+.timer-panel progress { display: block; width: 100%; height: 1rem; margin-block: 0.4rem; accent-color: var(--accent); }
+.countdown { margin-block: 0.25rem; text-align: right; font-weight: 700; color: var(--text); }
+.meteor-lane { position: relative; min-height: 6rem; margin-block: 0.75rem; overflow: hidden; border: 2px solid var(--border); border-radius: 1rem; background: var(--badge); }
+.meteor-card { position: absolute; top: 50%; left: 0; display: flex; align-items: center; gap: 0.5rem; min-width: 0; max-width: 70%; padding: 0.55rem 0.75rem; border: 2px solid var(--accent); border-radius: 1rem; background: var(--surface); color: var(--text); font-weight: 700; transform: translate(-50%, -50%); }
+.meteor-card > span:first-child { font-size: 1.5rem; }
+.meteor-card-label { min-width: 0; overflow-wrap: anywhere; }
+.meteor-shield { position: absolute; top: 50%; right: 0.5rem; font-size: 2.25rem; transform: translateY(-50%); }
+.meteor-patrol[data-reduced-motion="true"] .meteor-card { left: 50% !important; }
+.meteor-equation { text-align: center; font-size: clamp(1.7rem, 6vw, 2.75rem); }
+.meteor-answer label { display: block; font-weight: 700; }
+.answer-entry { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.answer-entry input { flex: 1 1 8rem; max-width: 12rem; }
+.answer-entry button { flex: 0 1 auto; min-width: 0; max-width: 100%; white-space: normal; overflow-wrap: anywhere; }
+.number-pad { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.5rem; max-width: 19rem; margin-block: 0.75rem; }
+.number-pad button { min-width: 0; max-width: 100%; min-height: 3rem; padding: 0.35rem; touch-action: manipulation; white-space: normal; overflow-wrap: anywhere; }
+.meteor-answer #answer-help { margin-block: 0.3rem; font-size: 0.9rem; }
+.math-meteor-patrol #next-meteor { margin-top: 0.5rem; }
+.quiz-mode .math-meteor-patrol > div:not(.theme-picker) { text-align: left; }
+.quiz-mode .math-meteor-patrol input { display: block; max-width: 12rem; }
+@media (max-width: 34rem) {
+  .meteor-options { grid-template-columns: 1fr; }
+  .meteor-options p { grid-column: auto; }
+  .meteor-toolbar .eyebrow { flex-basis: 100%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .meteor-card { transition: none; }
+}

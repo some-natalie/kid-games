@@ -50,6 +50,7 @@ test("game UI modules celebrate with their own themed set", () => {
     "picnic-pizza": "picnic-pizza.js",
     proofreading: "proofreading.js",
     "ribbon-workshop": "ribbon-workshop.js",
+    "math-meteor-patrol": "math-meteor-patrol.js",
   };
   for (const [game, file] of Object.entries(uses)) {
     const source = readFileSync(new URL(`../../../static/${file}`, import.meta.url), "utf8");

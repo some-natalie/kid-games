@@ -7,7 +7,8 @@ proofreading game, Number Trail is its woodland math adventure,
 Acorn Adventure introduces cumulative, multistep arithmetic, and Picnic Pizza
 introduces equal shares and visual fractions, while Ribbon
 Workshop explores fractions with equal-length ribbons, and Fraction Bridge
-helps children find, compare, and order fractions on a number line.
+helps children find, compare, and order fractions on a number line. Math
+Meteor Patrol adds optional, gently timed arithmetic-fluency practice.
 
 ## Quiz mode
 
@@ -106,6 +107,7 @@ prefix the success feedback.
 | Fraction Bridge | `GAME_CELEBRATIONS["fraction-bridge"]` | pond bubbles, lily blossoms, frogs, ducks, turtle friends, fraction stars |
 | Picnic Pizza | `GAME_CELEBRATIONS["picnic-pizza"]` | pizza slices, picnic fruit, ladybugs, marching ants, checkered confetti |
 | Ribbon Workshop | `GAME_CELEBRATIONS["ribbon-workshop"]` | ribbon confetti, bows, thread spools, yarn, sequins, fraction tags |
+| Math Meteor Patrol | `GAME_CELEBRATIONS["math-meteor-patrol"]` | meteor sparkles, rockets, planets, satellites, shields, galaxy confetti |
 
 `GAME_CELEBRATIONS` lives in `static/game-celebrations.js`. Each set is checked
 by `readCelebrations` and must use every motion (`burst`, `shower`, and `rise`).
@@ -433,6 +435,29 @@ individual stones within a level are not saved. **Start a new trail** resets
 progress; **Finish trail** clears it. Storage errors show a warning without
 blocking play. Proofreading and Number Trail share `static/level-progress.js`
 for versioned level storage, retaining separate keys.
+
+## Math Meteor Patrol
+
+Choose addition, subtraction, or optional multiplication, then select untimed
+practice, gentle patrol, or challenge patrol. Equations start within 10 and
+grow toward 20 a little at a time; subtraction stays nonnegative and
+multiplication keeps its products within the selected limit. The worked example
+explains a counting-on strategy before play.
+
+Timed modes explain their countdown before starting: gentle patrol begins at
+18 seconds per meteor and challenge at 12 seconds. Correct answers clear the
+active meteor and provide a short breather. Wrong entries can be edited; if a
+timed meteor reaches the shield, the game shows the correct equation and a
+strategy without a penalty. Pause/resume freezes the countdown, and switching
+tabs suspends movement and timing until the game is visible again. Reduced
+motion keeps the meteor card stationary and uses the countdown indicator
+instead. Keyboard entry and touch-friendly number buttons are both available.
+
+Selected mode and target are saved only in local browser storage, with a
+visible warning if the browser cannot save them. Quiz mode is a separate,
+untimed set of revisable questions: it hides the worked example and withholds
+answer feedback until submission. Quiz answers stay in memory and do not read
+or change saved patrol choices.
 
 ## Acorn Adventure
 
