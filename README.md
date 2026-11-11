@@ -7,8 +7,9 @@ proofreading game, Number Trail is its woodland math adventure,
 Acorn Adventure introduces cumulative, multistep arithmetic, and Picnic Pizza
 introduces equal shares and visual fractions, while Ribbon
 Workshop explores fractions with equal-length ribbons, and Fraction Bridge
-helps children find, compare, and order fractions on a number line. Math
-Meteor Patrol adds optional, gently timed arithmetic-fluency practice.
+helps children find, compare, and order fractions on a number line. Place-Value
+Builders visualizes hundreds, tens, ones, and regrouping. Math Meteor Patrol
+adds optional, gently timed arithmetic-fluency practice.
 
 ## Quiz mode
 
@@ -25,8 +26,8 @@ expandable **Answer details**, including incorrect responses and corrections.
 
 Each completely correct question earns one point: an entire word order or
 proofreading passage, one Number Trail puzzle, one Acorn Adventure stop, one
-Picnic Pizza or Ribbon Workshop fraction question, or one Fraction Bridge
-challenge.
+Picnic Pizza or Ribbon Workshop fraction question, one Fraction Bridge
+challenge, or one Place-Value Builders question.
 Unanswered questions count as incorrect. Proofreading requires marking every
 mistake without marking correct text. Acorn Adventure uses a numeric input
 instead of answer choices and carries the player's entered totals, so later
@@ -39,6 +40,9 @@ Quiz answers live only in memory: leaving or reloading discards them, and
 ordinary saved game progress is neither loaded nor changed.
 Ribbon Workshop quiz questions use the same level progression and score one
 point for each fully correct fraction response.
+Place-Value Builders quizzes ask about the same place-value representations
+and comparisons; answers can be revised before submission, and grading waits
+until then.
 
 ## Community and license
 
@@ -108,6 +112,7 @@ prefix the success feedback.
 | Picnic Pizza | `GAME_CELEBRATIONS["picnic-pizza"]` | pizza slices, picnic fruit, ladybugs, marching ants, checkered confetti |
 | Ribbon Workshop | `GAME_CELEBRATIONS["ribbon-workshop"]` | ribbon confetti, bows, thread spools, yarn, sequins, fraction tags |
 | Math Meteor Patrol | `GAME_CELEBRATIONS["math-meteor-patrol"]` | meteor sparkles, rockets, planets, satellites, shields, galaxy confetti |
+| Place-Value Builders | `GAME_CELEBRATIONS["place-value-builders"]` | base-ten blocks, number columns, hundred squares, rods, builder confetti |
 
 `GAME_CELEBRATIONS` lives in `static/game-celebrations.js`. Each set is checked
 by `readCelebrations` and must use every motion (`burst`, `shower`, and `rise`).
@@ -530,6 +535,28 @@ cross-products, not floating-point equality. The unlocked level is saved
 locally as `kid-games.ribbon-workshop.progress`; quiz mode neither reads nor
 changes that key. In quiz mode, the same nine skills are asked as revisable
 fraction questions, with grading and answer details held until submission.
+
+## Place-Value Builders
+
+Build and compare numbers with visible hundreds, tens, and ones blocks. Ten
+ones exchange for one ten, and ten tens exchange for one hundred; the reverse
+exchanges are available too, and every trade preserves the represented total.
+The ten untimed levels progress from two-digit building and comparisons to
+three-digit regrouping, including 40, 105, and 206 so that zero-place values
+are practiced.
+
+Use the add, remove, and exchange buttons with a mouse, touch, or keyboard.
+The block pictures include printed place values and have matching text
+descriptions, so the quantities do not depend on color. Hints and unlimited
+retries are available without lost points. Progress saves the unlocked level
+locally as `kid-games.place-value-builders.progress`; storage errors are
+reported, and quiz mode never reads or changes normal progress.
+
+`static/place-value-builders-engine.js` contains the bounded block operations,
+place-value checks, comparisons, and quiz questions. The UI in
+`static/place-value-builders.js` supplies the interactive workspace and
+themed celebrations. Quiz mode asks one revisable question per level, with
+no hints or answer feedback before submission.
 
 ## Picnic Pizza
 

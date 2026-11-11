@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block title %}{{ page.title }} · {{ config.title }}{% endblock title %}
+{% block description %}{{ page.description }}{% endblock description %}
+
+{% block content %}
+<section class="intro">
+  <a class="back-link" href="{{ get_url(path='/') }}">← All games</a>
+  <span class="game-icon" aria-hidden="true">{{ page.extra.icon }}</span>
+  <h1>{{ page.title }}</h1>
+  <p>{{ page.description }}</p>
+</section>
+
+<section class="alphabet-game place-value-builders" aria-label="{{ page.title }}">
+  <div class="theme-picker">
+    <a class="back-link play-only" href="{{ get_url(path='/') }}">← All games</a>
+    <p id="preference-status" role="status">Your level is saved only in this browser.</p>
+  </div>
+  <div id="tutorial" class="tutorial">
+    <p class="eyebrow">Build it. Trade it. Compare it.</p>
+    <h2>Make numbers with blocks</h2>
+    <p>Hundreds, tens, and ones blocks show the value of each digit. Add and remove blocks or exchange a group of ten. Every exchange keeps the same total.</p>
+    <div class="place-value-example">
+      <h3>Worked example: trade 10 ones for 1 ten</h3>
+      <div class="place-value-example-parts" role="img" aria-label="Fourteen ones are exchanged for one ten and four ones. Both show 14.">
+        <p><strong>14 ones</strong> = <strong>1 ten and 4 ones</strong></p>
+      </div>
+      <p>One ten is worth ten ones, so the number stays 14. The zero in 40 means 0 ones; the zero in 105 means 0 tens.</p>
+    </div>
+    <h3>Level path</h3>
+    <ol class="place-value-progression">
+      <li><strong>Levels 1–3:</strong> build with ones, then exchange ten ones for a ten and a ten back into ones.</li>
+      <li><strong>Levels 4–5:</strong> compare two-digit quantities and show 40 as 4 tens and 0 ones.</li>
+      <li><strong>Levels 6–7:</strong> build 105 and exchange ten tens for one hundred.</li>
+      <li><strong>Levels 8–10:</strong> compare three-digit numbers and regroup to build 206.</li>
+    </ol>
+    <p>There is no timer and no score to lose. Use the buttons to build, ask for a hint, and retry as often as you like.</p>
+    <div class="game-actions centered">
+      <button id="start-game" class="primary-button" type="button">Start building</button>
+      <button id="new-quest" class="secondary-button" type="button" hidden>Start from level 1</button>
+    </div>
+  </div>
+
+  <div id="play-area" hidden>
+    <ol id="level-map" class="level-map" aria-label="Place-Value Builders levels"></ol>
+    <p id="level-count" class="eyebrow"></p>
+    <h2 id="level-title" tabindex="-1"></h2>
+    <p id="level-instructions"></p>
+    <div id="build-area">
+      <div id="block-workspace" class="place-value-workspace" role="group" aria-label="Your base-ten blocks"></div>
+      <p id="number-readout" class="place-value-readout" role="status"></p>
+      <div id="block-controls" class="place-value-controls-grid"></div>
+    </div>
+    <div id="comparison-area" hidden>
+      <div id="comparison-models" class="place-value-comparisons" role="group" aria-label="Compare the two quantities"></div>
+    </div>
+    <p id="feedback" class="feedback" role="status"></p>
+    <p id="place-value-hint" role="status" hidden></p>
+    <div class="game-actions">
+      <button id="show-hint" class="secondary-button" type="button">Show hint</button>
+      <button id="check-build" class="primary-button" type="button">Check my build</button>
+      <button id="next-level" class="primary-button" type="button" hidden>Next level</button>
+    </div>
+  </div>
+
+  <div id="quest-complete" class="quest-complete" hidden>
+    <p class="trail-home" aria-hidden="true">🧱 🔟 ⭐</p>
+    <p class="eyebrow">Every block has a place!</p>
+    <h2 id="quest-heading" tabindex="-1">Place-Value Builders complete</h2>
+    <p>You built and compared numbers, and exchanged groups of ten without changing their value.</p>
+    <button id="play-again" class="primary-button" type="button">Play again</button>
+  </div>
+</section>
+<script src="{{ get_url(path='place-value-builders.js', cachebust=true) }}" type="module"></script>
+{% endblock content %}

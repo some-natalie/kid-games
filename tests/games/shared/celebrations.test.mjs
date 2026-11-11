@@ -51,6 +51,7 @@ test("game UI modules celebrate with their own themed set", () => {
     proofreading: "proofreading.js",
     "ribbon-workshop": "ribbon-workshop.js",
     "math-meteor-patrol": "math-meteor-patrol.js",
+    "place-value-builders": "place-value-builders.js",
   };
   for (const [game, file] of Object.entries(uses)) {
     const source = readFileSync(new URL(`../../../static/${file}`, import.meta.url), "utf8");

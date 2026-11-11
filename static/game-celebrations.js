@@ -114,4 +114,19 @@ export const GAME_CELEBRATIONS = Object.freeze({
       effect("galaxy-confetti", "Galaxy confetti", "shower", 72, [], ["#1d4ed8", "#9b5de5", "#ffb627", "#3fa7f5"]),
     ],
   ),
+  "place-value-builders": set(
+    ["Block builder!", "Place-value pro!", "Tens-tastic!", "You made it add up!", "Great regrouping!", "Number builder!"],
+    [
+      effect("base-ten-blocks", "Base-ten blocks", "burst", 40, ["▦", "▤", "▪"]),
+      effect("number-columns", "Number columns", "shower", 45, ["1", "10", "100"], RAINBOW),
+      effect("hundred-squares", "Hundred squares", "rise", 30, ["▦", "▧"]),
+      effect("ten-rods", "Ten rods", "burst", 35, ["▤", "▥"]),
+      effect("ones-cubes", "Ones cubes", "shower", 40, ["▪", "■", "◆"]),
+      effect("number-rain", "Number rain", "rise", 36, ["1", "2", "3", "4", "5"]),
+      effect("place-value-stars", "Place-value stars", "burst", 50, ["★", "✦", "✧"], RAINBOW),
+      effect("regrouping-ribbons", "Regrouping ribbons", "shower", 35, ["➜", "↗", "↔"]),
+      effect("block-towers", "Block towers", "rise", 24, ["🧱", "🏗️"]),
+      effect("builder-confetti", "Builder confetti", "burst", 80, [], ["#5546b8", "#ffb627", "#3ccf91", "#3fa7f5"]),
+    ],
+  ),
 });
