@@ -24,6 +24,21 @@ export const GAME_CELEBRATIONS = Object.freeze({
       effect("nut-confetti", "Nut confetti", "burst", 90, [], ["#8b5a2b", "#c47a3c", "#ffb627", "#ff7a3d", "#3ccf91"]),
     ],
   ),
+  "clockwork-critters": set(
+    ["Gear-genius!", "Perfect timing!", "Clockwork champion!", "Right on schedule!", "Critter-clock clever!", "Tick-tock terrific!"],
+    [
+      effect("gear-shower", "Gear shower", "shower", 42, ["⚙️", "🔩"]),
+      effect("clock-sparkles", "Clock sparkles", "burst", 48, ["✦", "✨", "★"]),
+      effect("owl-watch", "Owl watch", "rise", 24, ["🦉", "🕰️"]),
+      effect("cog-confetti", "Cog confetti", "burst", 70, [], ["#5546b8", "#3fa7f5", "#ffb627", "#3ccf91"]),
+      effect("mouse-march", "Mouse march", "rise", 30, ["🐭", "🐁"]),
+      effect("minute-stars", "Minute stars", "shower", 45, ["⭐", "🌟", "✦"]),
+      effect("cuckoo-pop", "Cuckoo pop", "burst", 36, ["🐦", "🎵"]),
+      effect("wind-up-keys", "Wind-up keys", "shower", 32, ["🗝️", "🔑"]),
+      effect("bell-ringers", "Bell ringers", "rise", 30, ["🔔", "✨"]),
+      effect("spring-bounce", "Spring bounce", "burst", 38, ["🌀", "⚙️"]),
+    ],
+  ),
   "fraction-bridge": set(
     ["Tilly made it!", "Right on the spot!", "Fraction star!", "Shell-ebrate!", "Perfect step!", "Bridge champion!"],
     [

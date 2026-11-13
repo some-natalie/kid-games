@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block title %}{{ page.title }} · {{ config.title }}{% endblock title %}
+{% block description %}{{ page.description }}{% endblock description %}
+
+{% block content %}
+<section class="intro">
+  <a class="back-link" href="{{ get_url(path='/') }}">← All games</a>
+  <span class="game-icon" aria-hidden="true">{{ page.extra.icon }}</span>
+  <h1>{{ page.title }}</h1>
+  <p>{{ page.description }}</p>
+</section>
+
+<section class="alphabet-game clockwork-critters" aria-label="{{ page.title }}">
+  <div class="theme-picker">
+    <a class="back-link play-only" href="{{ get_url(path='/') }}">← All games</a>
+    <p id="preference-status" role="status">Your level is saved only in this browser.</p>
+  </div>
+  <div id="tutorial" class="tutorial">
+    <p class="eyebrow">A woodland crew's day runs on time</p>
+    <h2>Help the critters keep their schedule</h2>
+    <p>Practice setting a clock and reading one. These are the animals' make-believe routines—not your own schedule.</p>
+    <div class="clock-example">
+      <h3>Worked example: 3:30</h3>
+      <div id="clock-example" class="clock-display"></div>
+      <p>The long minute hand points to 6: each number is 5 minutes, so 6 means 30. The short hour hand sits between 3 and 4 because half an hour has passed.</p>
+    </div>
+    <h3>Level path</h3>
+    <ol class="clock-progression">
+      <li><strong>Level 1:</strong> whole hours</li>
+      <li><strong>Level 2:</strong> half-hours</li>
+      <li><strong>Level 3:</strong> quarter-hours</li>
+      <li><strong>Level 4:</strong> five-minute intervals</li>
+    </ol>
+    <p>There is no timer and no score to lose. Ask for a hint and try as many times as you need.</p>
+    <div class="game-actions centered">
+      <button id="start-game" class="primary-button" type="button">Wind up the clocks!</button>
+      <button id="new-quest" class="secondary-button" type="button" hidden>Start from the beginning</button>
+    </div>
+  </div>
+
+  <div id="play-area" hidden>
+    <ol id="level-map" class="level-map" aria-label="Clockwork Critters levels"></ol>
+    <p id="level-count" class="eyebrow"></p>
+    <h2 id="level-title" tabindex="-1"></h2>
+    <p id="level-instructions"></p>
+    <p id="progress" class="progress" role="status"></p>
+    <div class="clock-modes" role="group" aria-label="Choose a clock activity">
+      <button id="mode-set" class="secondary-button" type="button" aria-pressed="true">Set a clock</button>
+      <button id="mode-read" class="secondary-button" type="button" aria-pressed="false">Read a clock</button>
+    </div>
+    <h3 id="clock-prompt" tabindex="-1"></h3>
+    <div id="clock-display" class="clock-display"></div>
+    <p class="clock-hand-key"><strong>Short, broad hand:</strong> hours. <strong>Long, thin hand:</strong> minutes.</p>
+    <p id="clock-description" class="clock-description" role="status" aria-live="polite"></p>
+    <div id="clock-controls" class="clock-controls" role="group" aria-label="Move the clock hands"></div>
+    <div id="clock-choices" class="clock-choices" role="group" aria-labelledby="clock-prompt" hidden></div>
+    <p id="feedback" class="feedback" role="status"></p>
+    <p id="clock-hint" role="status" hidden></p>
+    <div class="game-actions">
+      <button id="show-hint" class="secondary-button" type="button">Show hint</button>
+      <button id="check-clock" class="primary-button" type="button">Check the clock</button>
+      <button id="next-step" class="primary-button" type="button" hidden>Next activity</button>
+    </div>
+  </div>
+
+  <div id="quest-complete" class="quest-complete" hidden>
+    <p class="trail-home" aria-hidden="true">🕰️ ⚙️ 🦉</p>
+    <p class="eyebrow">Every critter is right on time!</p>
+    <h2 id="quest-heading" tabindex="-1">Clockwork Critters complete</h2>
+    <p>You set and read clocks from whole hours to five-minute intervals. The woodland schedule is back in rhythm!</p>
+    <button id="play-again" class="primary-button" type="button">Play again</button>
+  </div>
+</section>
+<script src="{{ get_url(path='clockwork-critters.js', cachebust=true) }}" type="module"></script>
+{% endblock content %}

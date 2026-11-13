@@ -9,7 +9,8 @@ introduces equal shares and visual fractions, while Ribbon
 Workshop explores fractions with equal-length ribbons, and Fraction Bridge
 helps children find, compare, and order fractions on a number line. Place-Value
 Builders visualizes hundreds, tens, ones, and regrouping. Math Meteor Patrol
-adds optional, gently timed arithmetic-fluency practice.
+adds optional, gently timed arithmetic-fluency practice, and Clockwork Critters
+introduces reading and setting analog clocks.
 
 ## Quiz mode
 
@@ -27,7 +28,7 @@ expandable **Answer details**, including incorrect responses and corrections.
 Each completely correct question earns one point: an entire word order or
 proofreading passage, one Number Trail puzzle, one Acorn Adventure stop, one
 Picnic Pizza or Ribbon Workshop fraction question, one Fraction Bridge
-challenge, or one Place-Value Builders question.
+challenge, one Place-Value Builders question, or one Clockwork Critters time.
 Unanswered questions count as incorrect. Proofreading requires marking every
 mistake without marking correct text. Acorn Adventure uses a numeric input
 instead of answer choices and carries the player's entered totals, so later
@@ -108,6 +109,7 @@ prefix the success feedback.
 | Proofreading Detectives | `GAME_CELEBRATIONS.proofreading` | magnifying glasses, clue notes, check marks, detective badges, footprints |
 | Number Trail | `GAME_CELEBRATIONS["number-trail"]` | number showers, stepping stones, foxes, deer, wildflowers, star paths |
 | Acorn Adventure | `GAME_CELEBRATIONS["acorn-adventure"]` | acorn rain, autumn leaves, squirrels, hedgehogs, owls, fireflies |
+| Clockwork Critters | `GAME_CELEBRATIONS["clockwork-critters"]` | gear showers, clock sparks, owls, cog confetti, mice, cuckoos, bells |
 | Fraction Bridge | `GAME_CELEBRATIONS["fraction-bridge"]` | pond bubbles, lily blossoms, frogs, ducks, turtle friends, fraction stars |
 | Picnic Pizza | `GAME_CELEBRATIONS["picnic-pizza"]` | pizza slices, picnic fruit, ladybugs, marching ants, checkered confetti |
 | Ribbon Workshop | `GAME_CELEBRATIONS["ribbon-workshop"]` | ribbon confetti, bows, thread spools, yarn, sequins, fraction tags |
