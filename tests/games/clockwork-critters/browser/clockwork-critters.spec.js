@@ -63,13 +63,13 @@ test("worked example leads to keyboard clock-setting and reading with hints and 
   await page.locator("#start-game").press("Enter");
   await expect(page.locator("#level-title")).toBeFocused();
   await expect(page.locator("#mode-set")).toHaveAttribute("aria-pressed", "true");
-  await expect(page.locator("#clock-description")).toContainText("12:00");
+  await expect(page.locator("#clock-description")).toContainText("hour hand is on 12");
   await page.locator("#check-clock").press("Space");
   await expect(page.locator("#feedback")).toContainText("Not quite");
   await expect(page.locator("#clock-hint")).toContainText("minute hand points straight up to 12");
   await expect(page.locator(".celebration")).toHaveCount(0);
   for (let step = 0; step < 6; step += 1) await hourBack(page).press("Space");
-  await expect(page.locator("#clock-description")).toContainText("6:00");
+  await expect(page.locator("#clock-description")).toContainText("hour hand is on 6");
   await expect(page.locator("#clock-display .clock-hand-hour")).toHaveAttribute("transform", "rotate(180 90 90)");
   await page.locator("#check-clock").press("Enter");
   await expect(page.locator("#feedback")).toContainText("That's");
