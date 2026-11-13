@@ -43,9 +43,12 @@ test("display text and accessible descriptions identify both hands without color
   assert.match(clockDescription(7 * 60 + 35), /short hour hand is between 7 and 8/);
   assert.match(clockDescription(12 * 60 + 30), /short hour hand is between 12 and 1/);
   assert.match(clockDescription(11 * 60), /short hour hand is on 11/);
+  assert.match(clockDescription(11 * 60 + 59), /minute hand sits between 11 and 12/);
+  assert.doesNotMatch(clockDescription(7 * 60 + 35), /7:35/);
 });
 
 test("choice sets include one exact time and nearby valid distractors", () => {
+  const answerPositions = new Set();
   for (const { time, interval } of LEVELS.flatMap((_, index) =>
     buildRound(index).map((question) => ({ ...question })))) {
     const choices = timeChoices(time, interval);
@@ -53,8 +56,11 @@ test("choice sets include one exact time and nearby valid distractors", () => {
     assert.equal(new Set(choices).size, 4);
     assert.ok(choices.includes(time));
     assert.ok(choices.every((choice) => choice % interval === 0));
+    answerPositions.add(choices.indexOf(time));
   }
+  assert.ok(answerPositions.size > 1);
   assert.throws(() => timeChoices(10, 7), RangeError);
+  assert.throws(() => timeChoices(10, 720), RangeError);
 });
 
 test("hints explain how minutes map to the dial and where the hour hand belongs", () => {

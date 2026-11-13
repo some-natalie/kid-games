@@ -45,6 +45,7 @@ test("game reward sets are themed differently from each other", () => {
 test("game UI modules celebrate with their own themed set", () => {
   const uses = {
     "acorn-adventure": "acorn-adventure.js",
+    "clockwork-critters": "clockwork-critters.js",
     "fraction-bridge": "fraction-bridge.js",
     "number-trail": "number-trail.js",
     "picnic-pizza": "picnic-pizza.js",

@@ -1,10 +1,10 @@
 export const STEPS_PER_LEVEL = 5;
 
 export const LEVELS = Object.freeze([
-  { title: "Whole-hour workshop", interval: 60, times: [360, 420, 480, 540, 600] },
-  { title: "Half-hour workshop", interval: 30, times: [390, 450, 510, 570, 630] },
-  { title: "Quarter-hour workshop", interval: 15, times: [375, 465, 555, 645, 435] },
-  { title: "Five-minute workshop", interval: 5, times: [365, 455, 545, 635, 415] },
+  { title: "Whole-hour workshop", description: "whole hours", interval: 60, times: [360, 420, 480, 540, 600] },
+  { title: "Half-hour workshop", description: "half-hours", interval: 30, times: [390, 450, 510, 570, 630] },
+  { title: "Quarter-hour workshop", description: "quarter-hours", interval: 15, times: [375, 450, 525, 600, 675] },
+  { title: "Five-minute workshop", description: "five-minute intervals", interval: 5, times: [365, 455, 545, 635, 695] },
 ].map((level) => Object.freeze({ ...level, times: Object.freeze(level.times) })));
 
 const ROUTINES = Object.freeze([
@@ -49,8 +49,12 @@ export function clockDescription(time) {
   const minute = time % 60;
   const nextHour = hour === 12 ? 1 : hour + 1;
   const hourPosition = minute === 0 ? `on ${hour}` : `between ${hour} and ${nextHour}`;
-  const minutePosition = minute === 0 ? "12" : String(minute / 5);
-  return `The clock shows ${formatTime(time)}. The long minute hand points to ${minutePosition} (${minute} minutes past the hour); the short hour hand is ${hourPosition}.`;
+  const minuteNumber = Math.floor(minute / 5) || 12;
+  const nextMinuteNumber = minuteNumber === 12 ? 1 : minuteNumber + 1;
+  const minutePosition = minute === 0 ? "points to 12"
+    : minute % 5 === 0 ? `points to ${minute / 5}`
+      : `sits between ${minuteNumber} and ${nextMinuteNumber}`;
+  return `The long minute hand ${minutePosition} (${minute} minutes past the hour); the short hour hand is ${hourPosition}.`;
 }
 
 export function buildRound(levelIndex) {
@@ -67,10 +71,12 @@ export function buildRound(levelIndex) {
 
 export function timeChoices(time, interval) {
   assertTime(time);
-  if (!Number.isInteger(interval) || interval < 1 || 1440 % interval !== 0) {
+  if (!Number.isInteger(interval) || interval < 1 || 1440 % interval !== 0 || 1440 / interval < 5) {
     throw new RangeError("The interval must divide a full day into whole minutes.");
   }
-  return [...new Set([-2, -1, 0, 1, 2].map((offset) => advanceTime(time, offset * interval)))].slice(0, 4);
+  const choices = [...new Set([-2, -1, 0, 1, 2].map((offset) => advanceTime(time, offset * interval)))].slice(0, 4);
+  const start = Math.floor(time / interval) % choices.length;
+  return [...choices.slice(start), ...choices.slice(0, start)];
 }
 
 export function hintText(time, interval, mode) {
