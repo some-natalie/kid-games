@@ -508,3 +508,37 @@ footer { padding-block: 1.5rem; text-align: center; }
 @media (prefers-reduced-motion: reduce) {
   .meteor-card { transition: none; }
 }
+.place-value-builders { max-width: 58rem; }
+.place-value-example { max-width: 34rem; margin: 1rem auto; padding: 0.75rem 1rem; border-radius: 0.75rem; background: var(--badge); text-align: left; }
+.place-value-example h3 { margin-top: 0; color: var(--text); }
+.place-value-example-parts { padding: 0.25rem 0.75rem; border: 2px solid var(--text); border-radius: 0.6rem; background: var(--surface); text-align: center; }
+.place-value-example-parts p { color: var(--text); font-size: 1.15rem; }
+.place-value-progression { text-align: left; }
+.place-value-progression li { margin-block: 0.55rem; }
+.place-value-workspace { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.5rem; margin-block: 1rem; }
+.place-value-column { min-width: 0; padding: 0.6rem; border: 2px solid var(--border); border-radius: 0.7rem; background: var(--surface); text-align: center; }
+.place-value-column h3 { margin: 0; font-size: 1rem; }
+.place-value-count { min-height: 1.6em; margin-block: 0.25rem; color: var(--text); font-weight: 700; overflow-wrap: anywhere; }
+.place-value-pieces { display: flex; flex-wrap: wrap; justify-content: center; align-content: start; gap: 0.25rem; min-height: 2.75rem; }
+.place-value-piece { display: grid; place-items: center; flex: 0 0 auto; border: 2px solid var(--text); border-radius: 0.2rem; background: var(--badge); color: var(--text); font-size: 0.75rem; font-weight: 800; line-height: 1; }
+.place-value-ones .place-value-piece { width: 2rem; height: 2rem; }
+.place-value-tens .place-value-piece { width: 3.25rem; height: 2rem; background-image: repeating-linear-gradient(90deg, transparent 0, transparent calc(10% - 1px), var(--border) calc(10% - 1px), var(--border) 10%); }
+.place-value-hundreds .place-value-piece { width: 3.25rem; height: 3.25rem; background-image: repeating-linear-gradient(0deg, transparent 0, transparent calc(10% - 1px), var(--border) calc(10% - 1px), var(--border) 10%), repeating-linear-gradient(90deg, transparent 0, transparent calc(10% - 1px), var(--border) calc(10% - 1px), var(--border) 10%); }
+.place-value-more { align-self: center; font-weight: 700; }
+.place-value-readout { padding: 0.5rem; border-inline-start: 4px solid var(--accent); background: var(--badge); color: var(--text); font-weight: 700; }
+.place-value-controls-grid { display: grid; gap: 0.75rem; }
+.place-value-controls { min-width: 0; margin: 0; padding: 0.65rem; border: 2px solid var(--border); border-radius: 0.7rem; }
+.place-value-controls legend { padding-inline: 0.35rem; font-weight: 700; }
+.place-value-control-row { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-block: 0.35rem; }
+.place-value-control-row button { min-width: 0; max-width: 100%; touch-action: manipulation; white-space: normal; overflow-wrap: anywhere; }
+.place-value-comparisons { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr)); gap: 1rem; }
+.comparison-model { min-width: 0; padding: 0.75rem; border: 2px solid var(--border); border-radius: 0.75rem; }
+.comparison-model h3 { margin-top: 0; text-align: center; }
+.comparison-model > button { display: block; width: 100%; margin-top: 0.5rem; }
+.comparison-model > button[aria-pressed="true"] { border-style: dashed; background: var(--badge); }
+@media (max-width: 30rem) {
+  .place-value-workspace { gap: 0.25rem; }
+  .place-value-column { padding: 0.35rem; }
+  .place-value-controls .secondary-button { flex: 1 1 9rem; }
+  .place-value-tens .place-value-piece, .place-value-hundreds .place-value-piece { width: 2.6rem; }
+}

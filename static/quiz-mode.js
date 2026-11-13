@@ -11,6 +11,7 @@ import { quizQuestions as pizzaQuestions } from "./picnic-pizza-engine.js";
 import { createWorkspace, finalWords, groupQuizQuestions } from "./alphabet-groups-engine.js";
 import { mountWorkspace } from "./alphabet-groups-workspace.js";
 import { buildQuizQuestions as meteorQuestions } from "./math-meteor-patrol-engine.js";
+import { LEVELS as PLACE_LEVELS, makeQuizQuestion as placeValueQuizQuestion } from "./place-value-builders-engine.js";
 import {
   LEVELS as CLOCK_LEVELS, advanceTime as advanceClockTime, buildRound as clockRound,
   clockDescription, formatTime as formatClockTime, timeChoices as clockChoices,
@@ -93,6 +94,7 @@ function makeQuestions(kind, bank, theme, grouped = false, mathOperation = "addi
     }));
   }
   if (kind === "ribbon") return RIBBON_LEVELS.map((_, index) => ribbonQuizQuestion(index));
+  if (kind === "place-value") return PLACE_LEVELS.map((_, index) => placeValueQuizQuestion(index));
   if (kind === "fraction") return fractionQuestions();
   if (kind === "pizza") return pizzaQuestions();
   return ACORN_LEVELS.flatMap((level, index) => {
@@ -114,7 +116,8 @@ function setupQuiz(game) {
       : game.classList.contains("proofreading-game") ? "proof"
         : game.classList.contains("picnic-pizza-game") ? "pizza"
           : game.classList.contains("fraction-bridge") ? "fraction"
-            : game.classList.contains("math-meteor-patrol") ? "math-meteor" : "alphabet";
+            : game.classList.contains("math-meteor-patrol") ? "math-meteor"
+          : game.classList.contains("place-value-builders") ? "place-value" : "alphabet";
   game.replaceChildren();
   const notice = element("p", QUIZ_NOTICE, "quiz-notice");
   const area = element("div");
@@ -333,7 +336,7 @@ function setupQuiz(game) {
       }
       area.append(label, pad);
     }
-    if (kind === "ribbon") {
+    if (kind === "ribbon" || kind === "place-value") {
       const choices = element("div", undefined, "answer-stones");
       choices.setAttribute("role", "group");
       choices.setAttribute("aria-labelledby", heading.id);
@@ -549,7 +552,8 @@ function setupQuiz(game) {
       const description = question.kind.startsWith("clock-") && answer !== undefined && answer !== ""
         ? formatClockTime(Number(answer))
         : kind === "proof" ? `${answer.length} items marked`
-        : question.kind === "ribbon" ? question.choices.find((choice) => choice.value === answer)?.label ?? "No answer"
+          : ["ribbon", "place-value"].includes(question.kind)
+            ? question.choices.find((choice) => choice.value === answer)?.label ?? "No answer"
           : question.kind === "fraction-placement" && answer !== undefined
             ? question.choices.find((choice) => choice.value === answer)?.label
             : ["fraction-equivalent", "fraction-compare"].includes(question.kind) && answer !== undefined
@@ -582,7 +586,7 @@ function setupQuiz(game) {
       if (!correct) {
         const answer = question.kind.startsWith("clock-") && response !== undefined && response !== ""
           ? formatClockTime(Number(response))
-          : question.kind === "ribbon"
+          : ["ribbon", "place-value"].includes(question.kind)
           ? question.choices.find((choice) => choice.value === response)?.label ?? "No answer"
           : question.kind === "fraction-placement" && response !== undefined
             ? question.choices.find((choice) => choice.value === response)?.label
