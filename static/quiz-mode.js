@@ -11,6 +11,11 @@ import { quizQuestions as pizzaQuestions } from "./picnic-pizza-engine.js";
 import { createWorkspace, finalWords, groupQuizQuestions } from "./alphabet-groups-engine.js";
 import { mountWorkspace } from "./alphabet-groups-workspace.js";
 import { buildQuizQuestions as meteorQuestions } from "./math-meteor-patrol-engine.js";
+import {
+  LEVELS as CLOCK_LEVELS, advanceTime as advanceClockTime, buildRound as clockRound,
+  clockDescription, formatTime as formatClockTime, timeChoices as clockChoices,
+} from "./clockwork-critters-engine.js";
+import { createClockFace } from "./clockwork-critters-clock.js";
 
 const active = isQuizMode(window.location.search);
 if (active) {
@@ -70,6 +75,23 @@ function makeQuestions(kind, bank, theme, grouped = false, mathOperation = "addi
     })));
   }
   if (kind === "math-meteor") return meteorQuestions(mathOperation);
+  if (kind === "clock") {
+    return CLOCK_LEVELS.flatMap((level, index) => clockRound(index).map((question, step) => {
+      const mode = (index + step) % 2 === 0 ? "set" : "read";
+      return {
+        kind: `clock-${mode}`,
+        title: `Level ${index + 1}, activity ${step + 1}: ${level.title}`,
+        prompt: mode === "set"
+          ? `Set the clock to ${formatClockTime(question.time)} for ${question.routine}.`
+          : `What time is shown for ${question.routine}?`,
+        expected: question.time,
+        interval: question.interval,
+        choices: clockChoices(question.time, question.interval),
+        clock: question.time,
+        correction: `The correct time is ${formatClockTime(question.time)}. ${clockDescription(question.time)}`,
+      };
+    }));
+  }
   if (kind === "ribbon") return RIBBON_LEVELS.map((_, index) => ribbonQuizQuestion(index));
   if (kind === "fraction") return fractionQuestions();
   if (kind === "pizza") return pizzaQuestions();
@@ -87,7 +109,7 @@ function makeQuestions(kind, bank, theme, grouped = false, mathOperation = "addi
 
 function setupQuiz(game) {
   const name = game.getAttribute("aria-label");
-  const kind = game.classList.contains("ribbon-workshop") ? "ribbon" : game.classList.contains("acorn-game")
+  const kind = game.classList.contains("clockwork-critters") ? "clock" : game.classList.contains("ribbon-workshop") ? "ribbon" : game.classList.contains("acorn-game")
     ? "acorn" : game.classList.contains("number-trail") ? "number"
       : game.classList.contains("proofreading-game") ? "proof"
         : game.classList.contains("picnic-pizza-game") ? "pizza"
@@ -116,6 +138,56 @@ function setupQuiz(game) {
     node.addEventListener("click", action);
     return node;
   };
+
+  function renderClock(question) {
+    const display = element("div", undefined, "clock-display");
+    const description = element("p", undefined, "clock-description");
+    description.setAttribute("role", "status");
+    description.setAttribute("aria-live", "polite");
+    const update = (time) => {
+      display.replaceChildren(createClockFace(time));
+      description.textContent = clockDescription(time);
+    };
+    if (question.kind === "clock-read") {
+      update(question.clock);
+      const choices = element("div", undefined, "answer-stones clock-choices");
+      choices.setAttribute("role", "group");
+      choices.setAttribute("aria-labelledby", "quiz-question-heading");
+      question.choices.forEach((time) => {
+        const choice = button(formatClockTime(time), () => {
+          responses[current] = time;
+          for (const item of choices.children) item.setAttribute("aria-pressed", String(item === choice));
+          status.textContent = "Answer selected. You can change it before submitting.";
+        });
+        choice.value = String(time);
+        choice.setAttribute("aria-pressed", String(responses[current] === time));
+        choices.append(choice);
+      });
+      area.append(display, element("p", "Short, broad hand: hours. Long, thin hand: minutes.", "clock-hand-key"), description, choices);
+      return;
+    }
+
+    let time = responses[current] ?? 720;
+    update(time);
+    area.append(display, element("p", "Short, broad hand: hours. Long, thin hand: minutes.", "clock-hand-key"), description);
+    const controls = element("div", undefined, "clock-controls");
+    controls.setAttribute("role", "group");
+    controls.setAttribute("aria-label", "Move the clock hands");
+    for (const [label, amount] of [
+      ["Move hour hand back one hour", -60],
+      ["Move hour hand forward one hour", 60],
+      [`Move minute hand back ${question.interval} minutes`, -question.interval],
+      [`Move minute hand forward ${question.interval} minutes`, question.interval],
+    ]) {
+      controls.append(button(label, () => {
+        time = advanceClockTime(time, amount);
+        responses[current] = time;
+        update(time);
+        status.textContent = "Answer changed. You can revise it before submitting.";
+      }));
+    }
+    area.append(controls);
+  }
 
   function showStart() {
     notice.textContent = QUIZ_NOTICE;
@@ -225,6 +297,7 @@ function setupQuiz(game) {
       });
       area.append(choices);
     }
+    if (question.kind === "clock-set" || question.kind === "clock-read") renderClock(question);
     if (kind === "math-meteor") {
       const label = element("label", "Your answer ");
       const input = element("input");
@@ -473,7 +546,9 @@ function setupQuiz(game) {
     questions.forEach((question, index) => {
       const item = element("li");
       const answer = responses[index];
-      const description = kind === "proof" ? `${answer.length} items marked`
+      const description = question.kind.startsWith("clock-") && answer !== undefined && answer !== ""
+        ? formatClockTime(Number(answer))
+        : kind === "proof" ? `${answer.length} items marked`
         : question.kind === "ribbon" ? question.choices.find((choice) => choice.value === answer)?.label ?? "No answer"
           : question.kind === "fraction-placement" && answer !== undefined
             ? question.choices.find((choice) => choice.value === answer)?.label
@@ -505,7 +580,9 @@ function setupQuiz(game) {
       item.append(element("strong", `${question.title}: ${correct ? "Correct" : "Incorrect"}`));
       item.append(element("p", question.prompt));
       if (!correct) {
-        const answer = question.kind === "ribbon"
+        const answer = question.kind.startsWith("clock-") && response !== undefined && response !== ""
+          ? formatClockTime(Number(response))
+          : question.kind === "ribbon"
           ? question.choices.find((choice) => choice.value === response)?.label ?? "No answer"
           : question.kind === "fraction-placement" && response !== undefined
             ? question.choices.find((choice) => choice.value === response)?.label
