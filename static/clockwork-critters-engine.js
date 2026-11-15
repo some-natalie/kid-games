@@ -1,3 +1,5 @@
+import { shuffled } from "./alphabet-word-lists.js";
+
 export const STEPS_PER_LEVEL = 5;
 
 export const LEVELS = Object.freeze([
@@ -87,8 +89,10 @@ export function buildRound(levelIndex) {
     throw new RangeError("Choose an existing Clockwork Critters level.");
   }
   const level = LEVELS[levelIndex];
+  const modes = shuffled(["set", "read", "set", "read", Math.random() < 0.5 ? "set" : "read"]);
   return level.times.map((time, index) => ({
     time,
+    mode: modes[index],
     routine: ROUTINES[index],
     interval: level.interval,
   }));

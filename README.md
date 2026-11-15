@@ -21,6 +21,10 @@ Clockwork Critters lets players click or tap and drag either clock hand in norma
 play and quiz mode. Hands snap to hour and five-minute positions and stay aligned
 as minutes pass. Both hands can move at every level, including whole-hour
 questions. Keyboard players can Tab to each hand and use the arrow keys.
+Each five-activity level randomly mixes two or three clock-setting activities
+with two or three clock-reading activities at that level's complexity. Both
+skills appear in every level, including quiz mode; quiz navigation preserves the
+assigned activities and answers until submission.
 
 ## Quiz mode
 

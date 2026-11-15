@@ -78,7 +78,7 @@ function makeQuestions(kind, bank, theme, grouped = false, mathOperation = "addi
   if (kind === "math-meteor") return meteorQuestions(mathOperation);
   if (kind === "clock") {
     return CLOCK_LEVELS.flatMap((level, index) => clockRound(index).map((question, step) => {
-      const mode = (index + step) % 2 === 0 ? "set" : "read";
+      const mode = question.mode;
       return {
         kind: `clock-${mode}`,
         title: `Level ${index + 1}, activity ${step + 1}: ${level.title}`,
