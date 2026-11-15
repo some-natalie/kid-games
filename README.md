@@ -5,8 +5,7 @@ light/dark styling based on the device preference. Alphabetical Adventure is
 the site's alphabetical-order game, Proofreading Detectives is its
 proofreading game, Number Trail is its woodland math adventure,
 Acorn Adventure introduces cumulative, multistep arithmetic, and Picnic Pizza
-introduces equal shares and visual fractions, while Ribbon
-Workshop explores fractions with equal-length ribbons, and Fraction Bridge
+introduces equal shares and visual fractions, while Fraction Bridge
 helps children find, compare, and order fractions on a number line. Place-Value
 Builders visualizes hundreds, tens, ones, and regrouping. Math Meteor Patrol
 adds optional, gently timed arithmetic-fluency practice, and Clockwork Critters
@@ -41,7 +40,7 @@ expandable **Answer details**, including incorrect responses and corrections.
 
 Each completely correct question earns one point: an entire word order or
 proofreading passage, one Number Trail puzzle, one Acorn Adventure stop, one
-Picnic Pizza or Ribbon Workshop fraction question, one Fraction Bridge
+Picnic Pizza fraction question, one Fraction Bridge
 challenge, one Place-Value Builders question, or one Clockwork Critters time.
 Unanswered questions count as incorrect. Proofreading requires marking every
 mistake without marking correct text. Acorn Adventure uses a numeric input
@@ -53,8 +52,6 @@ and touch-friendly Up/Down controls.
 
 Quiz answers live only in memory: leaving or reloading discards them, and
 ordinary saved game progress is neither loaded nor changed.
-Ribbon Workshop quiz questions use the same level progression and score one
-point for each fully correct fraction response.
 Place-Value Builders quizzes ask about the same place-value representations
 and comparisons; answers can be revised before submission, and grading waits
 until then.
@@ -129,7 +126,6 @@ prefix the success feedback.
 | Clockwork Critters | `GAME_CELEBRATIONS["clockwork-critters"]` | gear showers, clock sparks, owls, cog confetti, mice, cuckoos, bells |
 | Fraction Bridge | `GAME_CELEBRATIONS["fraction-bridge"]` | pond bubbles, lily blossoms, frogs, ducks, turtle friends, fraction stars |
 | Picnic Pizza | `GAME_CELEBRATIONS["picnic-pizza"]` | pizza slices, picnic fruit, ladybugs, marching ants, checkered confetti |
-| Ribbon Workshop | `GAME_CELEBRATIONS["ribbon-workshop"]` | ribbon confetti, bows, thread spools, yarn, sequins, fraction tags |
 | Math Meteor Patrol | `GAME_CELEBRATIONS["math-meteor-patrol"]` | meteor sparkles, rockets, planets, satellites, shields, galaxy confetti |
 | Place-Value Builders | `GAME_CELEBRATIONS["place-value-builders"]` | base-ten blocks, number columns, hundred squares, rods, builder confetti |
 
@@ -524,37 +520,6 @@ Returning begins that level with a new journey; individual stops are not saved.
 Starting a new adventure or finishing clears that save without touching other
 games. Storage failures display a warning and do not block play.
 
-## Ribbon Workshop
-
-Fold equal-length rectangular ribbons into halves, thirds, quarters, sixths,
-and eighths. The worked example shows how two of four equal parts have the same
-length as one half. Its nine untimed levels progress from selecting halves and
-quarters, through thirds and equivalent lengths, to eighths, comparisons, and
-completing a whole.
-
-| Levels | Fraction skill |
-|---|---|
-| 1–3 | Select 1/2, 1/4, and 3/4 |
-| 4–5 | Select 2/3; align 1/2 and 2/4 |
-| 6–7 | Match 1/2 = 4/8 and 1/3 = 2/6 |
-| 8–9 | Compare 3/4 and 2/3; complete a whole from 5/8 |
-
-Use the fold buttons to divide a ribbon into equal parts, and the large
-**Select one more part** and **Remove one selected part** controls to color its
-length. The aligned overlay uses a shared origin and whole length, with distinct
-partition guides and hatching. Selection labels name both the fraction and the
-number of equal parts. Wrong attempts keep the current selection, show a hint,
-and can be retried without a timer or point loss. Right answers add a themed
-cheer and a ribbon, bow, or sewing celebration.
-
-Fraction and partition logic lives in `static/ribbon-workshop-engine.js`;
-`static/ribbon-workshop.js` renders the accessible HTML controls and overlay.
-Exact comparisons use integer numerators and denominators with BigInt
-cross-products, not floating-point equality. The unlocked level is saved
-locally as `kid-games.ribbon-workshop.progress`; quiz mode neither reads nor
-changes that key. In quiz mode, the same nine skills are asked as revisable
-fraction questions, with grading and answer details held until submission.
-
 ## Place-Value Builders
 
 Build and compare numbers with tangible-style unit cubes, ten-cube rods, 10×10
@@ -607,7 +572,7 @@ Find fractions on a number line from zero to one. The eight levels move from
 placing halves, quarters, thirds, and eighths to recognizing equivalent
 positions, ordering fractions, comparing values, and placing fractions when
 partition guides are hidden. The number-line model complements Picnic Pizza's
-serving activities and Ribbon Workshop's equal-length overlays.
+serving activities.
 
 `static/fraction-bridge-engine.js` keeps exact fraction comparison, tick
 placement, equivalence, and ordering separate from the UI in

@@ -50,7 +50,6 @@ test("game UI modules celebrate with their own themed set", () => {
     "number-trail": "number-trail.js",
     "picnic-pizza": "picnic-pizza.js",
     proofreading: "proofreading.js",
-    "ribbon-workshop": "ribbon-workshop.js",
     "math-meteor-patrol": "math-meteor-patrol.js",
     "place-value-builders": "place-value-builders.js",
   };

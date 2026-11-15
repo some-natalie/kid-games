@@ -9,6 +9,8 @@ for (const mode of ["", "?quiz=1"]) {
     test.slow();
     const ageRecommendation = /\bages?\s*:?\s*\d|\b(?:under|over)\s+\d+\s*(?:years?|years?\s+old)?\b|\b\d+(?:\s*[–-]\s*\d+)?\s*[- ]year[- ]olds?\b/i;
     await page.goto(`/${mode}`);
+    await expect(page.locator(".game-tile")).toHaveCount(9);
+    await expect(page.getByRole("link", { name: /Ribbon Workshop/ })).toHaveCount(0);
     const gamePaths = await page.locator(".game-tile").evaluateAll((tiles) =>
       tiles.map((tile) => new URL(tile.href).pathname));
     for (const path of ["/", "/for-grown-ups/", ...gamePaths]) {
@@ -25,8 +27,8 @@ for (const mode of ["", "?quiz=1"]) {
 
 test("landing page links to grown-up settings without listing them as a game", async ({ page }) => {
   await page.goto("/");
-  await expect(page.locator(".game-tile")).toHaveCount(10);
-  await expect(page.getByRole("link", { name: /Ribbon Workshop/ })).toBeVisible();
+  await expect(page.locator(".game-tile")).toHaveCount(9);
+  await expect(page.getByRole("link", { name: /Ribbon Workshop/ })).toHaveCount(0);
   await expect(page.getByRole("link", { name: /Picnic Pizza/ })).toBeVisible();
   await expect(page.getByRole("link", { name: /Fraction Bridge/ })).toBeVisible();
   await expect(page.getByRole("link", { name: /Math Meteor Patrol/ })).toBeVisible();
