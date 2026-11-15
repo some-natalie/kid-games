@@ -58,6 +58,9 @@ point for each fully correct fraction response.
 Place-Value Builders quizzes ask about the same place-value representations
 and comparisons; answers can be revised before submission, and grading waits
 until then.
+Building questions now use the same draggable blocks as normal play and earn
+one point only for the exact required counts in all four places, not merely
+an equivalent total. Untouched builds count as unanswered.
 
 ## Community and license
 
@@ -554,25 +557,29 @@ fraction questions, with grading and answer details held until submission.
 
 ## Place-Value Builders
 
-Build and compare numbers with visible hundreds, tens, and ones blocks. Ten
-ones exchange for one ten, and ten tens exchange for one hundred; the reverse
-exchanges are available too, and every trade preserves the represented total.
-The ten untimed levels progress from two-digit building and comparisons to
-three-digit regrouping, including 40, 105, and 206 so that zero-place values
-are practiced.
+Build and compare numbers with tangible-style unit cubes, ten-cube rods, 10×10
+hundred flats, and 10×10×10 thousand cubes. Ten smaller blocks exchange for one
+block in the next place; reverse exchanges preserve the represented total too.
+The twelve untimed levels progress through two- and three-digit building and
+comparisons, including 40, 105, and 206, then thousand regrouping and a 1234
+build. The workspace supports totals through 9999.
 
-Use the add, remove, and exchange buttons with a mouse, touch, or keyboard.
-The block pictures include printed place values and have matching text
-descriptions, so the quantities do not depend on color. Hints and unlimited
+Drag from the tray into a matching place to add a block, or back to remove it.
+Moving workspace blocks to a neighboring place trades a group of ten or splits
+a larger block. Drag near a screen edge to scroll a tall workspace. Click/tap,
+keyboard controls, and exchange buttons offer the same operations. Unit grids
+and matching text descriptions do not depend on color. Models show up to 100
+blocks per place, with exact counts for any remainder. Hints and unlimited
 retries are available without lost points. Progress saves the unlocked level
 locally as `kid-games.place-value-builders.progress`; storage errors are
 reported, and quiz mode never reads or changes normal progress.
 
 `static/place-value-builders-engine.js` contains the bounded block operations,
 place-value checks, comparisons, and quiz questions. The UI in
-`static/place-value-builders.js` supplies the interactive workspace and
-themed celebrations. Quiz mode asks one revisable question per level, with
-no hints or answer feedback before submission.
+`static/place-value-builders.js` supplies the themed celebrations;
+`static/place-value-blocks.js` draws the models and provides the shared
+normal/quiz drag-and-drop workspace. Quiz mode asks one revisable question per
+level, with no hints or answer feedback before submission.
 
 ## Picnic Pizza
 

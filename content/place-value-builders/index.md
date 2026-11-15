@@ -1,6 +1,6 @@
 +++
 title = "Place-Value Builders"
-description = "Build numbers with hundreds, tens, and ones, and trade groups without changing their value."
+description = "Drag unit cubes, ten rods, hundred flats, and thousand cubes to build numbers and trade groups without changing their value."
 weight = 6
 template = "place-value-builders.html"
 
