@@ -36,6 +36,31 @@ export function handAngles(time) {
   };
 }
 
+export function timeFromHandPosition(time, hand, x, y) {
+  assertTime(time);
+  if (!["hour", "minute"].includes(hand) || !Number.isFinite(x) || !Number.isFinite(y)) {
+    throw new RangeError("Choose a clock hand and finite coordinates.");
+  }
+  if (Math.hypot(x, y) < 10) return time;
+  const angle = (Math.atan2(x, -y) * 180 / Math.PI + 360) % 360;
+  const minutes = time % 60;
+  if (hand === "hour") {
+    const hour = ((Math.round((angle - minutes / 2) / 30) % 12) + 12) % 12;
+    return hour * 60 + minutes;
+  }
+  const target = (Math.round(angle / 30) * 5) % 60;
+  let change = target - minutes;
+  if (change > 30) change -= 60;
+  if (change < -30) change += 60;
+  if (Math.abs(change) === 30) {
+    let turn = angle - minutes * 6;
+    if (turn > 180) turn -= 360;
+    if (turn < -180) turn += 360;
+    change = turn >= 0 ? 30 : -30;
+  }
+  return advanceTime(time, change) % 720;
+}
+
 export function formatTime(time) {
   assertTime(time);
   const hour = Math.floor(time / 60) % 12 || 12;

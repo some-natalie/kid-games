@@ -5,7 +5,52 @@ import { buildRound, formatTime } from "../../../../static/clockwork-critters-en
 import { expectThemedCelebration } from "../../shared/celebrations.js";
 
 const progressKey = "kid-games.clockwork-critters.progress";
-const hourBack = (page) => page.getByRole("button", { name: "Move hour hand back one hour" });
+const hourHand = (page) => page.getByRole("slider", { name: "Hour hand" });
+const minuteHand = (page) => page.getByRole("slider", { name: "Minute hand" });
+
+async function setHands(page, hour, minute) {
+  const currentHour = Number(await hourHand(page).getAttribute("aria-valuenow"));
+  for (let step = 0; step < (currentHour - Number(hour) + 12) % 12; step += 1) {
+    await hourHand(page).press("ArrowLeft");
+  }
+  const interval = 60 - Number(await minuteHand(page).getAttribute("aria-valuemax"));
+  const currentMinute = Number(await minuteHand(page).getAttribute("aria-valuenow"));
+  for (let step = 0; step < (Number(minute) - currentMinute + 60) % 60 / interval; step += 1) {
+    await minuteHand(page).press("ArrowRight");
+  }
+}
+
+async function dragHand(page, hand, angle, gripRadius = hand === "hour" ? 33 : 60) {
+  const slider = page.getByRole("slider", { name: `${hand === "hour" ? "Hour" : "Minute"} hand` });
+  await slider.scrollIntoViewIfNeeded();
+  const points = await slider.evaluate((node, { angle, gripRadius }) => {
+    const face = node.ownerSVGElement;
+    const start = Number(node.getAttribute("transform").match(/rotate\(([\d.]+)/)[1]);
+    return Array.from({ length: 13 }, (_, index) => {
+      const radians = (start + (angle - start) * index / 12) * Math.PI / 180;
+      const point = face.createSVGPoint();
+      const radius = index === 0 ? gripRadius : 60;
+      point.x = 90 + Math.sin(radians) * radius;
+      point.y = 90 - Math.cos(radians) * radius;
+      const screen = point.matrixTransform(face.getScreenCTM());
+      return { x: screen.x, y: screen.y };
+    });
+  }, { angle, gripRadius });
+  if (test.info().project.name === "touch-chromium") {
+    const session = await page.context().newCDPSession(page);
+    await session.send("Input.dispatchTouchEvent", { type: "touchStart", touchPoints: [points[0]] });
+    for (const point of points.slice(1)) {
+      await session.send("Input.dispatchTouchEvent", { type: "touchMove", touchPoints: [point] });
+    }
+    await session.send("Input.dispatchTouchEvent", { type: "touchEnd", touchPoints: [] });
+    await session.detach();
+  } else {
+    await page.mouse.move(points[0].x, points[0].y);
+    await page.mouse.down();
+    for (const point of points.slice(1)) await page.mouse.move(point.x, point.y);
+    await page.mouse.up();
+  }
+}
 
 async function start(page, level) {
   await page.goto("/clockwork-critters/");
@@ -20,11 +65,7 @@ async function start(page, level) {
 async function solveSettingActivity(page) {
   const prompt = await page.locator("#clock-prompt").textContent();
   const [, hour, minute] = prompt.match(/to (\d+):(\d\d)/);
-  for (let step = 0; step < (12 - Number(hour)) % 12; step += 1) await hourBack(page).click();
-  const interval = Number((await page.getByRole("button", { name: /Move minute hand forward/ }).textContent()).match(/\d+/)[0]);
-  for (let step = 0; step < Number(minute) / interval; step += 1) {
-    await page.getByRole("button", { name: `Move minute hand forward ${interval} minutes` }).click();
-  }
+  await setHands(page, hour, minute);
   await page.locator("#check-clock").click();
   await expect(page.locator("#feedback")).toContainText("That's");
 }
@@ -33,14 +74,7 @@ async function solveQuizQuestion(page, questionIndex) {
   const prompt = await page.locator("#quiz-question-heading + p").textContent();
   if (prompt.startsWith("Set the clock to")) {
     const [, hour, minute] = prompt.match(/to (\d+):(\d\d)/);
-    const targetHour = Number(hour) % 12 || 12;
-    for (let step = 0; step < (12 - targetHour) % 12; step += 1) {
-      await page.getByRole("button", { name: "Move hour hand back one hour" }).click();
-    }
-    const interval = Number((await page.getByRole("button", { name: /Move minute hand forward/ }).first().textContent()).match(/\d+/)[0]);
-    for (let step = 0; step < Number(minute) / interval; step += 1) {
-      await page.getByRole("button", { name: `Move minute hand forward ${interval} minutes` }).click();
-    }
+    await setHands(page, hour, minute);
   } else {
     const time = formatTime(buildRound(Math.floor(questionIndex / 5))[questionIndex % 5].time);
     await page.getByRole("button", { name: time, exact: true }).click();
@@ -68,16 +102,26 @@ test("worked example leads to keyboard clock-setting and reading with hints and 
   await expect(page.locator("#feedback")).toContainText("Not quite");
   await expect(page.locator("#clock-hint")).toContainText("minute hand points straight up to 12");
   await expect(page.locator(".celebration")).toHaveCount(0);
-  for (let step = 0; step < 6; step += 1) await hourBack(page).press("Space");
+  await page.locator("#clock-prompt").focus();
+  await page.keyboard.press("Tab");
+  await expect(hourHand(page)).toBeFocused();
+  for (let step = 0; step < 6; step += 1) await hourHand(page).press("ArrowLeft");
+  await expect(hourHand(page)).toBeFocused();
   await expect(page.locator("#clock-description")).toContainText("hour hand is on 6");
-  await expect(page.locator("#clock-display .clock-hand-hour")).toHaveAttribute("transform", "rotate(180 90 90)");
+  await expect(hourHand(page)).toHaveAttribute("transform", "rotate(180 90 90)");
+  await page.keyboard.press("Tab");
+  await expect(minuteHand(page)).toBeFocused();
   await page.locator("#check-clock").press("Enter");
   await expect(page.locator("#feedback")).toContainText("That's");
   await expect(page.locator("#next-step")).toBeFocused();
+  await expect(hourHand(page)).toHaveAttribute("aria-disabled", "true");
+  await hourHand(page).press("ArrowRight");
+  await expect(hourHand(page)).toHaveAttribute("aria-valuenow", "6");
   await expectThemedCelebration(page, GAME_CELEBRATIONS["clockwork-critters"]);
   await audit(page);
   await page.locator("#next-step").press("Enter");
   await page.locator("#mode-read").press("Enter");
+  await expect(page.getByRole("slider")).toHaveCount(0);
   await expect(page.locator("#clock-description")).toContainText("hour hand is on 7");
   const readAnswer = page.getByRole("button", { name: "7:00", exact: true });
   if (test.info().project.name === "touch-chromium") await readAnswer.tap();
@@ -140,7 +184,7 @@ test("quiz withholds grading, retains revisions, scores exact answers, and leave
   await expect(readingAnswers.filter({ hasText: revisedAnswer })).toHaveAttribute("aria-pressed", "true");
   for (let question = 1; question < 20; question += 1) await solveQuizQuestion(page, question);
   await page.getByRole("button", { name: "Edit question 1", exact: true }).click();
-  await page.getByRole("button", { name: "Move hour hand forward one hour" }).click();
+  await hourHand(page).press("ArrowRight");
   await page.getByRole("button", { name: "Next question" }).click();
   for (let question = 1; question < 19; question += 1) {
     await page.getByRole("button", { name: "Next question" }).click();
@@ -174,23 +218,105 @@ test("blocked storage is reported, and tutorial and play remain accessible in li
   await expect(page.locator("#level-title")).toBeVisible();
 });
 
-test("clock controls reflow with enlarged OpenDyslexic text", async ({ page }) => {
+test("clock controls reflow with enlarged OpenDyslexic text in normal and quiz modes", async ({ page }) => {
   await page.setViewportSize({ width: 320, height: 568 });
   await page.addInitScript(() => localStorage.setItem("kid-games.font", "opendyslexic"));
-  await start(page, 3);
-  await page.addStyleTag({ content: `
-    :root { font-size: 200%; }
-    p, h1, h2, h3, button, summary {
-      line-height: 1.5 !important; letter-spacing: 0.12em !important; word-spacing: 0.16em !important;
+  for (const quiz of [false, true]) {
+    if (quiz) {
+      await page.goto("/clockwork-critters/?quiz=1");
+      await page.getByRole("button", { name: "Start quiz" }).click();
+    } else {
+      await start(page, 3);
     }
-    p { margin-bottom: 2em !important; }
-  ` });
-  await page.evaluate(() => document.fonts.ready);
-  await expect(page.locator("html")).toHaveClass("opendyslexic");
-  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(320);
-  for (const button of await page.locator(".clock-controls button").all()) {
-    const bounds = await button.boundingBox();
-    expect(bounds.width).toBeGreaterThanOrEqual(44);
-    expect(bounds.height).toBeGreaterThanOrEqual(44);
+    await page.emulateMedia({ colorScheme: quiz ? "dark" : "light", reducedMotion: "reduce" });
+    await page.addStyleTag({ content: `
+      :root { font-size: 200%; }
+      p, h1, h2, h3, button, summary {
+        line-height: 1.5 !important; letter-spacing: 0.12em !important; word-spacing: 0.16em !important;
+      }
+      p { margin-bottom: 2em !important; }
+    ` });
+    await page.evaluate(() => document.fonts.ready);
+    await expect(page.locator("html")).toHaveClass(/\bopendyslexic\b/);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(320);
+    await expect(page.getByRole("slider")).toHaveCount(2);
+    for (const hit of await page.locator(".clock-hand-hit").all()) {
+      const bounds = await hit.evaluate((node) => {
+        const box = node.getBoundingClientRect();
+        const width = Number.parseFloat(getComputedStyle(node).strokeWidth);
+        return { width: box.width + width, height: box.height + width };
+      });
+      expect(bounds.width).toBeGreaterThanOrEqual(44);
+      expect(bounds.height).toBeGreaterThanOrEqual(44);
+    }
+    await dragHand(page, "hour", 180);
+    await expect(hourHand(page)).toHaveAttribute("aria-valuenow", "6");
+    await dragHand(page, "minute", 90, 33);
+    await expect(minuteHand(page)).toHaveAttribute("aria-valuenow", "15");
+    await audit(page);
   }
+});
+
+for (const [level, minute] of [[0, 0], [1, 30], [2, 15], [3, 5]]) {
+  test(`hands drag directly and snap in level ${level + 1}`, async ({ page }) => {
+    await start(page, level);
+    await expect(page.getByRole("button", { name: /Move .* hand/ })).toHaveCount(0);
+    await page.locator("#check-clock").click();
+    await dragHand(page, "hour", 180);
+    await expect(hourHand(page)).toHaveAttribute("aria-valuenow", "6");
+    await expect(page.locator("#feedback")).toBeEmpty();
+    await expect(page.locator("#clock-hint")).toBeHidden();
+    if (level === 0) {
+      await dragHand(page, "minute", 180, 33);
+      await expect(minuteHand(page)).toHaveAttribute("aria-valuenow", "30");
+      await page.locator("#check-clock").click();
+      await expect(page.locator("#feedback")).toContainText("Not quite");
+      await dragHand(page, "minute", 360);
+      await expect(minuteHand(page)).toHaveAttribute("aria-valuenow", "0");
+      await expect(hourHand(page)).toHaveAttribute("aria-valuenow", "7");
+      await dragHand(page, "hour", 180);
+    }
+    await dragHand(page, "minute", minute * 6 + 2);
+    await expect(minuteHand(page)).toHaveAttribute("aria-valuenow", String(minute));
+    await expect(hourHand(page)).toHaveAttribute("transform", `rotate(${180 + minute / 2} 90 90)`);
+    await page.locator("#check-clock").click();
+    await expect(page.locator("#feedback")).toContainText("That's");
+    await dragHand(page, "hour", 270);
+    await expect(hourHand(page)).toHaveAttribute("aria-valuenow", "6");
+  });
+}
+
+test("quiz dragging retains revisions without revealing correctness or changing normal progress", async ({ page }) => {
+  await page.goto("/clockwork-critters/?quiz=1");
+  await page.evaluate((key) => localStorage.setItem(key, '{"version":1,"level":3}'), progressKey);
+  await page.reload();
+  await page.getByRole("button", { name: "Start quiz" }).click();
+  await dragHand(page, "hour", 180);
+  await expect(hourHand(page)).toHaveAttribute("aria-valuenow", "6");
+  await expect(page.locator(".celebration")).toHaveCount(0);
+  await expect(page.locator(".clockwork-critters > [role=status]"))
+    .toHaveText("Answer changed. You can revise it before submitting.");
+  await expect(page.locator("#feedback, #clock-hint, .quiz-score")).toHaveCount(0);
+  await page.getByRole("button", { name: "Next question" }).click();
+  await expect(page.getByRole("slider")).toHaveCount(0);
+  await page.getByRole("button", { name: "Previous question" }).click();
+  await expect(hourHand(page)).toHaveAttribute("aria-valuenow", "6");
+  await dragHand(page, "hour", 210);
+  await page.getByRole("button", { name: "Next question" }).click();
+  await page.getByRole("button", { name: "Previous question" }).click();
+  await expect(hourHand(page)).toHaveAttribute("aria-valuenow", "7");
+  for (let question = 0; question < 6; question += 1) {
+    await page.getByRole("button", { name: "Next question" }).click();
+  }
+  await dragHand(page, "hour", 180);
+  await dragHand(page, "minute", 180);
+  await expect(minuteHand(page)).toHaveAttribute("aria-valuenow", "30");
+  await expect(hourHand(page)).toHaveAttribute("transform", "rotate(195 90 90)");
+  await page.getByRole("button", { name: "Next question" }).click();
+  await page.getByRole("button", { name: "Previous question" }).click();
+  await expect(minuteHand(page)).toHaveAttribute("aria-valuenow", "30");
+  await expect(hourHand(page)).toHaveAttribute("aria-valuenow", "6");
+  await audit(page);
+  expect(await page.evaluate((key) => localStorage.getItem(key), progressKey))
+    .toBe('{"version":1,"level":3}');
 });

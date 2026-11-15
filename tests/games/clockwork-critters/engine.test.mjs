@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import {
   LEVELS, STEPS_PER_LEVEL, advanceTime, buildRound, clockDescription,
-  formatTime, handAngles, hintText, timeChoices,
+  formatTime, handAngles, hintText, timeChoices, timeFromHandPosition,
 } from "../../../static/clockwork-critters-engine.js";
 
 test("the levels progress from whole hours through five-minute intervals", () => {
@@ -33,6 +33,23 @@ test("time adjustments wrap in both directions across hour and day boundaries", 
   assert.equal(advanceTime(1435, 10), 5);
   assert.equal(advanceTime(5, -10), 1435);
   assert.throws(() => advanceTime(60, 1.5), RangeError);
+});
+
+test("dragging hands snaps to clock numbers and preserves the other hand's time", () => {
+  const position = (angle) => [60 * Math.sin(angle * Math.PI / 180), -60 * Math.cos(angle * Math.PI / 180)];
+  assert.equal(timeFromHandPosition(360, "minute", ...position(87)), 375);
+  assert.equal(timeFromHandPosition(360, "minute", ...position(180)), 390);
+  assert.equal(timeFromHandPosition(390, "minute", ...position(359)), 420);
+  assert.equal(timeFromHandPosition(360, "minute", ...position(181)), 330);
+  assert.equal(timeFromHandPosition(390, "hour", ...position(195)), 390);
+  assert.equal(timeFromHandPosition(390, "hour", ...position(225)), 450);
+  assert.equal(timeFromHandPosition(695, "minute", ...position(0)), 0);
+  assert.equal(timeFromHandPosition(0, "minute", ...position(330)), 715);
+  assert.equal(timeFromHandPosition(390, "hour", 0, 0), 390);
+  assert.equal(timeFromHandPosition(390, "hour", ...position(5)), 30);
+  for (const args of [[360, "second", 0, -60], [360, "hour", NaN, 0], [360, "minute", 0, Infinity]]) {
+    assert.throws(() => timeFromHandPosition(...args), RangeError);
+  }
 });
 
 test("display text and accessible descriptions identify both hands without color", () => {

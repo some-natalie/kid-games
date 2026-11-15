@@ -1,5 +1,5 @@
-import { advanceTime, buildRound, clockDescription, formatTime, hintText, LEVELS, STEPS_PER_LEVEL, timeChoices } from "./clockwork-critters-engine.js";
-import { createClockFace } from "./clockwork-critters-clock.js";
+import { buildRound, clockDescription, formatTime, hintText, LEVELS, STEPS_PER_LEVEL, timeChoices } from "./clockwork-critters-engine.js";
+import { CLOCK_INSTRUCTIONS, createClockFace, createInteractiveClock } from "./clockwork-critters-clock.js";
 import { createLevelProgress } from "./level-progress.js";
 import { celebrate, stopCelebration } from "./alphabet-celebration.js";
 import { GAME_CELEBRATIONS } from "./game-celebrations.js";
@@ -29,6 +29,7 @@ if (!isQuizMode(window.location.search)) {
   let mode = "set";
   let clockTime = 720;
   let solved = false;
+  let interactiveClock;
 
   function showWarning(message) {
     if (!message) return;
@@ -48,7 +49,14 @@ if (!isQuizMode(window.location.search)) {
   }
 
   function updateClock(time) {
-    clockDisplay.replaceChildren(createClockFace(time));
+    interactiveClock = mode === "set" ? createInteractiveClock(time, (value) => {
+      clockTime = value;
+      clockText.textContent = clockDescription(value);
+      feedback.textContent = "";
+      feedback.classList.remove("success");
+      hint.hidden = true;
+    }) : null;
+    clockDisplay.replaceChildren(interactiveClock?.face ?? createClockFace(time));
     clockText.textContent = clockDescription(time);
   }
 
@@ -58,34 +66,12 @@ if (!isQuizMode(window.location.search)) {
   }
 
   function renderControls() {
-    controls.replaceChildren();
+    controls.textContent = CLOCK_INSTRUCTIONS;
     choices.replaceChildren();
     const problem = round[stepIndex];
     if (mode === "set") {
       controls.hidden = false;
       choices.hidden = true;
-      for (const [label, amount, unit] of [
-        ["Move hour hand back one hour", -60, "hour"],
-        ["Move hour hand forward one hour", 60, "hour"],
-        [`Move minute hand back ${problem.interval} minutes`, -problem.interval, "minute"],
-        [`Move minute hand forward ${problem.interval} minutes`, problem.interval, "minute"],
-      ]) {
-        const button = document.createElement("button");
-        button.type = "button";
-        button.className = "secondary-button";
-        button.textContent = label;
-        button.setAttribute("aria-label", label);
-        button.dataset.hand = unit;
-        button.addEventListener("click", () => {
-          if (solved) return;
-          clockTime = advanceTime(clockTime, amount);
-          updateClock(clockTime);
-          feedback.textContent = "";
-          feedback.classList.remove("success");
-          hint.hidden = true;
-        });
-        controls.append(button);
-      }
     } else {
       controls.hidden = true;
       choices.hidden = false;
@@ -120,7 +106,7 @@ if (!isQuizMode(window.location.search)) {
     const { message } = celebrate(GAME_CELEBRATIONS["clockwork-critters"]);
     feedback.textContent = `${message} That's ${formatTime(problem.time)}! ${clockDescription(problem.time)}`;
     hint.hidden = true;
-    for (const button of controls.querySelectorAll("button")) button.disabled = true;
+    interactiveClock?.setDisabled(true);
     for (const button of choices.querySelectorAll("button")) button.disabled = true;
     find("mode-set").disabled = true;
     find("mode-read").disabled = true;
