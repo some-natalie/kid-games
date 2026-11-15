@@ -99,21 +99,6 @@ export const GAME_CELEBRATIONS = Object.freeze({
       effect("ink-confetti", "Ink confetti", "burst", 90, [], ["#22243a", "#5546b8", "#3fa7f5", "#ff5d8f", "#ffb627"]),
     ],
   ),
-  "ribbon-workshop": set(
-    ["Ribbon-tastic!", "Sew good!", "Perfect measure!", "Neat as a bow!", "Workshop wizard!", "Cut to fit!"],
-    [
-      effect("ribbon-confetti", "Ribbon confetti", "burst", 90, [], RAINBOW),
-      effect("bows", "Bows", "rise", 30, ["🎀"]),
-      effect("thread-spools", "Thread spools", "shower", 35, ["🧵"]),
-      effect("yarn-balls", "Yarn balls", "burst", 35, ["🧶"]),
-      effect("snips", "Snips", "shower", 30, ["✂️"]),
-      effect("gift-boxes", "Gift boxes", "rise", 30, ["🎁"]),
-      effect("sequins", "Sequins", "shower", 60, ["✦", "✧", "✨", "◆"], RAINBOW),
-      effect("rainbow-ribbons", "Rainbow ribbons", "burst", 25, ["🌈"]),
-      effect("stitched-hearts", "Stitched hearts", "rise", 40, ["💖", "💗", "💜"]),
-      effect("fraction-tags", "Fraction tags", "shower", 50, ["½", "⅓", "¼", "⅙", "⅛"], RAINBOW),
-    ],
-  ),
   "math-meteor-patrol": set(
     ["Meteor master!", "Shield superstar!", "Orbit on target!", "Asteroid ace!", "A star solution!", "Space math whiz!"],
     [

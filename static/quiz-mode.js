@@ -4,7 +4,6 @@ import { buildRound as proofRound, tokenKey, pickVariant, describeFix } from "./
 import { LEVELS as PROOF_LEVELS } from "./proofreading-levels.js";
 import { LEVELS as NUMBER_LEVELS, buildRound as numberRound, equationText } from "./number-trail-engine.js";
 import { LEVELS as ACORN_LEVELS, buildJourney } from "./acorn-adventure-engine.js";
-import { LEVELS as RIBBON_LEVELS, makeQuizQuestion as ribbonQuizQuestion } from "./ribbon-workshop-engine.js";
 import { buildQuizQuestions as fractionQuestions, fractionName } from "./fraction-bridge-engine.js";
 import { createBridgeLine, createTargetCard } from "./fraction-bridge-line.js";
 import { quizQuestions as pizzaQuestions } from "./picnic-pizza-engine.js";
@@ -97,7 +96,6 @@ function makeQuestions(kind, bank, theme, grouped = false, mathOperation = "addi
       };
     }));
   }
-  if (kind === "ribbon") return RIBBON_LEVELS.map((_, index) => ribbonQuizQuestion(index));
   if (kind === "place-value") return PLACE_LEVELS.map((_, index) => placeValueQuizQuestion(index));
   if (kind === "fraction") return fractionQuestions();
   if (kind === "pizza") return pizzaQuestions();
@@ -115,7 +113,7 @@ function makeQuestions(kind, bank, theme, grouped = false, mathOperation = "addi
 
 function setupQuiz(game) {
   const name = game.getAttribute("aria-label");
-  const kind = game.classList.contains("clockwork-critters") ? "clock" : game.classList.contains("ribbon-workshop") ? "ribbon" : game.classList.contains("acorn-game")
+  const kind = game.classList.contains("clockwork-critters") ? "clock" : game.classList.contains("acorn-game")
     ? "acorn" : game.classList.contains("number-trail") ? "number"
       : game.classList.contains("proofreading-game") ? "proof"
         : game.classList.contains("picnic-pizza-game") ? "pizza"
@@ -347,19 +345,17 @@ function setupQuiz(game) {
       }
       area.append(label, pad);
     }
-    if (kind === "ribbon" || question.kind === "place-value") {
-      if (question.kind === "place-value") {
-        const models = element("div", undefined, "place-value-comparisons");
-        for (const { label } of question.choices) {
-          const model = element("section", undefined, "comparison-model");
-          model.append(element("h3", label));
-          const columns = element("div", undefined, "place-value-workspace");
-          drawBlockColumns(columns, blocksForNumber(Number(label)));
-          model.append(columns);
-          models.append(model);
-        }
-        area.append(models);
+    if (question.kind === "place-value") {
+      const models = element("div", undefined, "place-value-comparisons");
+      for (const { label } of question.choices) {
+        const model = element("section", undefined, "comparison-model");
+        model.append(element("h3", label));
+        const columns = element("div", undefined, "place-value-workspace");
+        drawBlockColumns(columns, blocksForNumber(Number(label)));
+        model.append(columns);
+        models.append(model);
       }
+      area.append(models);
       const choices = element("div", undefined, "answer-stones");
       choices.setAttribute("role", "group");
       choices.setAttribute("aria-labelledby", heading.id);
@@ -579,7 +575,7 @@ function setupQuiz(game) {
         : question.kind === "place-value-build" && answer !== undefined
           ? blockDescription(blocksFromCounts(answer))
         : kind === "proof" ? `${answer.length} items marked`
-          : ["ribbon", "place-value"].includes(question.kind)
+          : question.kind === "place-value"
             ? question.choices.find((choice) => choice.value === answer)?.label ?? "No answer"
           : question.kind === "fraction-placement" && answer !== undefined
             ? question.choices.find((choice) => choice.value === answer)?.label
@@ -617,7 +613,7 @@ function setupQuiz(game) {
           ? formatClockTime(Number(response))
           : question.kind === "place-value-build" && response !== undefined
             ? blockDescription(blocksFromCounts(response))
-          : ["ribbon", "place-value"].includes(question.kind)
+          : question.kind === "place-value"
           ? question.choices.find((choice) => choice.value === response)?.label ?? "No answer"
           : question.kind === "fraction-placement" && response !== undefined
             ? question.choices.find((choice) => choice.value === response)?.label
