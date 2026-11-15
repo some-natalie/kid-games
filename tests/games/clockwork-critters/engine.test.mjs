@@ -15,6 +15,24 @@ test("the levels progress from whole hours through five-minute intervals", () =>
   }
 });
 
+test("each round randomly mixes both skills without changing level complexity", (t) => {
+  const random = t.mock.method(Math, "random");
+  for (const [index, level] of LEVELS.entries()) {
+    const patterns = [];
+    for (const value of [0, 0.999]) {
+      random.mock.mockImplementation(() => value);
+      const round = buildRound(index);
+      const settings = round.filter(({ mode }) => mode === "set").length;
+      assert.ok(settings === 2 || settings === 3);
+      assert.equal(round.filter(({ mode }) => mode === "read").length, 5 - settings);
+      assert.deepEqual(round.map(({ time }) => time), [...level.times]);
+      assert.ok(round.every(({ interval, time }) => interval === level.interval && time % interval === 0));
+      patterns.push(round.map(({ mode }) => mode));
+    }
+    assert.notDeepEqual(patterns[0], patterns[1]);
+  }
+});
+
 test("minute and hour hands stay mathematically aligned at boundaries and between hours", () => {
   assert.deepEqual(handAngles(0), { minute: 0, hour: 0 });
   assert.deepEqual(handAngles(720), { minute: 0, hour: 0 });

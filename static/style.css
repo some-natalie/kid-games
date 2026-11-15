@@ -152,8 +152,6 @@ button:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
 .clock-description, .clock-hand-key { text-align: center; }
 .clock-hand-key { font-size: 0.9rem; }
 .clock-progression { display: inline-block; text-align: left; }
-.clock-modes { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-block: 0.75rem; }
-.clock-modes [aria-pressed="true"] { border-width: 4px; background: var(--badge); }
 .clock-controls { text-align: center; margin-block: 0.75rem; }
 .clock-choices { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 7rem), 1fr)); gap: 0.5rem; margin-block: 0.75rem; }
 .clock-choices button { min-height: 2.75rem; touch-action: manipulation; }

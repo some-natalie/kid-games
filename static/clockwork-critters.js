@@ -60,11 +60,6 @@ if (!isQuizMode(window.location.search)) {
     clockText.textContent = clockDescription(time);
   }
 
-  function updateModeButtons() {
-    find("mode-set").setAttribute("aria-pressed", String(mode === "set"));
-    find("mode-read").setAttribute("aria-pressed", String(mode === "read"));
-  }
-
   function renderControls() {
     controls.textContent = CLOCK_INSTRUCTIONS;
     choices.replaceChildren();
@@ -108,8 +103,6 @@ if (!isQuizMode(window.location.search)) {
     hint.hidden = true;
     interactiveClock?.setDisabled(true);
     for (const button of choices.querySelectorAll("button")) button.disabled = true;
-    find("mode-set").disabled = true;
-    find("mode-read").disabled = true;
     check.hidden = true;
     next.textContent = stepIndex < STEPS_PER_LEVEL - 1
       ? "Next activity" : levelIndex < LEVELS.length - 1 ? "Next level" : "Finish schedule";
@@ -129,17 +122,15 @@ if (!isQuizMode(window.location.search)) {
     hint.textContent = "";
     hint.hidden = true;
     next.hidden = true;
-    find("mode-set").disabled = false;
-    find("mode-read").disabled = false;
-    check.hidden = mode !== "set";
     const problem = round[stepIndex];
+    mode = problem.mode;
+    check.hidden = mode !== "set";
     prompt.textContent = mode === "set"
       ? `Set the clock to ${formatTime(problem.time)} for the critters' schedule.`
       : `What time is shown for this part of the critters' schedule?`;
     updateClock(mode === "set" ? clockTime : problem.time);
     renderControls();
     find("progress").textContent = `Activity ${stepIndex + 1} of ${STEPS_PER_LEVEL} in this level.`;
-    updateModeButtons();
     if (focus) prompt.focus();
   }
 
@@ -156,7 +147,7 @@ if (!isQuizMode(window.location.search)) {
     find("level-count").textContent = `Level ${index + 1} of ${LEVELS.length}`;
     find("level-title").textContent = LEVELS[index].title;
     find("level-instructions").textContent =
-      `Practice ${LEVELS[index].description}. Each number the minute hand points to stands for 5 minutes, and the hour hand moves between numbers as minutes pass.`;
+      `Practice setting and reading clocks with ${LEVELS[index].description}. Each activity randomly asks you to set or read the clock. Each number the minute hand points to stands for 5 minutes, and the hour hand moves between numbers as minutes pass.`;
     showPuzzle(false);
     find("level-title").focus();
   }
@@ -167,13 +158,6 @@ if (!isQuizMode(window.location.search)) {
     startLevel(0);
   }
 
-  function selectMode(nextMode) {
-    if (mode === nextMode || solved) return;
-    mode = nextMode;
-    showPuzzle(false);
-    find(mode === "set" ? "mode-set" : "mode-read").focus();
-  }
-
   find("clock-example").append(createClockFace(210));
   find("start-game").addEventListener("click", () => {
     const progress = loadProgress(storage, LEVELS.length);
@@ -182,8 +166,6 @@ if (!isQuizMode(window.location.search)) {
   });
   find("new-quest").addEventListener("click", restart);
   find("play-again").addEventListener("click", restart);
-  find("mode-set").addEventListener("click", () => selectMode("set"));
-  find("mode-read").addEventListener("click", () => selectMode("read"));
   find("show-hint").addEventListener("click", showHint);
   check.addEventListener("click", () => answer(clockTime));
   next.addEventListener("click", () => {
