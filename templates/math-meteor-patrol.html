@@ -20,7 +20,7 @@
   <div id="tutorial" class="tutorial">
     <p class="eyebrow">A space-number mission</p>
     <h2>Zap the meteors into sparkles!</h2>
-    <p>In timed patrols, each meteor falls toward the shield. Solve its equation to burst it into sparkles! Only one meteor is active, and the equation stays still in text below it. Untimed practice keeps the meteor waiting until you are ready.</p>
+    <p>In timed patrols, each meteor falls toward the shield. Solve its equation to fire a pew! shot and burst it into sparkles! Only one meteor is active, and the equation stays still beside or below it. Untimed practice keeps the meteor waiting until you are ready.</p>
     <div class="meteor-example">
       <h3>Worked example: 2 + 3 = ?</h3>
       <p>Start at 2 and count on 3: 3, 4, 5. The answer is <strong>5</strong>.</p>
@@ -48,38 +48,45 @@
   </div>
 
   <div id="play-area" class="meteor-patrol" hidden>
-    <div class="meteor-toolbar">
-      <p id="wave-label" class="eyebrow"></p>
-      <p id="target-label"></p>
-      <button id="pause-game" class="secondary-button" type="button">Pause patrol</button>
-      <button id="resume-game" class="secondary-button" type="button" hidden>Resume patrol</button>
-      <button id="end-game" class="secondary-button" type="button">Finish patrol</button>
-    </div>
-    <p id="suspension-note" class="meteor-note" role="status" hidden>Patrol paused while this tab is hidden.</p>
-    <div id="timer-panel" class="timer-panel" hidden>
-      <label for="time-left">Time before the meteor reaches the shield</label>
-      <progress id="time-left" max="1" value="1"></progress>
-      <p id="countdown" class="countdown"></p>
-    </div>
-    <div id="meteor-lane" class="meteor-lane" role="img" aria-label="One active meteor falling toward the shield">
-      <div id="meteor-card" class="meteor-card">
-        <span aria-hidden="true">☄️</span>
-        <span class="meteor-card-label">Active meteor</span>
+    <div class="meteor-battle">
+      <div id="meteor-lane" class="meteor-lane" role="img" aria-label="One active meteor falling toward the shield">
+        <div id="meteor-card" class="meteor-card">
+          <span aria-hidden="true">☄️</span>
+          <span class="meteor-card-label">Active meteor</span>
+        </div>
+        <pre id="meteor-shot" class="meteor-shot" aria-hidden="true" hidden>^
+| pew!
+|</pre>
+        <span id="meteor-shield" class="meteor-shield" aria-hidden="true">🛡️</span>
       </div>
-      <span id="meteor-shield" class="meteor-shield" aria-hidden="true">🛡️</span>
-    </div>
-    <h2 id="equation" class="meteor-equation" tabindex="-1"></h2>
-    <form id="answer-form" class="meteor-answer">
-      <label for="answer">Enter the answer</label>
-      <div class="answer-entry">
-        <input id="answer" name="answer" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="2" autocomplete="off" aria-describedby="equation answer-help">
-        <button class="primary-button" type="submit">Zap meteor</button>
+      <div class="meteor-controls">
+        <div class="meteor-toolbar">
+          <p id="wave-label" class="eyebrow"></p>
+          <p id="target-label"></p>
+          <button id="pause-game" class="secondary-button" type="button">Pause patrol</button>
+          <button id="resume-game" class="secondary-button" type="button" hidden>Resume patrol</button>
+          <button id="end-game" class="secondary-button" type="button">Finish patrol</button>
+        </div>
+        <p id="suspension-note" class="meteor-note" role="status" hidden>Patrol paused while this tab is hidden.</p>
+        <div id="timer-panel" class="timer-panel" hidden>
+          <label for="time-left">Time before the meteor reaches the shield</label>
+          <progress id="time-left" max="1" value="1"></progress>
+          <p id="countdown" class="countdown"></p>
+        </div>
+        <h2 id="equation" class="meteor-equation" tabindex="-1"></h2>
+        <form id="answer-form" class="meteor-answer">
+          <label for="answer">Enter the answer</label>
+          <div class="answer-entry">
+            <input id="answer" name="answer" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="2" autocomplete="off" aria-describedby="equation answer-help">
+            <button class="primary-button" type="submit">Zap meteor</button>
+          </div>
+          <p id="answer-help">Type a number, press Enter, or use the number buttons.</p>
+          <div id="number-pad" class="number-pad" role="group" aria-label="Number buttons"></div>
+        </form>
+        <p id="feedback" class="feedback" role="status" aria-live="polite"></p>
+        <button id="next-meteor" class="primary-button" type="button" hidden>Next meteor</button>
       </div>
-      <p id="answer-help">Type a number, press Enter, or use the number buttons.</p>
-      <div id="number-pad" class="number-pad" role="group" aria-label="Number buttons"></div>
-    </form>
-    <p id="feedback" class="feedback" role="status" aria-live="polite"></p>
-    <button id="next-meteor" class="primary-button" type="button" hidden>Next meteor</button>
+    </div>
   </div>
 
   <div id="quest-complete" class="quest-complete" hidden>

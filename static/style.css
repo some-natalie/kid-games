@@ -471,6 +471,12 @@ footer { padding-block: 1.5rem; text-align: center; }
 .meteor-card > span:first-child { font-size: 1.5rem; }
 .meteor-card-label { min-width: 0; overflow-wrap: anywhere; }
 .meteor-shield { position: absolute; bottom: 0; left: 50%; font-size: 2.25rem; transform: translateX(-50%); }
+.meteor-controls { min-width: 0; }
+.meteor-shot { position: absolute; left: 50%; z-index: 2; margin: 0; color: var(--text); background: var(--surface); font: bold 1rem/1 monospace; white-space: pre; pointer-events: none; transform: translate(-50%, var(--shot-travel)); animation: meteor-pew 0.5s ease-out; }
+@keyframes meteor-pew {
+  from { transform: translate(-50%, 0); }
+  to { transform: translate(-50%, var(--shot-travel)); }
+}
 .celebration.celebration-local { position: absolute; width: 0; height: 0; inset: auto; z-index: 1; overflow: visible; }
 .meteor-equation { text-align: center; font-size: clamp(1.7rem, 6vw, 2.75rem); }
 .meteor-answer label { display: block; font-weight: 700; }
@@ -483,6 +489,12 @@ footer { padding-block: 1.5rem; text-align: center; }
 .math-meteor-patrol #next-meteor { margin-top: 0.5rem; }
 .quiz-mode .math-meteor-patrol > div:not(.theme-picker) { text-align: left; }
 .quiz-mode .math-meteor-patrol input { display: block; max-width: 12rem; }
+@media (orientation: landscape) and (min-width: 40rem) {
+  .math-meteor-patrol { max-width: 64rem; }
+  .meteor-battle { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: start; gap: 1.25rem; }
+  .meteor-lane { position: sticky; top: 0.75rem; height: clamp(10rem, calc(100dvh - 8rem), 26rem); margin: 0; }
+  .meteor-controls .meteor-equation { margin-block: 0.5rem; }
+}
 @media (max-width: 34rem) {
   .meteor-options { grid-template-columns: 1fr; }
   .meteor-options p { grid-column: auto; }
@@ -490,6 +502,7 @@ footer { padding-block: 1.5rem; text-align: center; }
 }
 @media (prefers-reduced-motion: reduce) {
   .meteor-card { transition: none; }
+  .meteor-shot { animation: none; }
 }
 .place-value-builders { max-width: 58rem; }
 .place-value-example { max-width: 34rem; margin: 1rem auto; padding: 0.75rem 1rem; border-radius: 0.75rem; background: var(--badge); text-align: left; }

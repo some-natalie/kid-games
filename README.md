@@ -15,6 +15,9 @@ Math Meteor Patrol's timed meteors fall toward the shield. Correct answers burst
 the meteor into sparkles at its current position, then give a short breather.
 Untimed practice keeps the meteor still; reduced motion uses still sparkles.
 Quiz mode remains untimed, without falling meteors or rewards before submission.
+Landscape play uses side-by-side meteor and answer panes, keeping the meteor
+visible while the controls scroll. Correct answers fire an ASCII `pew!` shot
+from the shield toward the meteor; reduced motion shows a still shot instead.
 
 Clockwork Critters lets players click or tap and drag either clock hand in normal
 play and quiz mode. Hands snap to hour and five-minute positions and stay aligned

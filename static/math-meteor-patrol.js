@@ -35,6 +35,24 @@ if (!isQuizMode(window.location.search)) {
   let solved = false;
   let correctCount = 0;
   let missedCount = 0;
+  let shotTimeout;
+
+  function stopShot() {
+    window.clearTimeout(shotTimeout);
+    find("meteor-shot").hidden = true;
+  }
+
+  function fireShot() {
+    const shot = find("meteor-shot");
+    const lane = find("meteor-lane");
+    const shield = find("meteor-shield");
+    const start = lane.clientHeight - shield.offsetHeight;
+    const target = Number.parseFloat(find("meteor-card").style.top);
+    shot.style.top = `${start}px`;
+    shot.style.setProperty("--shot-travel", `${target - start}px`);
+    shot.hidden = false;
+    shotTimeout = window.setTimeout(stopShot, BREATHING_MS);
+  }
 
   function showStorageWarning(message) {
     preferenceStatus.classList.toggle("warning", Boolean(message));
@@ -117,6 +135,7 @@ if (!isQuizMode(window.location.search)) {
 
   function renderProblem() {
     stopCelebration();
+    stopShot();
     wave += 1;
     problem = buildProblem(operation, maxForWave(wave));
     phase = "moving";
@@ -190,6 +209,7 @@ if (!isQuizMode(window.location.search)) {
     setAnswerDisabled(true);
     find("meteor-lane").setAttribute("aria-label", "The meteor burst into sparkles. The shield is safe.");
     const { message } = celebrate(sparkleReward, find("meteor-card"));
+    fireShot();
     find("meteor-card").hidden = true;
     find("meteor-lane").dataset.state = "sparkles";
     feedback.textContent = `${message} Correct! ${equationText(problem)} The meteor burst into sparkles. The shield is safe.`;
@@ -207,6 +227,7 @@ if (!isQuizMode(window.location.search)) {
     if (frameId !== undefined) window.cancelAnimationFrame(frameId);
     frameId = undefined;
     stopCelebration();
+    stopShot();
     playArea.hidden = true;
     finale.hidden = false;
     manuallyPaused = false;
@@ -238,6 +259,7 @@ if (!isQuizMode(window.location.search)) {
     frameId = undefined;
     manuallyPaused = false;
     stopCelebration();
+    stopShot();
     playArea.hidden = true;
     finale.hidden = true;
     tutorial.hidden = false;
