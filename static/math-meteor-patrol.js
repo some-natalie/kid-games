@@ -20,6 +20,8 @@ if (!isQuizMode(window.location.search)) {
   const BREATHING_MS = 1400;
   const MISS_BREAK_MS = 2400;
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+  const rewards = GAME_CELEBRATIONS["math-meteor-patrol"];
+  const sparkleReward = { ...rewards, effects: rewards.effects.filter(({ id }) => id === "meteor-sparkles") };
   let mode = "practice";
   let operation = "addition";
   let wave = 0;
@@ -71,6 +73,7 @@ if (!isQuizMode(window.location.search)) {
 
   function updateMotionPreference() {
     playArea.dataset.reducedMotion = String(reducedMotion.matches);
+    updateTimer();
   }
 
   function updatePauseControls() {
@@ -81,13 +84,17 @@ if (!isQuizMode(window.location.search)) {
   }
 
   function updateTimer() {
+    if (playArea.hidden || wave === 0) return;
+    const lane = find("meteor-lane");
+    const card = find("meteor-card");
+    const fraction = mode === "practice" ? 1 : Math.max(0, remaining / travelDuration(mode, wave));
+    const start = card.offsetHeight / 2 + 8;
+    const end = lane.clientHeight - find("meteor-shield").offsetHeight - card.offsetHeight / 2 - 8;
+    card.style.top = `${mode === "practice" || reducedMotion.matches
+      ? (start + end) / 2 : start + (end - start) * (1 - fraction)}px`;
     if (mode === "practice") return;
-    const duration = travelDuration(mode, wave);
-    const fraction = Math.max(0, remaining / duration);
     find("time-left").value = fraction;
     find("countdown").textContent = `${Math.ceil(Math.max(0, remaining) / 1000)} seconds remain`;
-    const percentage = 1 - fraction;
-    find("meteor-card").style.left = reducedMotion.matches ? "50%" : `${percentage * 100}%`;
   }
 
   function setAnswerDisabled(disabled) {
@@ -97,6 +104,7 @@ if (!isQuizMode(window.location.search)) {
   }
 
   function showMiss() {
+    find("meteor-lane").dataset.state = "shield";
     phase = "missed";
     phaseRemaining = MISS_BREAK_MS;
     missedCount += 1;
@@ -120,14 +128,16 @@ if (!isQuizMode(window.location.search)) {
     find("equation").textContent = `${problem.left} ${OPERATIONS[operation].symbol} ${problem.right} = ?`;
     find("equation").setAttribute("aria-label", `${problem.left} ${operation === "addition" ? "plus" : operation === "subtraction" ? "minus" : "times"} ${problem.right} equals what?`);
     find("meteor-card").hidden = false;
+    find("meteor-lane").dataset.state = "falling";
+    find("meteor-lane").setAttribute("aria-label", mode === "practice" || reducedMotion.matches
+      ? "One active meteor waiting above the shield" : "One active meteor falling toward the shield");
     input.value = "";
     setAnswerDisabled(false);
     feedback.textContent = "";
     find("next-meteor").hidden = true;
     find("timer-panel").hidden = mode === "practice";
-    find("meteor-card").style.left = reducedMotion.matches ? "50%" : "0%";
+    updateTimer();
     if (mode !== "practice") {
-      updateTimer();
       startFrameLoop();
     }
     input.focus();
@@ -178,9 +188,11 @@ if (!isQuizMode(window.location.search)) {
     solved = true;
     correctCount += 1;
     setAnswerDisabled(true);
+    find("meteor-lane").setAttribute("aria-label", "The meteor burst into sparkles. The shield is safe.");
+    const { message } = celebrate(sparkleReward, find("meteor-card"));
     find("meteor-card").hidden = true;
-    const { message } = celebrate(GAME_CELEBRATIONS["math-meteor-patrol"]);
-    feedback.textContent = `${message} Correct! ${equationText(problem)} The shield is safe.`;
+    find("meteor-lane").dataset.state = "sparkles";
+    feedback.textContent = `${message} Correct! ${equationText(problem)} The meteor burst into sparkles. The shield is safe.`;
     if (mode === "practice") {
       find("next-meteor").hidden = false;
       find("next-meteor").focus();
@@ -294,6 +306,7 @@ if (!isQuizMode(window.location.search)) {
     }
   });
   reducedMotion.addEventListener("change", updateMotionPreference);
+  window.addEventListener("resize", updateTimer);
   readPreferences();
   updateModeDescription();
   updateMotionPreference();

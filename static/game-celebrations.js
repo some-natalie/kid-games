@@ -117,7 +117,7 @@ export const GAME_CELEBRATIONS = Object.freeze({
   "math-meteor-patrol": set(
     ["Meteor master!", "Shield superstar!", "Orbit on target!", "Asteroid ace!", "A star solution!", "Space math whiz!"],
     [
-      effect("meteor-sparkles", "Meteor sparkles", "shower", 36, ["✦", "✧", "✨"], ["#ffb627", "#9b5de5", "#3fa7f5"]),
+      effect("meteor-sparkles", "Meteor sparkles", "burst", 36, ["✦", "✧", "✨"], ["#ffb627", "#9b5de5", "#3fa7f5"]),
       effect("rocket-boost", "Rocket boost", "rise", 24, ["🚀", "🌠"]),
       effect("planet-rings", "Planet rings", "burst", 32, ["🪐"]),
       effect("star-map", "Star map", "shower", 40, ["⭐", "🌟"]),

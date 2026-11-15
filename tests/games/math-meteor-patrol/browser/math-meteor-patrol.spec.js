@@ -36,6 +36,8 @@ test("worked example leads to editable untimed practice with keyboard and touch 
   await expect(page.locator("#feedback")).toContainText("try again");
   await expect(page.locator("#feedback")).not.toContainText(`= ${answer}`);
   await expect(page.locator("#answer")).toHaveValue(String(wrong));
+  await expect(page.locator(".celebration")).toHaveCount(0);
+  await expect(page.locator("#meteor-card")).toBeVisible();
   if (test.info().project.name === "touch-chromium") {
     await page.getByRole("button", { name: "Clear", exact: true }).tap();
     for (const digit of String(answer)) await page.getByRole("button", { name: digit, exact: true }).tap();
@@ -48,11 +50,16 @@ test("worked example leads to editable untimed practice with keyboard and touch 
   await expect(page.locator("#next-meteor")).toBeVisible();
   await expect(page.locator("#meteor-card")).toBeHidden();
   await expectThemedCelebration(page, celebrations);
+  await expect(page.locator("#meteor-lane .celebration")).toHaveAttribute("data-effect", "meteor-sparkles");
+  expect(await page.locator(".celebration").evaluate((layer) => layer.getAnimations({ subtree: true }).length)).toBe(0);
+  await audit(page);
   await page.locator("#next-meteor").click();
+  await expect(page.locator(".celebration")).toHaveCount(0);
   await expect(page.locator("#wave-label")).toHaveText("Meteor 2");
 });
 
 test("gentle and challenge timing can be paused and hidden tabs suspend the countdown", async ({ page }) => {
+  await page.clock.install();
   await page.goto("/math-meteor-patrol/");
   await page.locator("#mode").selectOption("gentle");
   await page.locator("#operation").selectOption("subtraction");
@@ -63,7 +70,7 @@ test("gentle and challenge timing can be paused and hidden tabs suspend the coun
   await page.locator("#pause-game").click();
   await expect(page.locator("#resume-game")).toBeVisible();
   const paused = await page.locator("#time-left").evaluate((meter) => meter.value);
-  await page.waitForTimeout(350);
+  await page.clock.runFor(350);
   expect(await page.locator("#time-left").evaluate((meter) => meter.value)).toBe(paused);
   await page.locator("#resume-game").click();
   await page.evaluate(() => {
@@ -72,14 +79,14 @@ test("gentle and challenge timing can be paused and hidden tabs suspend the coun
   });
   await expect(page.locator("#suspension-note")).toBeVisible();
   const hiddenProgress = await page.locator("#time-left").evaluate((meter) => meter.value);
-  await page.waitForTimeout(1000);
+  await page.clock.runFor(1000);
   expect(await page.locator("#time-left").evaluate((meter) => meter.value)).toBe(hiddenProgress);
   await page.evaluate(() => {
     delete document.hidden;
     document.dispatchEvent(new Event("visibilitychange"));
   });
   await expect(page.locator("#suspension-note")).toBeHidden();
-  await page.waitForTimeout(100);
+  await page.clock.runFor(100);
   const resumedProgress = await page.locator("#time-left").evaluate((meter) => meter.value);
   expect(resumedProgress).toBeLessThan(hiddenProgress);
   expect(resumedProgress).toBeGreaterThan(hiddenProgress - 0.02);
@@ -97,13 +104,16 @@ test("gentle and challenge timing can be paused and hidden tabs suspend the coun
 });
 
 test("reduced motion keeps the meteor stationary and provides countdown feedback", async ({ page }) => {
+  await page.clock.install();
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/math-meteor-patrol/");
   await page.locator("#mode").selectOption("gentle");
   await page.locator("#start-game").click();
   await expect(page.locator("#play-area")).toHaveAttribute("data-reduced-motion", "true");
   await expect(page.locator("#countdown")).toBeVisible();
-  expect(await page.locator("#meteor-card").evaluate((card) => card.style.left)).toBe("50%");
+  const top = await page.locator("#meteor-card").evaluate((card) => card.style.top);
+  await page.clock.runFor(2000);
+  expect(await page.locator("#meteor-card").evaluate((card) => card.style.top)).toBe(top);
   await audit(page);
 });
 
@@ -149,24 +159,54 @@ test("a missed timed meteor shows its equation and strategy before the next wave
   await expect(page.locator("#feedback")).toContainText("The correct equation is");
   await expect(page.locator("#feedback")).toContainText(equation.replace(" = ?", ` = ${answerFor(equation)}`));
   await expect(page.locator("#feedback")).toContainText(/count on|count back|groups/);
+  await expect(page.locator(".celebration")).toHaveCount(0);
+  const card = await page.locator("#meteor-card").boundingBox();
+  const shield = await page.locator(".meteor-shield").boundingBox();
+  expect(card.y + card.height).toBeLessThanOrEqual(shield.y + 2);
   await page.clock.runFor(2500);
   await expect(page.locator("#wave-label")).toHaveText("Meteor 2");
 });
 
-test("a correct timed answer clears the meteor and leaves a short breather", async ({ page }) => {
+test("a falling meteor explodes into sparkles at its position and leaves a short breather", async ({ page }) => {
   await page.clock.install();
-  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.emulateMedia({ reducedMotion: "no-preference", colorScheme: "dark" });
   await page.goto("/math-meteor-patrol/");
+  await page.clock.pauseAt(new Date());
   await page.locator("#mode").selectOption("gentle");
   await page.locator("#start-game").click();
+  const start = await page.locator("#meteor-card").boundingBox();
+  const equationBounds = await page.locator("#equation").boundingBox();
+  await page.clock.runFor(6000);
+  const falling = await page.locator("#meteor-card").boundingBox();
+  expect(falling.y).toBeGreaterThan(start.y + 40);
+  expect(falling.x).toBe(start.x);
+  expect(await page.locator("#equation").boundingBox()).toEqual(equationBounds);
+  await page.locator("#pause-game").click();
+  const paused = await page.locator("#meteor-card").boundingBox();
+  await page.clock.runFor(1000);
+  expect(await page.locator("#meteor-card").boundingBox()).toEqual(paused);
+  await page.locator("#resume-game").click();
+  const meteorTop = await page.locator("#meteor-card").evaluate((card) => Number.parseFloat(card.style.top));
   const equation = await page.locator("#equation").textContent();
   await page.locator("#answer").fill(String(answerFor(equation)));
   await page.locator("#answer").press("Enter");
   await expect(page.locator("#meteor-card")).toBeHidden();
+  await expectThemedCelebration(page, celebrations);
+  const burst = page.locator("#meteor-lane .celebration-local");
+  await expect(burst).toHaveAttribute("data-effect", "meteor-sparkles");
+  const origin = await burst.evaluate((layer) => ({
+    top: Number.parseFloat(layer.style.top), left: Number.parseFloat(layer.style.left),
+    center: layer.parentElement.clientWidth / 2,
+  }));
+  expect(Math.abs(origin.left - origin.center)).toBeLessThan(2);
+  expect(Math.abs(origin.top - meteorTop)).toBeLessThan(2);
+  expect(await burst.evaluate((layer) => layer.getAnimations({ subtree: true }).length)).toBeGreaterThan(0);
+  await expect(page.locator("#feedback")).toContainText("burst into sparkles");
   await page.clock.runFor(1000);
   await expect(page.locator("#wave-label")).toHaveText("Meteor 1");
   await page.clock.runFor(500);
   await expect(page.locator("#wave-label")).toHaveText("Meteor 2");
+  await expect(page.locator(".celebration")).toHaveCount(0);
 });
 
 test("quiz mode hides the example, retains revisions, and grades only after submission", async ({ page }) => {
@@ -175,6 +215,7 @@ test("quiz mode hides the example, retains revisions, and grades only after subm
   await expect(page.locator(".quiz-notice")).toContainText("change your answers");
   await expect(page.locator(".math-meteor-patrol")).not.toContainText("Worked example");
   await page.getByRole("button", { name: "Start quiz" }).click();
+  await expect(page.locator("#meteor-lane, .celebration")).toHaveCount(0);
   await audit(page);
   const firstEquation = await page.locator(".quiz-question-heading, #quiz-question-heading").textContent();
   const firstPrompt = await page.locator("#quiz-question-heading + p").textContent();

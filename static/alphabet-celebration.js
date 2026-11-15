@@ -106,6 +106,32 @@ function stillPieces(layer, effect) {
   }
 }
 
+function targetBurst(layer, effect, target, animate) {
+  const bounds = target.getBoundingClientRect();
+  const parent = target.parentElement.getBoundingClientRect();
+  layer.classList.add("celebration-local");
+  layer.style.left = `${bounds.left - parent.left - target.parentElement.clientLeft + bounds.width / 2}px`;
+  layer.style.top = `${bounds.top - parent.top - target.parentElement.clientTop + bounds.height / 2}px`;
+  target.parentElement.append(layer);
+  const count = animate ? effect.count : 5;
+  for (let index = 0; index < count; index += 1) {
+    const element = piece(layer, effect);
+    const angle = index * Math.PI * 2 / count;
+    const radius = animate ? between(35, 100) : 35;
+    const transform = `translate(${Math.cos(angle) * radius}px, ${Math.sin(angle) * radius}px)`;
+    if (!animate) {
+      element.classList.add("still");
+      element.style.transform = transform;
+    } else {
+      element.animate([
+        { transform: "translate(0, 0) scale(0.4)", opacity: 1 },
+        { transform: `${transform} scale(1.1)`, opacity: 1, offset: 0.55 },
+        { transform: `${transform} scale(0.5)`, opacity: 0 },
+      ], { duration: between(850, 1200), easing: "ease-out", fill: "both" });
+    }
+  }
+}
+
 export function stopCelebration() {
   if (!active) return;
   clearTimeout(active.timer);
@@ -113,7 +139,7 @@ export function stopCelebration() {
   active = undefined;
 }
 
-export function celebrate(celebrations = DEFAULT_CELEBRATIONS) {
+export function celebrate(celebrations = DEFAULT_CELEBRATIONS, target) {
   stopCelebration();
   const effect = pick(celebrations.effects);
   const origin = ORIGINS[effect.motion] ?? pick(CORNERS);
@@ -126,7 +152,8 @@ export function celebrate(celebrations = DEFAULT_CELEBRATIONS) {
   document.body.append(layer);
   const animate = typeof layer.animate === "function" &&
     !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  if (!animate) stillPieces(layer, effect);
+  if (target) targetBurst(layer, effect, target, animate);
+  else if (!animate) stillPieces(layer, effect);
   else if (effect.motion === "burst") burst(layer, effect, origin);
   else drift(layer, effect, effect.motion === "rise");
   active = { layer, timer: setTimeout(stopCelebration, 4000) };

@@ -19,8 +19,8 @@
 
   <div id="tutorial" class="tutorial">
     <p class="eyebrow">A space-number mission</p>
-    <h2>Guide the meteors away!</h2>
-    <p>Each meteor carries one equation. Solve it before the meteor reaches the shield. Only one meteor is active, and the equation is shown in text.</p>
+    <h2>Zap the meteors into sparkles!</h2>
+    <p>In timed patrols, each meteor falls toward the shield. Solve its equation to burst it into sparkles! Only one meteor is active, and the equation stays still in text below it. Untimed practice keeps the meteor waiting until you are ready.</p>
     <div class="meteor-example">
       <h3>Worked example: 2 + 3 = ?</h3>
       <p>Start at 2 and count on 3: 3, 4, 5. The answer is <strong>5</strong>.</p>
@@ -61,12 +61,12 @@
       <progress id="time-left" max="1" value="1"></progress>
       <p id="countdown" class="countdown"></p>
     </div>
-    <div id="meteor-lane" class="meteor-lane" aria-label="One active meteor approaching the shield">
+    <div id="meteor-lane" class="meteor-lane" role="img" aria-label="One active meteor falling toward the shield">
       <div id="meteor-card" class="meteor-card">
         <span aria-hidden="true">☄️</span>
         <span class="meteor-card-label">Active meteor</span>
       </div>
-      <span class="meteor-shield" aria-hidden="true">🛡️</span>
+      <span id="meteor-shield" class="meteor-shield" aria-hidden="true">🛡️</span>
     </div>
     <h2 id="equation" class="meteor-equation" tabindex="-1"></h2>
     <form id="answer-form" class="meteor-answer">
