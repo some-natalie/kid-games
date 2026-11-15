@@ -10,7 +10,7 @@ export function gradeQuiz(questions, responses) {
     const response = responses[index];
     const correct = Array.isArray(question.expected)
       ? Array.isArray(response) && response.length === question.expected.length &&
-        new Set(response).size === response.length &&
+        (question.kind === "place-value-build" || new Set(response).size === response.length) &&
         (question.kind === "proof" || question.kind === "pizza"
           ? question.expected.every((item) => response.includes(item))
           : question.expected.every((word, position) => response[position] === word))

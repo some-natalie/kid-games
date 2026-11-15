@@ -1,7 +1,8 @@
-export const PLACES = Object.freeze(["hundreds", "tens", "ones"]);
+export const PLACES = Object.freeze(["thousands", "hundreds", "tens", "ones"]);
+export const PLACE_VALUES = Object.freeze({ thousands: 1000, hundreds: 100, tens: 10, ones: 1 });
 
-const freezeBlocks = ({ hundreds, tens, ones }) => Object.freeze({ hundreds, tens, ones });
-const totalFor = ({ hundreds, tens, ones }) => hundreds * 100 + tens * 10 + ones;
+const freezeBlocks = ({ thousands = 0, hundreds, tens, ones }) => Object.freeze({ thousands, hundreds, tens, ones });
+const totalFor = (blocks) => PLACES.reduce((sum, place) => sum + blocks[place] * PLACE_VALUES[place], 0);
 
 export const LEVELS = Object.freeze([
   {
@@ -91,17 +92,35 @@ export const LEVELS = Object.freeze([
     instructions: "Choose the greater quantity. Compare the hundreds, then the tens if needed.",
     hint: "Both have 4 hundreds. Compare 1 ten with 9 tens.",
   },
+  {
+    title: "Bundle hundreds into a thousand",
+    type: "build",
+    target: 1000,
+    start: freezeBlocks({ hundreds: 10, tens: 0, ones: 0 }),
+    answer: freezeBlocks({ thousands: 1, hundreds: 0, tens: 0, ones: 0 }),
+    instructions: "Regroup ten hundred flats into one thousand cube. A thousand cube is 10 cubes wide, 10 deep, and 10 high.",
+    hint: "Ten hundred flats stack to make one thousand cube. Drag a hundred to Thousands to trade all ten, or use the exchange button.",
+  },
+  {
+    title: "Build with thousands",
+    type: "build",
+    target: 1234,
+    start: freezeBlocks({ hundreds: 0, tens: 0, ones: 0 }),
+    answer: freezeBlocks({ thousands: 1, hundreds: 2, tens: 3, ones: 4 }),
+    instructions: "Build 1234 with thousand cubes, hundred flats, ten rods, and ones.",
+    hint: "1234 has 1 thousand, 2 hundreds, 3 tens, and 4 ones. Drag each type from the tray into its matching place.",
+  },
 ].map((level) => Object.freeze(level)));
 
 function assertBlocks(blocks) {
   if (!blocks || PLACES.some((place) => !Number.isSafeInteger(blocks[place]) ||
-      blocks[place] < 0 || blocks[place] > 999) || totalFor(blocks) > 999) {
-    throw new RangeError("Blocks must represent a whole number from 0 to 999.");
+      blocks[place] < 0 || blocks[place] > 9999) || totalFor(blocks) > 9999) {
+    throw new RangeError("Blocks must represent a whole number from 0 to 9999.");
   }
 }
 
-export function makeBlocks(hundreds = 0, tens = 0, ones = 0) {
-  const blocks = { hundreds, tens, ones };
+export function makeBlocks(hundreds = 0, tens = 0, ones = 0, thousands = 0) {
+  const blocks = { thousands, hundreds, tens, ones };
   assertBlocks(blocks);
   return freezeBlocks(blocks);
 }
@@ -123,17 +142,17 @@ export function adjustBlock(blocks, place, amount) {
 
 export function exchangeBlocks(blocks, place, direction) {
   assertBlocks(blocks);
-  if (!["ones", "tens"].includes(place) || !["up", "down"].includes(direction)) {
-    throw new RangeError("Exchange ones and tens only, in a valid direction.");
+  if (!["ones", "tens", "hundreds"].includes(place) || !["up", "down"].includes(direction)) {
+    throw new RangeError("Exchange ones, tens, or hundreds in a valid direction.");
   }
-  const higherPlace = place === "ones" ? "tens" : "hundreds";
+  const higherPlace = PLACES[PLACES.indexOf(place) - 1];
   const next = { ...blocks };
   if (direction === "up") {
     if (next[place] < 10) return null;
     next[place] -= 10;
     next[higherPlace] += 1;
   } else {
-    if (next[higherPlace] < 1 || next[place] > 989) return null;
+    if (next[higherPlace] < 1) return null;
     next[higherPlace] -= 1;
     next[place] += 10;
   }
@@ -141,26 +160,68 @@ export function exchangeBlocks(blocks, place, direction) {
   return freezeBlocks(next);
 }
 
-function blockDescription(blocks) {
-  return `${blocks.hundreds} ${blocks.hundreds === 1 ? "hundred" : "hundreds"}, ` +
+export function blockDescription(blocks) {
+  assertBlocks(blocks);
+  return `${blocks.thousands} ${blocks.thousands === 1 ? "thousand" : "thousands"}, ` +
+    `${blocks.hundreds} ${blocks.hundreds === 1 ? "hundred" : "hundreds"}, ` +
     `${blocks.tens} ${blocks.tens === 1 ? "ten" : "tens"}, and ` +
     `${blocks.ones} ${blocks.ones === 1 ? "one" : "ones"}`;
 }
 
+export function blockCounts(blocks) {
+  assertBlocks(blocks);
+  return PLACES.map((place) => blocks[place]);
+}
+
+export function blocksFromCounts(counts) {
+  if (!Array.isArray(counts) || counts.length !== PLACES.length) {
+    throw new RangeError("Provide a count for each of the four places.");
+  }
+  return makeBlocks(counts[1], counts[2], counts[3], counts[0]);
+}
+
+export function blocksForNumber(number) {
+  if (!Number.isSafeInteger(number) || number < 0 || number > 9999) {
+    throw new RangeError("Choose a whole number from 0 to 9999.");
+  }
+  return makeBlocks(Math.floor(number / 100) % 10, Math.floor(number / 10) % 10, number % 10,
+    Math.floor(number / 1000));
+}
+
+export function dropBlock(blocks, place, source, target) {
+  assertBlocks(blocks);
+  if (!PLACES.includes(place) || !["tray", "workspace"].includes(source)) {
+    throw new RangeError("Choose a block from the tray or workspace.");
+  }
+  if (source === "tray" && target === place) return adjustBlock(blocks, place, 1);
+  if (source === "workspace" && target === "tray") return adjustBlock(blocks, place, -1);
+  if (source === "workspace" && target === place) return blocks;
+  if (source === "workspace" && PLACES.includes(target)) {
+    const difference = PLACES.indexOf(target) - PLACES.indexOf(place);
+    if (Math.abs(difference) === 1) {
+      const lower = difference < 0 ? place : target;
+      const exchanged = exchangeBlocks(blocks, lower, difference < 0 ? "up" : "down");
+      if (exchanged) return exchanged;
+      throw new RangeError(`You need ten ${place} to make one ${target.slice(0, -1)}.`);
+    }
+  }
+  throw new RangeError("Drop a tray block in its matching place. Exchange workspace blocks with a neighboring place, or return them to the tray.");
+}
+
 function placeDescription(count, place) {
-  const singular = { hundreds: "hundred", tens: "ten", ones: "one" }[place];
+  const singular = place.slice(0, -1);
   return `${count} ${singular}${count === 1 ? "" : "s"}`;
 }
 
 export function comparisonExplanation(left, right) {
-  if (!Number.isSafeInteger(left) || left < 0 || left > 999 ||
-      !Number.isSafeInteger(right) || right < 0 || right > 999 || left === right) {
-    throw new RangeError("Compare two different whole numbers from 0 to 999.");
+  if (!Number.isSafeInteger(left) || left < 0 || left > 9999 ||
+      !Number.isSafeInteger(right) || right < 0 || right > 9999 || left === right) {
+    throw new RangeError("Compare two different whole numbers from 0 to 9999.");
   }
   const greater = Math.max(left, right);
   const smaller = Math.min(left, right);
-  const greaterBlocks = makeBlocks(Math.floor(greater / 100), Math.floor(greater / 10) % 10, greater % 10);
-  const smallerBlocks = makeBlocks(Math.floor(smaller / 100), Math.floor(smaller / 10) % 10, smaller % 10);
+  const greaterBlocks = blocksForNumber(greater);
+  const smallerBlocks = blocksForNumber(smaller);
   const differingPlace = PLACES.find((place) => greaterBlocks[place] !== smallerBlocks[place]);
   const reason = `${greater} has ${placeDescription(greaterBlocks[differingPlace], differingPlace)}, ` +
     `while ${smaller} has ${placeDescription(smallerBlocks[differingPlace], differingPlace)}.`;
@@ -184,15 +245,14 @@ export function makeQuizQuestion(levelIndex) {
   const title = `Level ${levelIndex + 1}: ${level.title}`;
   if (level.type === "build") {
     const blocks = level.answer;
-    const choices = [...new Set([level.target, Math.max(0, level.target - 10), Math.min(999, level.target + 10), level.target === 105 ? 150 : 0])]
-      .sort((a, b) => a - b).map((value) => ({ value, label: String(value) }));
     return {
-      kind: "place-value",
+      kind: "place-value-build",
       title,
-      prompt: `Which number is shown by ${blockDescription(blocks)}?`,
-      expected: level.target,
-      choices,
-      correction: `${blockDescription(blocks)} makes ${level.target} (${blocks.hundreds * 100} + ${blocks.tens * 10} + ${blocks.ones}).`,
+      prompt: levelIndex === 2 ? "Show 14 using only ones."
+        : `Build ${level.target} using its place-value digits, with fewer than ten blocks in each place.`,
+      expected: blockCounts(blocks),
+      initial: level.start,
+      correction: `${blockDescription(blocks)} makes ${level.target}.`,
     };
   }
   const greater = level.left > level.right ? "left" : "right";

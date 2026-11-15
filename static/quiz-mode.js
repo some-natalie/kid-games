@@ -11,7 +11,11 @@ import { quizQuestions as pizzaQuestions } from "./picnic-pizza-engine.js";
 import { createWorkspace, finalWords, groupQuizQuestions } from "./alphabet-groups-engine.js";
 import { mountWorkspace } from "./alphabet-groups-workspace.js";
 import { buildQuizQuestions as meteorQuestions } from "./math-meteor-patrol-engine.js";
-import { LEVELS as PLACE_LEVELS, makeQuizQuestion as placeValueQuizQuestion } from "./place-value-builders-engine.js";
+import {
+  LEVELS as PLACE_LEVELS, blockCounts, blockDescription, blocksForNumber, blocksFromCounts,
+  makeQuizQuestion as placeValueQuizQuestion,
+} from "./place-value-builders-engine.js";
+import { drawBlockColumns, mountBlockWorkspace } from "./place-value-blocks.js";
 import {
   LEVELS as CLOCK_LEVELS, buildRound as clockRound,
   clockDescription, formatTime as formatClockTime, timeChoices as clockChoices,
@@ -134,6 +138,7 @@ function setupQuiz(game) {
   let grouped = new URLSearchParams(location.search).get("sort") === "groups";
   let groupWorkspaces = [];
   let mathOperation = "addition";
+  let blockWorkspace;
 
   const button = (text, action, primary = false) => {
     const node = element("button", text, primary ? "primary-button" : "secondary-button");
@@ -183,6 +188,8 @@ function setupQuiz(game) {
   }
 
   function showStart() {
+    blockWorkspace?.destroy();
+    blockWorkspace = undefined;
     notice.textContent = QUIZ_NOTICE;
     area.replaceChildren(element("h2", `${name} quiz`),
       element("p", "There are no hints or answer checks during the quiz. Use Next question to continue and Previous question to revise. Review your answers before submitting. Quiz answers are not saved when you leave this page."));
@@ -257,6 +264,8 @@ function setupQuiz(game) {
   }
 
   function showQuestion() {
+    blockWorkspace?.destroy();
+    blockWorkspace = undefined;
     status.textContent = "";
     const question = questions[current];
     const heading = element("h2", question.title);
@@ -291,6 +300,18 @@ function setupQuiz(game) {
       area.append(choices);
     }
     if (question.kind === "clock-set" || question.kind === "clock-read") renderClock(question);
+    if (question.kind === "place-value-build") {
+      const workspace = element("div", undefined, "place-value-editor");
+      area.append(workspace);
+      blockWorkspace = mountBlockWorkspace(workspace, {
+        initial: responses[current] === undefined ? question.initial : blocksFromCounts(responses[current]),
+        quiz: true,
+        onChange(blocks) {
+          responses[current] = blockCounts(blocks);
+          status.textContent = "Blocks changed. You can revise them before submitting.";
+        },
+      });
+    }
     if (kind === "math-meteor") {
       const label = element("label", "Your answer ");
       const input = element("input");
@@ -326,7 +347,19 @@ function setupQuiz(game) {
       }
       area.append(label, pad);
     }
-    if (kind === "ribbon" || kind === "place-value") {
+    if (kind === "ribbon" || question.kind === "place-value") {
+      if (question.kind === "place-value") {
+        const models = element("div", undefined, "place-value-comparisons");
+        for (const { label } of question.choices) {
+          const model = element("section", undefined, "comparison-model");
+          model.append(element("h3", label));
+          const columns = element("div", undefined, "place-value-workspace");
+          drawBlockColumns(columns, blocksForNumber(Number(label)));
+          model.append(columns);
+          models.append(model);
+        }
+        area.append(models);
+      }
       const choices = element("div", undefined, "answer-stones");
       choices.setAttribute("role", "group");
       choices.setAttribute("aria-labelledby", heading.id);
@@ -526,6 +559,8 @@ function setupQuiz(game) {
   }
 
   function showReview() {
+    blockWorkspace?.destroy();
+    blockWorkspace = undefined;
     if (kind === "acorn" && responses.some((response) => response !== undefined && response !== "" &&
         (!Number.isInteger(Number(response)) || Number(response) < 0))) {
       status.textContent = "Enter whole numbers of nuts, zero or more, before reviewing.";
@@ -541,6 +576,8 @@ function setupQuiz(game) {
       const answer = responses[index];
       const description = question.kind.startsWith("clock-") && answer !== undefined && answer !== ""
         ? formatClockTime(Number(answer))
+        : question.kind === "place-value-build" && answer !== undefined
+          ? blockDescription(blocksFromCounts(answer))
         : kind === "proof" ? `${answer.length} items marked`
           : ["ribbon", "place-value"].includes(question.kind)
             ? question.choices.find((choice) => choice.value === answer)?.label ?? "No answer"
@@ -559,6 +596,8 @@ function setupQuiz(game) {
   }
 
   function showResults() {
+    blockWorkspace?.destroy();
+    blockWorkspace = undefined;
     const grade = gradeQuiz(questions, responses);
     const heading = element("h2", "Show your parent!");
     heading.id = "quest-heading";
@@ -576,6 +615,8 @@ function setupQuiz(game) {
       if (!correct) {
         const answer = question.kind.startsWith("clock-") && response !== undefined && response !== ""
           ? formatClockTime(Number(response))
+          : question.kind === "place-value-build" && response !== undefined
+            ? blockDescription(blocksFromCounts(response))
           : ["ribbon", "place-value"].includes(question.kind)
           ? question.choices.find((choice) => choice.value === response)?.label ?? "No answer"
           : question.kind === "fraction-placement" && response !== undefined

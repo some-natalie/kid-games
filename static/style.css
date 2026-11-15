@@ -520,20 +520,28 @@ footer { padding-block: 1.5rem; text-align: center; }
 .place-value-example-parts p { color: var(--text); font-size: 1.15rem; }
 .place-value-progression { text-align: left; }
 .place-value-progression li { margin-block: 0.55rem; }
-.place-value-workspace { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.5rem; margin-block: 1rem; }
+.place-value-workspace { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 10rem), 1fr)); gap: 0.5rem; margin-block: 1rem; }
 .place-value-column { min-width: 0; padding: 0.6rem; border: 2px solid var(--border); border-radius: 0.7rem; background: var(--surface); text-align: center; }
 .place-value-column h3 { margin: 0; font-size: 1rem; }
 .place-value-count { min-height: 1.6em; margin-block: 0.25rem; color: var(--text); font-weight: 700; overflow-wrap: anywhere; }
 .place-value-pieces { display: flex; flex-wrap: wrap; justify-content: center; align-content: start; gap: 0.25rem; min-height: 2.75rem; }
-.place-value-piece { display: grid; place-items: center; flex: 0 0 auto; border: 2px solid var(--text); border-radius: 0.2rem; background: var(--badge); color: var(--text); font-size: 0.75rem; font-weight: 800; line-height: 1; }
-.place-value-ones .place-value-piece { width: 2rem; height: 2rem; }
-.place-value-tens .place-value-piece { width: 3.25rem; height: 2rem; background-image: repeating-linear-gradient(90deg, transparent 0, transparent calc(10% - 1px), var(--border) calc(10% - 1px), var(--border) 10%); }
-.place-value-hundreds .place-value-piece { width: 3.25rem; height: 3.25rem; background-image: repeating-linear-gradient(0deg, transparent 0, transparent calc(10% - 1px), var(--border) calc(10% - 1px), var(--border) 10%), repeating-linear-gradient(90deg, transparent 0, transparent calc(10% - 1px), var(--border) calc(10% - 1px), var(--border) 10%); }
+.base-ten-model { display: block; flex: none; height: auto; max-width: 100%; }
+.base-ten-ones { width: 1.5rem; }
+.base-ten-tens, .base-ten-hundreds, .base-ten-thousands { width: 7rem; }
+.base-ten-face rect { fill: var(--badge); stroke: var(--text); stroke-width: 0.06; }
+.base-ten-face-front rect { fill: var(--surface); }
+.base-ten-face-side rect { fill: var(--background); }
+.base-ten-block { display: grid; place-items: center; min-width: 2.75rem; min-height: 2.75rem; padding: 0.25rem; border: 1px solid var(--border); border-radius: 0.4rem; background: var(--surface); color: var(--text); }
+button.base-ten-block, .base-ten-supply { cursor: grab; touch-action: none; }
+.base-ten-block:disabled, .base-ten-supply:disabled { cursor: not-allowed; }
+.base-ten-tray { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 10rem), 1fr)); gap: 0.5rem; padding: 0.5rem; border: 2px dashed var(--border); border-radius: 0.75rem; }
+.base-ten-supply { display: grid; justify-items: center; align-content: space-between; gap: 0.5rem; min-width: 0; min-height: 2.75rem; padding: 0.65rem; border: 2px solid var(--accent); border-radius: 0.65rem; background: var(--surface); color: var(--text); font: inherit; font-weight: 700; }
+.base-ten-supply span { overflow-wrap: anywhere; }
+.block-drop-active { outline: 3px dashed var(--accent); outline-offset: -4px; }
+.base-ten-drag-ghost { position: fixed; z-index: 25; pointer-events: none; transform: translate(-50%, -50%); padding: 0.5rem; background: var(--surface); border: 2px solid var(--text); border-radius: 0.5rem; }
 .place-value-more { align-self: center; font-weight: 700; }
 .place-value-readout { padding: 0.5rem; border-inline-start: 4px solid var(--accent); background: var(--badge); color: var(--text); font-weight: 700; }
 .place-value-controls-grid { display: grid; gap: 0.75rem; }
-.place-value-controls { min-width: 0; margin: 0; padding: 0.65rem; border: 2px solid var(--border); border-radius: 0.7rem; }
-.place-value-controls legend { padding-inline: 0.35rem; font-weight: 700; }
 .place-value-control-row { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-block: 0.35rem; }
 .place-value-control-row button { min-width: 0; max-width: 100%; touch-action: manipulation; white-space: normal; overflow-wrap: anywhere; }
 .place-value-comparisons { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr)); gap: 1rem; }
@@ -544,6 +552,4 @@ footer { padding-block: 1.5rem; text-align: center; }
 @media (max-width: 30rem) {
   .place-value-workspace { gap: 0.25rem; }
   .place-value-column { padding: 0.35rem; }
-  .place-value-controls .secondary-button { flex: 1 1 9rem; }
-  .place-value-tens .place-value-piece, .place-value-hundreds .place-value-piece { width: 2.6rem; }
 }
