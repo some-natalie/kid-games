@@ -37,6 +37,7 @@ test("worked example leads to editable untimed practice with keyboard and touch 
   await expect(page.locator("#feedback")).not.toContainText(`= ${answer}`);
   await expect(page.locator("#answer")).toHaveValue(String(wrong));
   await expect(page.locator(".celebration")).toHaveCount(0);
+  await expect(page.locator("#meteor-shot")).toBeHidden();
   await expect(page.locator("#meteor-card")).toBeVisible();
   if (test.info().project.name === "touch-chromium") {
     await page.getByRole("button", { name: "Clear", exact: true }).tap();
@@ -49,12 +50,17 @@ test("worked example leads to editable untimed practice with keyboard and touch 
   await expect(page.locator("#feedback")).toContainText("Correct!");
   await expect(page.locator("#next-meteor")).toBeVisible();
   await expect(page.locator("#meteor-card")).toBeHidden();
+  await expect(page.locator("#meteor-shot")).toBeVisible();
+  await expect(page.locator("#meteor-shot")).toContainText("pew!");
+  await expect(page.locator("#meteor-shot")).toHaveAttribute("aria-hidden", "true");
+  expect(await page.locator("#meteor-shot").evaluate((shot) => shot.getAnimations().length)).toBe(0);
   await expectThemedCelebration(page, celebrations);
   await expect(page.locator("#meteor-lane .celebration")).toHaveAttribute("data-effect", "meteor-sparkles");
   expect(await page.locator(".celebration").evaluate((layer) => layer.getAnimations({ subtree: true }).length)).toBe(0);
   await audit(page);
   await page.locator("#next-meteor").click();
   await expect(page.locator(".celebration")).toHaveCount(0);
+  await expect(page.locator("#meteor-shot")).toBeHidden();
   await expect(page.locator("#wave-label")).toHaveText("Meteor 2");
 });
 
@@ -149,6 +155,40 @@ test("number controls reflow with OpenDyslexic and enlarged text", async ({ page
   }
 });
 
+for (const mode of ["practice", "gentle"]) {
+  test(`landscape ${mode} keeps the meteor visible beside scrollable answers`, async ({ page }) => {
+    await page.setViewportSize({ width: 844, height: 390 });
+    await page.emulateMedia({ reducedMotion: mode === "practice" ? "reduce" : "no-preference", colorScheme: "dark" });
+    await page.goto("/math-meteor-patrol/");
+    await page.locator("#mode").selectOption(mode);
+    await page.locator("#start-game").click();
+    const lane = page.locator("#meteor-lane");
+    const controls = await page.locator(".meteor-controls").boundingBox();
+    const laneBounds = await lane.boundingBox();
+    expect(laneBounds.x + laneBounds.width).toBeLessThan(controls.x);
+    const initialMeteor = await page.locator("#meteor-card").boundingBox();
+    expect(initialMeteor.y).toBeGreaterThanOrEqual(0);
+    expect(initialMeteor.y + initialMeteor.height).toBeLessThanOrEqual(390);
+    for (const control of ["#answer", "#number-pad button:last-child"]) {
+      await page.locator(control).focus();
+      await page.locator(control).scrollIntoViewIfNeeded();
+      for (const selector of ["#meteor-card", "#meteor-shield"]) {
+        const bounds = await page.locator(selector).boundingBox();
+        expect(bounds.y).toBeGreaterThanOrEqual(0);
+        expect(bounds.y + bounds.height).toBeLessThanOrEqual(390);
+      }
+    }
+    await audit(page);
+    await page.setViewportSize({ width: 390, height: 844 });
+    const portraitLane = await lane.boundingBox();
+    const portraitControls = await page.locator(".meteor-controls").boundingBox();
+    expect(portraitLane.y + portraitLane.height).toBeLessThanOrEqual(portraitControls.y);
+    await page.setViewportSize({ width: 844, height: 390 });
+    await page.addStyleTag({ content: ":root { font-size: 200%; }" });
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(844);
+  });
+}
+
 test("a missed timed meteor shows its equation and strategy before the next wave", async ({ page }) => {
   await page.clock.install();
   await page.goto("/math-meteor-patrol/");
@@ -160,6 +200,7 @@ test("a missed timed meteor shows its equation and strategy before the next wave
   await expect(page.locator("#feedback")).toContainText(equation.replace(" = ?", ` = ${answerFor(equation)}`));
   await expect(page.locator("#feedback")).toContainText(/count on|count back|groups/);
   await expect(page.locator(".celebration")).toHaveCount(0);
+  await expect(page.locator("#meteor-shot")).toBeHidden();
   const card = await page.locator("#meteor-card").boundingBox();
   const shield = await page.locator(".meteor-shield").boundingBox();
   expect(card.y + card.height).toBeLessThanOrEqual(shield.y + 2);
@@ -191,6 +232,16 @@ test("a falling meteor explodes into sparkles at its position and leaves a short
   await page.locator("#answer").fill(String(answerFor(equation)));
   await page.locator("#answer").press("Enter");
   await expect(page.locator("#meteor-card")).toBeHidden();
+  const shot = page.locator("#meteor-shot");
+  await expect(shot).toBeVisible();
+  expect(await shot.evaluate((node) => node.getAnimations().length)).toBeGreaterThan(0);
+  const trajectory = await shot.evaluate((node) => ({
+    start: Number.parseFloat(node.style.top),
+    travel: Number.parseFloat(node.style.getPropertyValue("--shot-travel")),
+    shield: node.parentElement.clientHeight - document.getElementById("meteor-shield").offsetHeight,
+  }));
+  expect(trajectory.start).toBe(trajectory.shield);
+  expect(Math.abs(trajectory.start + trajectory.travel - meteorTop)).toBeLessThan(2);
   await expectThemedCelebration(page, celebrations);
   const burst = page.locator("#meteor-lane .celebration-local");
   await expect(burst).toHaveAttribute("data-effect", "meteor-sparkles");
@@ -207,6 +258,7 @@ test("a falling meteor explodes into sparkles at its position and leaves a short
   await page.clock.runFor(500);
   await expect(page.locator("#wave-label")).toHaveText("Meteor 2");
   await expect(page.locator(".celebration")).toHaveCount(0);
+  await expect(shot).toBeHidden();
 });
 
 test("quiz mode hides the example, retains revisions, and grades only after submission", async ({ page }) => {
@@ -215,7 +267,7 @@ test("quiz mode hides the example, retains revisions, and grades only after subm
   await expect(page.locator(".quiz-notice")).toContainText("change your answers");
   await expect(page.locator(".math-meteor-patrol")).not.toContainText("Worked example");
   await page.getByRole("button", { name: "Start quiz" }).click();
-  await expect(page.locator("#meteor-lane, .celebration")).toHaveCount(0);
+  await expect(page.locator("#meteor-lane, #meteor-shot, .celebration")).toHaveCount(0);
   await audit(page);
   const firstEquation = await page.locator(".quiz-question-heading, #quiz-question-heading").textContent();
   const firstPrompt = await page.locator("#quiz-question-heading + p").textContent();
