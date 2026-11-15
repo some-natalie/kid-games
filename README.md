@@ -12,6 +12,11 @@ Builders visualizes hundreds, tens, ones, and regrouping. Math Meteor Patrol
 adds optional, gently timed arithmetic-fluency practice, and Clockwork Critters
 introduces reading and setting analog clocks.
 
+Clockwork Critters lets players click or tap and drag either clock hand in normal
+play and quiz mode. Hands snap to hour and five-minute positions and stay aligned
+as minutes pass. Both hands can move at every level, including whole-hour
+questions. Keyboard players can Tab to each hand and use the arrow keys.
+
 ## Quiz mode
 
 Add `?quiz=1` to the home page or any game URL to opt into quiz mode.

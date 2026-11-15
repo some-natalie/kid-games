@@ -13,10 +13,10 @@ import { mountWorkspace } from "./alphabet-groups-workspace.js";
 import { buildQuizQuestions as meteorQuestions } from "./math-meteor-patrol-engine.js";
 import { LEVELS as PLACE_LEVELS, makeQuizQuestion as placeValueQuizQuestion } from "./place-value-builders-engine.js";
 import {
-  LEVELS as CLOCK_LEVELS, advanceTime as advanceClockTime, buildRound as clockRound,
+  LEVELS as CLOCK_LEVELS, buildRound as clockRound,
   clockDescription, formatTime as formatClockTime, timeChoices as clockChoices,
 } from "./clockwork-critters-engine.js";
-import { createClockFace } from "./clockwork-critters-clock.js";
+import { CLOCK_INSTRUCTIONS, createClockFace, createInteractiveClock } from "./clockwork-critters-clock.js";
 
 const active = isQuizMode(window.location.search);
 if (active) {
@@ -170,26 +170,16 @@ function setupQuiz(game) {
       return;
     }
 
-    let time = responses[current] ?? 720;
-    update(time);
+    const time = responses[current] ?? 720;
+    const clock = createInteractiveClock(time, (value) => {
+      responses[current] = value;
+      description.textContent = clockDescription(value);
+      status.textContent = "Answer changed. You can revise it before submitting.";
+    });
+    display.append(clock.face);
+    description.textContent = clockDescription(time);
     area.append(display, element("p", "Short, broad hand: hours. Long, thin hand: minutes.", "clock-hand-key"), description);
-    const controls = element("div", undefined, "clock-controls");
-    controls.setAttribute("role", "group");
-    controls.setAttribute("aria-label", "Move the clock hands");
-    for (const [label, amount] of [
-      ["Move hour hand back one hour", -60],
-      ["Move hour hand forward one hour", 60],
-      [`Move minute hand back ${question.interval} minutes`, -question.interval],
-      [`Move minute hand forward ${question.interval} minutes`, question.interval],
-    ]) {
-      controls.append(button(label, () => {
-        time = advanceClockTime(time, amount);
-        responses[current] = time;
-        update(time);
-        status.textContent = "Answer changed. You can revise it before submitting.";
-      }));
-    }
-    area.append(controls);
+    area.append(element("p", CLOCK_INSTRUCTIONS, "clock-controls"));
   }
 
   function showStart() {

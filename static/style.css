@@ -137,19 +137,26 @@ button:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
 .clock-example { max-width: 24rem; margin: 1.5rem auto; padding: 1rem; border: 2px solid var(--border); border-radius: 0.75rem; background: var(--background); }
 .clock-display { display: grid; place-items: center; width: min(100%, 18rem); margin: 0.75rem auto; }
 .clock-face { display: block; width: 100%; height: auto; overflow: visible; }
+.clock-interactive { touch-action: none; }
 .clock-dial { fill: var(--surface); stroke: var(--text); stroke-width: 2.5; }
 .clock-number { fill: var(--text); font-family: inherit; font-size: 0.65rem; font-weight: 700; text-anchor: middle; }
 .clock-hand-hour { fill: var(--text); }
 .clock-hand-minute { stroke: var(--accent); stroke-width: 3.5; stroke-linecap: round; }
+.clock-hand-control { cursor: grab; touch-action: none; }
+.clock-hand-hit { stroke: transparent; stroke-width: 44; stroke-linecap: round; pointer-events: stroke; vector-effect: non-scaling-stroke; }
+.clock-hand-control:focus-visible .clock-hand-hit { stroke: var(--accent); stroke-opacity: 0.25; }
+.clock-hand-control:focus-visible { outline: 3px solid var(--text); outline-offset: 3px; }
+.clock-hand-control.is-dragging { cursor: grabbing; }
+.clock-hand-control[aria-disabled="true"] { cursor: default; }
 .clock-pivot { fill: var(--accent); }
 .clock-description, .clock-hand-key { text-align: center; }
 .clock-hand-key { font-size: 0.9rem; }
 .clock-progression { display: inline-block; text-align: left; }
 .clock-modes { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-block: 0.75rem; }
 .clock-modes [aria-pressed="true"] { border-width: 4px; background: var(--badge); }
-.clock-controls, .clock-choices { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr)); gap: 0.5rem; margin-block: 0.75rem; }
-.clock-choices { grid-template-columns: repeat(auto-fit, minmax(min(100%, 7rem), 1fr)); }
-.clock-controls button, .clock-choices button { min-height: 2.75rem; touch-action: manipulation; }
+.clock-controls { text-align: center; margin-block: 0.75rem; }
+.clock-choices { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 7rem), 1fr)); gap: 0.5rem; margin-block: 0.75rem; }
+.clock-choices button { min-height: 2.75rem; touch-action: manipulation; }
 @media (max-width: 30rem) {
   .answer-list li { padding-right: 0.15rem; }
   .word-move-controls { position: static; transform: none; flex-wrap: wrap; margin-top: 0.25rem; }
