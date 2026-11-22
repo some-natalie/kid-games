@@ -467,9 +467,7 @@ footer { padding-block: 1.5rem; text-align: center; }
 .timer-panel progress { display: block; width: 100%; height: 1rem; margin-block: 0.4rem; accent-color: var(--accent); }
 .countdown { margin-block: 0.25rem; text-align: right; font-weight: 700; color: var(--text); }
 .meteor-lane { position: relative; height: 18rem; margin-block: 0.75rem; overflow: hidden; border: 2px solid var(--border); border-radius: 1rem; background: var(--badge); }
-.meteor-card { position: absolute; top: 50%; left: 50%; display: flex; align-items: center; gap: 0.5rem; min-width: 0; max-width: 70%; padding: 0.55rem 0.75rem; border: 2px solid var(--accent); border-radius: 1rem; background: var(--surface); color: var(--text); font-weight: 700; transform: translate(-50%, -50%); }
-.meteor-card > span:first-child { font-size: 1.5rem; }
-.meteor-card-label { min-width: 0; overflow-wrap: anywhere; }
+.meteor-card { position: absolute; top: 50%; left: 50%; font-size: 3.5rem; line-height: 1; transform: translate(-50%, -50%); }
 .meteor-shield { position: absolute; bottom: 0; left: 50%; font-size: 2.25rem; transform: translateX(-50%); }
 .meteor-controls { min-width: 0; }
 .meteor-shot { position: absolute; left: 50%; z-index: 2; margin: 0; color: var(--text); background: var(--surface); font: bold 1rem/1 monospace; white-space: pre; pointer-events: none; transform: translate(-50%, var(--shot-travel)); animation: meteor-pew 0.5s ease-out; }

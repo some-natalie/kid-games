@@ -39,6 +39,10 @@ test("worked example leads to editable untimed practice with keyboard and touch 
   await expect(page.locator(".celebration")).toHaveCount(0);
   await expect(page.locator("#meteor-shot")).toBeHidden();
   await expect(page.locator("#meteor-card")).toBeVisible();
+  await expect(page.locator("#meteor-card")).toHaveText("☄️");
+  const meteorSize = await page.locator("#meteor-card").boundingBox();
+  const shieldSize = await page.locator("#meteor-shield").boundingBox();
+  expect(meteorSize.width).toBeGreaterThan(shieldSize.width);
   if (test.info().project.name === "touch-chromium") {
     await page.getByRole("button", { name: "Clear", exact: true }).tap();
     for (const digit of String(answer)) await page.getByRole("button", { name: digit, exact: true }).tap();
