@@ -43,6 +43,8 @@ test("worked example leads to editable untimed practice with keyboard and touch 
   const meteorSize = await page.locator("#meteor-card").boundingBox();
   const shieldSize = await page.locator("#meteor-shield").boundingBox();
   expect(meteorSize.width).toBeGreaterThan(shieldSize.width);
+  expect(await page.locator("#meteor-card > span").evaluate((meteor) => getComputedStyle(meteor).transform))
+    .toBe("matrix(-1, 0, 0, -1, 0, 0)");
   if (test.info().project.name === "touch-chromium") {
     await page.getByRole("button", { name: "Clear", exact: true }).tap();
     for (const digit of String(answer)) await page.getByRole("button", { name: digit, exact: true }).tap();
