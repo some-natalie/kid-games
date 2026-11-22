@@ -162,6 +162,16 @@ test("equivalent fractions share one point and ordering uses keyboard controls",
   await expect(page.locator("#feedback")).toContainText("5/8 (five eighths) is greater");
 });
 
+test("comparison levels let Tilly move along a labelled bridge without answering", async ({ page }) => {
+  await start(page, 6);
+  await expect(page.locator(".bridge-label")).toHaveCount(9);
+  await tapBridge(page, 5 / 8);
+  await expectTillyAt(page, 5 / 8);
+  await expect(page.locator(".bridge-summary")).toContainText("Tilly is at 5/8 (five eighths)");
+  await expect(page.locator("#feedback")).toHaveText("");
+  await expect(page.locator("#next-level")).toBeHidden();
+});
+
 test("the optional hint restores hidden partitions and keeps storage failures visible", async ({ page }) => {
   await start(page, 7);
   await expect(page.locator(".bridge-tick")).toHaveCount(2);
