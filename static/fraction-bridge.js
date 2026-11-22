@@ -148,8 +148,16 @@ if (!isQuizMode(window.location.search)) {
       });
       group.append(choice);
     });
-    bridge = createBridgeLine({ intervals: level.intervals, guides: false, interactive: false });
-    challengeArea.append(title, bridge.element, group);
+    bridge = createBridgeLine({
+      intervals: level.intervals,
+      guides: true,
+      keyboardHelp: "Use the arrow keys to move Tilly along the bridge and compare the two fractions.",
+      onMove: () => { feedback.textContent = ""; },
+    });
+    const tip = document.createElement("p");
+    tip.className = "level-tip";
+    tip.textContent = "Drag Tilly to each fraction to compare how far it is from 0, then choose the greater one.";
+    challengeArea.append(title, tip, bridge.element, group);
   }
 
   function showHint(level) {
@@ -163,7 +171,7 @@ if (!isQuizMode(window.location.search)) {
           ? "The whole bridge stays the same length. The fraction farther from 0 is greater."
           : `The denominator in ${level.fractions.join(" and ")} tells how many equal intervals make 1 whole. Count intervals from 0; the denominator is not the number of tick marks. The numerator tells how many intervals to count.`;
     }
-    bridge?.setGuides(level.guide || hintShown);
+    bridge?.setGuides(level.guide || level.mode === "compare" || hintShown);
   }
 
   function finishLevel(message) {
